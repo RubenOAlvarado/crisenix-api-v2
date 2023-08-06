@@ -1,0 +1,7 @@
+export enum SalesStatus {
+  RESERVED = 'RESERVADA',
+  PAID = 'PAGADA',
+  CHECKED = 'COMPROBADA',
+  CANCELED = 'CANCELADA',
+  DECLINED = 'RECHAZADA',
+}
