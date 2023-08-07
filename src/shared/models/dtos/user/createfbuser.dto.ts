@@ -6,7 +6,6 @@ import {
   IsPhoneNumber,
   MaxLength,
   IsString,
-  IsAlphanumeric,
   IsUrl,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -37,7 +36,6 @@ export class CreateFbUserDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @IsAlphanumeric()
   @MaxLength(150)
   displayName: string;
 

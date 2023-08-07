@@ -21,6 +21,7 @@ import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
 import { FbUser } from 'src/shared/interfaces/fbUser.interface';
 import { Status } from 'src/shared/enums/status.enum';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UserService {
@@ -28,6 +29,7 @@ export class UserService {
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
     private logService: EventlogService,
+    private roleService: RolesService,
   ) {}
 
   private readonly logger = new Logger(UserService.name);
@@ -58,14 +60,20 @@ export class UserService {
   //Database methods
   async createDbUser(
     createUserDTO: CreateUserDTO,
-    role: string,
+    roleId: string,
   ): Promise<User> {
     try {
       this.logger.debug('Creating new user profile');
       const dbUser = new this.userModel(createUserDTO);
-      const { firebaseUid } = createUserDTO;
-      await this.addClaimsToUser(firebaseUid);
-      await this.setLogDto(dbUser._id.toString(), MOVES.CREATE, dbUser, role);
+      const { firebaseUid, role } = createUserDTO;
+      const { description } = await this.roleService.getRoleById({
+        id: role,
+      });
+
+      if (!description) throw new BadRequestException('Role not found');
+
+      await this.addClaimsToUser(firebaseUid, description);
+      await this.setLogDto(dbUser._id.toString(), MOVES.CREATE, dbUser, roleId);
       return dbUser.save();
     } catch (e) {
       this.logger.error(`Error creating user profile: ${e}`);
@@ -76,7 +84,10 @@ export class UserService {
   async getDbUserById({ id }: UrlValidator): Promise<User> {
     try {
       this.logger.debug('Looking user profile');
-      const dbUSer = await this.userModel.findById(id).exec();
+      const dbUSer = await this.userModel
+        .findById(id)
+        .select({ __v: 0, createdAt: 0 })
+        .exec();
       return dbUSer;
     } catch (e) {
       this.logger.error(`Error looking user profile: ${e}`);
@@ -87,7 +98,10 @@ export class UserService {
   async getDbUserByFbUid(firebaseUid: string): Promise<User> {
     try {
       this.logger.debug('Looking user profile by his firebaseid');
-      const user = await this.userModel.findOne({ firebaseUid }).exec();
+      const user = await this.userModel
+        .findOne({ firebaseUid })
+        .select({ __v: 0, createdAt: 0 })
+        .exec();
       return user;
     } catch (e) {
       this.logger.error(`Error looking user profile by firebaseid: ${e}`);
@@ -248,7 +262,7 @@ export class UserService {
 
   async addClaimsToUser(
     uid: string,
-    role: UserRoles = UserRoles.CONSULTA,
+    role: string = UserRoles.CONSULTA,
   ): Promise<void> {
     try {
       this.logger.debug('Adding claims to user');

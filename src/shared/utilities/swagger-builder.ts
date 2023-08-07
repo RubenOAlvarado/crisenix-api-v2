@@ -9,6 +9,7 @@ import {
 } from 'src/configs/open-api.config';
 import { UserModule } from 'src/user/user.module';
 import { Config } from '../interfaces/config.interface';
+import { RolesModule } from 'src/roles/roles.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -27,7 +28,7 @@ export const buildSwaggerModule = async (
     .build();
 
   const document = SwaggerModule.createDocument(scopedApplicationCore, config, {
-    include: [UserModule],
+    include: [UserModule, RolesModule],
   });
 
   return document;
