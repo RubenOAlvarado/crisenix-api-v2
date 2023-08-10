@@ -1,9 +1,19 @@
 import { Module } from '@nestjs/common';
-import { OrigincityService } from './origincity.service';
-import { OrigincityController } from './origincity.controller';
+import { OriginCityController } from './origincity.controller';
+import { OriginCityService } from './origincity.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import {
+  OriginCity,
+  OriginCitySchema,
+} from 'src/shared/models/schemas/origincity.schema';
 
 @Module({
-  controllers: [OrigincityController],
-  providers: [OrigincityService],
+  imports: [
+    MongooseModule.forFeature([
+      { name: OriginCity.name, schema: OriginCitySchema },
+    ]),
+  ],
+  controllers: [OriginCityController],
+  providers: [OriginCityService],
 })
 export class OrigincityModule {}

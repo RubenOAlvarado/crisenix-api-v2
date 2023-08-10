@@ -1,45 +1,87 @@
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { OriginCityService } from './origincity.service';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
-import { OrigincityService } from './origincity.service';
-import { CreateOrigincityDto } from './dto/create-origincity.dto';
-import { UpdateOrigincityDto } from './dto/update-origincity.dto';
+import { CreateOriginCityDTO } from 'src/shared/models/dtos/originCity/createorigincity.dto';
+import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
+import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { QueryDTO } from 'src/shared/dtos/query.dto';
+import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
+import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateorigincity.dto';
+import { SearcherDTO } from 'src/shared/dtos/searcher.dto';
 
 @Controller('origincity')
-export class OrigincityController {
-  constructor(private readonly origincityService: OrigincityService) {}
+@ApiTags('Origin City')
+export class OriginCityController {
+  constructor(private readonly originCityService: OriginCityService) {}
 
-  @Post()
-  create(@Body() createOrigincityDto: CreateOrigincityDto) {
-    return this.origincityService.create(createOrigincityDto);
+  @ApiResponse({ status: HttpStatus.CREATED })
+  @Post('create')
+  async create(
+    @Body() createOriginCityDTO: CreateOriginCityDTO,
+  ): Promise<OriginCity> {
+    return this.originCityService.create(createOriginCityDTO);
   }
 
-  @Get()
-  findAll() {
-    return this.origincityService.findAll();
-  }
-
+  @ApiResponse({ status: HttpStatus.OK })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.origincityService.findOne(+id);
+  async findOne(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
+    return this.originCityService.findOne(urlValidator);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateOrigincityDto: UpdateOrigincityDto,
-  ) {
-    return this.origincityService.update(+id, updateOrigincityDto);
+  @ApiResponse({ status: HttpStatus.OK })
+  @Get()
+  async findAll(
+    @Query() queryDTO: QueryDTO,
+  ): Promise<PaginateResult<OriginCity> | Array<OriginCity>> {
+    return this.originCityService.findAll(queryDTO);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.origincityService.remove(+id);
+  @Put(':id')
+  async update(
+    @Param() urlValidator: UrlValidator,
+    @Body() updateOriginCityDTO: UpdateOriginCityDTO,
+  ): Promise<OriginCity> {
+    return this.originCityService.update(urlValidator, updateOriginCityDTO);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK })
+  @Delete('delete/:id')
+  async delete(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
+    return this.originCityService.delete(urlValidator);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK })
+  @Patch('reactivate/:id')
+  async reactivate(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
+    return this.originCityService.reactivate(urlValidator);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK })
+  @Post('search')
+  async search(@Body() searcherDTO: SearcherDTO): Promise<Array<OriginCity>> {
+    return this.originCityService.searcher(searcherDTO);
+  }
+
+  @ApiResponse({ status: HttpStatus.OK })
+  @Patch('addpoints/:id')
+  async addPoints(
+    @Param() urlValidator: UrlValidator,
+    @Body() updateOriginCityDTO: UpdateOriginCityDTO,
+  ): Promise<OriginCity> {
+    return this.originCityService.addAboardPoints(
+      urlValidator,
+      updateOriginCityDTO,
+    );
   }
 }
