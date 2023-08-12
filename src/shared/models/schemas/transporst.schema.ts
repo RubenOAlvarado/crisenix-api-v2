@@ -18,7 +18,13 @@ export class Transports {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(name: string, translationType: TranslationType, status: string) {
+    this.name = name;
+    this.translationType = translationType;
+    this.status = status;
+  }
 }
 
 export type TransportsDocument = HydratedDocument<Transports>;

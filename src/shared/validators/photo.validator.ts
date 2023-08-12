@@ -13,4 +13,9 @@ export class PhotoValidator {
   @IsString()
   @IsMongoId({ message: 'It must be an id' })
   destination: string;
+
+  constructor(photo: string, destination: string) {
+    this.photo = photo;
+    this.destination = destination;
+  }
 }

@@ -33,4 +33,9 @@ export class CreateOriginCityDTO {
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(state: string, name: string) {
+    this.state = state;
+    this.name = name;
+  }
 }

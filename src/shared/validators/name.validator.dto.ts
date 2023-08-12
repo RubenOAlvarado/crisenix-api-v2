@@ -9,4 +9,8 @@ export class NameValidator {
   @IsString()
   @MaxLength(80)
   name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
 }

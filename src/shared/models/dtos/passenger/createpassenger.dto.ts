@@ -63,4 +63,20 @@ export class CreatePassengerDTO {
   @IsString()
   @MaxLength(15)
   seat?: string;
+
+  constructor(
+    name: string,
+    lastName: string,
+    originCity: string,
+    aboardPoint: string,
+    price: string,
+    room: string,
+  ) {
+    this.name = name;
+    this.lastName = lastName;
+    this.originCity = originCity;
+    this.aboardPoint = aboardPoint;
+    this.price = price;
+    this.room = room;
+  }
 }

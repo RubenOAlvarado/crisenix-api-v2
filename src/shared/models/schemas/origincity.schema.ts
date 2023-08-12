@@ -13,15 +13,20 @@ export class OriginCity {
   // ref: 'AboardPoint'
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AboardPoint' }],
-    required: true,
   })
-  aboardPoints: Array<AboardPoint>;
+  aboardPoints?: Array<AboardPoint>;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], required: true, index: true })
+  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
-  @Prop({ required: true, index: true })
-  createdAt: Date;
+  @Prop({ default: Date.now })
+  createdAt?: Date;
+
+  constructor(state: string, name: string, status: string) {
+    this.state = state;
+    this.name = name;
+    this.status = status;
+  }
 }
 
 export type OriginCityDocument = HydratedDocument<OriginCity>;

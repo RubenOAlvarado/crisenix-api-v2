@@ -7,13 +7,19 @@ export class TourType {
   name: string;
 
   @Prop()
-  description: string;
+  description?: string;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(name: string, description: string, status: string) {
+    this.name = name;
+    this.description = description;
+    this.status = status;
+  }
 }
 
 export type TourTypeDocument = HydratedDocument<TourType>;

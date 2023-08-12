@@ -21,4 +21,10 @@ export class PaypalResponse {
   @ApiProperty({ enum: FailureReason })
   @IsNotEmpty()
   failureReason: FailureReason;
+
+  constructor(sale: string, state: State, failureReason: FailureReason) {
+    this.sale = sale;
+    this.state = state;
+    this.failureReason = failureReason;
+  }
 }

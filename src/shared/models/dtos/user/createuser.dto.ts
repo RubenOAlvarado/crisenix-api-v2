@@ -12,11 +12,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateUserDTO {
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  firebaseUid?: string;
+  firebaseUid: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -59,4 +58,16 @@ export class CreateUserDTO {
   @IsOptional()
   @IsMongoId()
   role?: string;
+
+  constructor(
+    firebaseUid: string,
+    name: string,
+    lastName: string,
+    fbregistered: boolean,
+  ) {
+    this.firebaseUid = firebaseUid;
+    this.name = name;
+    this.lastName = lastName;
+    this.fbregistered = fbregistered;
+  }
 }

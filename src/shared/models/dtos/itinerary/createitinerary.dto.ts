@@ -6,6 +6,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Status } from '@/shared/enums/status.enum';
 
 export class CreateItineraryDTO {
   @ApiProperty()
@@ -19,8 +20,12 @@ export class CreateItineraryDTO {
   @IsMongoId()
   clasification?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: Status })
   @IsOptional()
   @IsString()
-  status?: string;
+  status?: Status;
+
+  constructor(activity: string) {
+    this.activity = activity;
+  }
 }

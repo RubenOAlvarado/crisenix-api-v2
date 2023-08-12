@@ -9,4 +9,8 @@ export class CodeValidator {
   @IsString()
   @MaxLength(15)
   code: string;
+
+  constructor(code: string) {
+    this.code = code;
+  }
 }

@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFilerDto } from './dto/create-filer.dto';
-import { UpdateFilerDto } from './dto/update-filer.dto';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import * as XLSX from 'xlsx';
+const {
+  readFile,
+  utils: { sheet_to_json },
+} = XLSX;
 
 @Injectable()
 export class FilerService {
-  create(createFilerDto: CreateFilerDto) {
-    return 'This action adds a new filer';
-  }
+  private readonly logger = new Logger(FilerService.name);
 
-  findAll() {
-    return `This action returns all filer`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} filer`;
-  }
-
-  update(id: number, updateFilerDto: UpdateFilerDto) {
-    return `This action updates a #${id} filer`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} filer`;
+  excelToJson<T>(filePath: string): T[] {
+    try {
+      this.logger.log(`readExcelFile`);
+      const workbook: XLSX.WorkBook = readFile(filePath);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+    } catch (error) {
+      this.logger.error(`Error converting excel to json: ${error}`);
+      throw new InternalServerErrorException('Error converting excel to json');
+    }
   }
 }

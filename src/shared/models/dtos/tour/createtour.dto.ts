@@ -144,4 +144,22 @@ export class CreateTourDTO {
   @IsOptional()
   @IsMongoId({ each: true })
   price?: Array<string>;
+
+  constructor(
+    destination: string,
+    code: string,
+    seating: number,
+    initDate: Date,
+    transport: string,
+    returnDate: Date,
+    tourType: string,
+  ) {
+    this.destination = destination;
+    this.code = code;
+    this.seating = seating;
+    this.initDate = initDate;
+    this.transport = transport;
+    this.returnDate = returnDate;
+    this.tourType = tourType;
+  }
 }

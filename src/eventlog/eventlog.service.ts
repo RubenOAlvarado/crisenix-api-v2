@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { EventLog } from 'src/shared/models/schemas/eventlog.schema';
 import { CreateEventLogDTO } from 'src/shared/models/dtos/eventlog/eventlog.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { SearchLogDTO } from 'src/shared/models/dtos/eventlog/searchlog.dto';
 
 @Injectable()
 export class EventlogService {
@@ -30,7 +29,7 @@ export class EventlogService {
     }
   }
 
-  async getLog({ id }: UrlValidator): Promise<EventLog> {
+  async getLog({ id }: UrlValidator): Promise<EventLog | null> {
     try {
       this.logger.debug('Looking for eventlog');
       const log = await this.eventLogModel.findById(id).exec();
@@ -107,8 +106,11 @@ export class EventlogService {
     }
   }
 
-  async searchLog(searchLogDTO: SearchLogDTO): Promise<Array<EventLog>> {
-    let logs = [];
+  // TODO: improve searchLog method
+  /* async searchLog(
+    searchLogDTO: SearchLogDTO,
+  ): Promise<Array<EventLog> | undefined> {
+    let logs: EventLog[] = [] as EventLog[];
     try {
       for (const [key, value] of Object.entries(searchLogDTO)) {
         if (value !== undefined && value !== null) {
@@ -140,5 +142,5 @@ export class EventlogService {
     } catch (e) {
       this.logger.error(`Error searching logs: ${e}`);
     }
-  }
+  } */
 }

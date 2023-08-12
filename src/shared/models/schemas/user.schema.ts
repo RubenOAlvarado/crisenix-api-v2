@@ -13,22 +13,34 @@ export class User {
   lastName: string;
 
   @Prop()
-  secondLast: string;
+  secondLast?: string;
 
   @Prop()
-  phone: string;
+  phone?: string;
 
-  @Prop({ default: 'Activo' })
+  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Prop()
-  deletedAt: Date;
+  deletedAt?: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Roles' })
-  role: string;
+  role?: string;
+
+  constructor(
+    firebaseUid: string,
+    name: string,
+    lastName: string,
+    status: string,
+  ) {
+    this.firebaseUid = firebaseUid;
+    this.name = name;
+    this.lastName = lastName;
+    this.status = status;
+  }
 }
 
 export type UserDocument = HydratedDocument<User>;

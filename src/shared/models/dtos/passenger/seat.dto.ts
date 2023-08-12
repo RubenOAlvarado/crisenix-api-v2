@@ -1,11 +1,4 @@
-import {
-  IsAlphanumeric,
-  IsMongoId,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AssignSeatDTO {
@@ -22,4 +15,9 @@ export class AssignSeatDTO {
   })
   @IsString()
   seatNumber: string;
+
+  constructor(id: string, seatNumber: string) {
+    this.id = id;
+    this.seatNumber = seatNumber;
+  }
 }

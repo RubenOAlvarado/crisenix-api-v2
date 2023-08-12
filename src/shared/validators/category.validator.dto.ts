@@ -7,4 +7,8 @@ export class CategoryValidator {
   @IsString()
   @MaxLength(30)
   category: string;
+
+  constructor(category: string) {
+    this.category = category;
+  }
 }

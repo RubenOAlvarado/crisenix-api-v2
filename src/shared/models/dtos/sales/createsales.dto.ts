@@ -96,4 +96,22 @@ export class CreateSaleDTO {
   @IsOptional()
   @IsMongoId()
   user?: string;
+
+  constructor(
+    tour: string,
+    clientName: string,
+    clientLastName: string,
+    email: string,
+    reservedSeat: number,
+    reservationDate: Date,
+    payDate: Date,
+  ) {
+    this.tour = tour;
+    this.clientName = clientName;
+    this.clientLastName = clientLastName;
+    this.email = email;
+    this.reservedSeat = reservedSeat;
+    this.reservationDate = reservationDate;
+    this.payDate = payDate;
+  }
 }

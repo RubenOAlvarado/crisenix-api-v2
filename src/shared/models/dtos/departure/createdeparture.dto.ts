@@ -42,4 +42,22 @@ export class CreateDepartureDTO {
   @IsNotEmpty()
   @IsDateString()
   date: Date;
+
+  constructor(
+    terminal: string,
+    aeroline: string,
+    route: string,
+    gate: string,
+    flight: string,
+    hour: string,
+    date: Date,
+  ) {
+    this.terminal = terminal;
+    this.aeroline = aeroline;
+    this.route = route;
+    this.gate = gate;
+    this.flight = flight;
+    this.hour = hour;
+    this.date = date;
+  }
 }

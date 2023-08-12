@@ -5,4 +5,8 @@ export class DescriptionDTO {
   @ApiProperty()
   @IsNotEmpty()
   description: string;
+
+  constructor(description: string) {
+    this.description = description;
+  }
 }

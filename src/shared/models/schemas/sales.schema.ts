@@ -28,13 +28,13 @@ export class Sales {
   clientLastName: string;
 
   @Prop()
-  clientMotherLastName: string;
+  clientMotherLastName?: string;
 
   @Prop()
-  email: string;
+  email?: string;
 
   @Prop()
-  oficialId: string;
+  oficialId?: string;
 
   @Prop({ required: true })
   reservedSeat: number;
@@ -43,22 +43,42 @@ export class Sales {
   reservationDate: Date;
 
   @Prop()
-  payLimitDate: Date;
+  payLimitDate?: Date;
 
   @Prop()
-  totalPayedMount: number;
+  totalPayedMount?: number;
 
   @Prop()
-  payDate: Date;
+  payDate?: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Saler' })
-  saler: Saler;
+  saler?: Saler;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }] })
-  passenger: Array<Passenger>;
+  passenger?: Array<Passenger>;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    tour: Tour,
+    user: string,
+    status: string,
+    origin: string,
+    clientName: string,
+    clientLastName: string,
+    reservedSeat: number,
+    reservationDate: Date,
+  ) {
+    this.tour = tour;
+    this.user = user;
+    this.status = status;
+    this.origin = origin;
+    this.clientName = clientName;
+    this.clientLastName = clientLastName;
+    this.reservedSeat = reservedSeat;
+    this.reservationDate = reservationDate;
+  }
 }
 
 export type SalesDocument = HydratedDocument<Sales>;

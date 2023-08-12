@@ -19,4 +19,8 @@ export class CreateCategoryDTO {
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(label: string) {
+    this.label = label;
+  }
 }

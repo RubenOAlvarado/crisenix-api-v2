@@ -26,4 +26,18 @@ export class CreateEventLogDTO {
   @IsNotEmpty()
   @IsObject()
   registry: any;
+
+  constructor(
+    serviceId: string,
+    service: string,
+    move: string,
+    user: string,
+    registry: any,
+  ) {
+    this.serviceId = serviceId;
+    this.service = service;
+    this.move = move;
+    this.user = user;
+    this.registry = registry;
+  }
 }

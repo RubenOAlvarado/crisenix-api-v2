@@ -32,6 +32,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { firebaseProvider } from './shared/providers/firebase.provider';
 import configuration from './configs/configuration';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import configuration from './configs/configuration';
       }),
       inject: [ConfigService],
     }),
+    MulterModule.register(),
     AuthModule,
     AboardpointModule,
     CaptionsModule,

@@ -12,4 +12,9 @@ export class AboardHourDTO {
   @IsString()
   @IsMongoId()
   aboardPoint: string;
+
+  constructor(hour: string, aboardPoint: string) {
+    this.hour = hour;
+    this.aboardPoint = aboardPoint;
+  }
 }

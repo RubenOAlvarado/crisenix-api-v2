@@ -18,7 +18,13 @@ export class Itinerary {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(activity: string, clasification: Clasification, status: string) {
+    this.activity = activity;
+    this.clasification = clasification;
+    this.status = status;
+  }
 }
 
 export type ItineraryDocument = HydratedDocument<Itinerary>;

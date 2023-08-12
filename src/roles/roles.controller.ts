@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Res,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
@@ -26,42 +25,29 @@ export class RolesController {
 
   @ApiResponse({ status: HttpStatus.CREATED })
   @Post('create')
-  async createRole(@Body() createRoleDTO: CreateCatalogDTO, @Res() res) {
-    const newRole = await this.rolesService.createRole(createRoleDTO);
-
-    return res.status(HttpStatus.CREATED).json({
-      status: HttpStatus.CREATED,
-      message: 'Role created',
-      data: newRole,
-    });
+  async createRole(@Body() createRoleDTO: CreateCatalogDTO) {
+    return await this.rolesService.createRole(createRoleDTO);
   }
 
   @ApiResponse({ status: HttpStatus.OK })
   @Get()
-  async getAllRoles(@Res() res, @Query() query?: StatusDTO) {
+  async getAllRoles(@Query() query: StatusDTO) {
     const roles = await this.rolesService.getRoles(query);
 
     if (!roles) throw new NotFoundException('No Roles registered');
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      data: roles,
-    });
+    return roles;
   }
 
   @ApiResponse({ status: HttpStatus.OK })
   @Get(':id')
-  async findRole(@Res() res, @Param() params: UrlValidator) {
+  async findRole(@Param() params: UrlValidator) {
     const role = await this.rolesService.getRoleById(params);
 
     if (!role)
       throw new NotFoundException(`Role with id: ${params.id} doesn't exist`);
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `Role with id: ${params.id} found`,
-      data: role,
-    });
+    return role;
   }
 
   @ApiResponse({ status: HttpStatus.OK })
@@ -69,40 +55,27 @@ export class RolesController {
   async updateRole(
     @Body() updateRoleDTO: UpdateCatalogDTO,
     @Param() params: UrlValidator,
-    @Res() res,
   ) {
     const updatedRole = await this.rolesService.updateRole(
       updateRoleDTO,
       params,
     );
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `Role ${updatedRole.description} updated`,
-      data: updatedRole,
-    });
+    return updatedRole;
   }
 
   @ApiResponse({ status: HttpStatus.OK })
   @Delete(':id')
-  async inactiveRole(@Res() res, @Param() params: UrlValidator) {
+  async inactiveRole(@Param() params: UrlValidator) {
     await this.rolesService.inactivateRole(params);
-
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `Role with id: ${params.id} was inactivated`,
-    });
   }
 
   @ApiResponse({ status: HttpStatus.OK })
   @Patch('reactivate/:id')
-  async reactivateRole(@Res() res, @Param() params: UrlValidator) {
+  async reactivateRole(@Param() params: UrlValidator) {
     const reactivatedRole = await this.rolesService.reactiveRole(params);
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      reactivatedRole,
-    });
+    return reactivatedRole;
   }
 
   /* @ApiResponse({ status: 201 })

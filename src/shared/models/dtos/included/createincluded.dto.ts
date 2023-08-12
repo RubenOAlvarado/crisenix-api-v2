@@ -73,7 +73,7 @@ export class CreateIncludedDTO {
   @ValidateIf((o) => o.entry === Entry.HOSPEDAJE)
   @IsOptional()
   @IsNotEmpty()
-  @IsPhoneNumber(null)
+  @IsPhoneNumber()
   @MaxLength(15)
   phone?: string;
 
@@ -154,4 +154,16 @@ export class CreateIncludedDTO {
   @IsNumber()
   @MaxLength(6)
   inapam?: number;
+
+  constructor(
+    concept: string,
+    included: string,
+    publish: string,
+    entry: Entry,
+  ) {
+    this.concept = concept;
+    this.included = included;
+    this.publish = publish;
+    this.entry = entry;
+  }
 }

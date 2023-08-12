@@ -36,4 +36,10 @@ export class CreateCommissionDTO {
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(salerType: string, tourType: string, amount: number) {
+    this.salerType = salerType;
+    this.tourType = tourType;
+    this.amount = amount;
+  }
 }

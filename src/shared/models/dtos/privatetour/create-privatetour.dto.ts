@@ -66,4 +66,26 @@ export class CreatePrivatetourDto {
   @IsString()
   @MaxLength(1000)
   tourDescription: string;
+
+  constructor(
+    name: string,
+    phone: string,
+    email: string,
+    destination: string,
+    origin: string,
+    initDate: string,
+    returnDate: string,
+    adults: number,
+    tourDescription: string,
+  ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.destination = destination;
+    this.origin = origin;
+    this.initDate = initDate;
+    this.returnDate = returnDate;
+    this.adults = adults;
+    this.tourDescription = tourDescription;
+  }
 }

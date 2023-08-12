@@ -8,4 +8,8 @@ export class TourByMonth {
   @IsNotEmpty()
   @IsString()
   dateToLook: string;
+
+  constructor(dateToLook: string) {
+    this.dateToLook = dateToLook;
+  }
 }

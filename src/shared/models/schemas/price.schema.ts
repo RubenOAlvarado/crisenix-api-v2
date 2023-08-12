@@ -16,31 +16,55 @@ export class Price {
   currency: string;
 
   @Prop()
-  general: number;
+  general?: number;
 
   @Prop()
-  singleBase: number;
+  singleBase?: number;
 
   @Prop()
-  doubleBase: number;
+  doubleBase?: number;
 
   @Prop()
-  tripleBase: number;
+  tripleBase?: number;
 
   @Prop()
-  quadrupleBase: number;
+  quadrupleBase?: number;
 
   @Prop()
-  minor: number;
+  minor?: number;
 
   @Prop()
-  inapam: number;
+  inapam?: number;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    city: OriginCity,
+    currency: string,
+    general: number,
+    singleBase: number,
+    doubleBase: number,
+    tripleBase: number,
+    quadrupleBase: number,
+    minor: number,
+    inapam: number,
+    status: string,
+  ) {
+    this.city = city;
+    this.currency = currency;
+    this.general = general;
+    this.singleBase = singleBase;
+    this.doubleBase = doubleBase;
+    this.tripleBase = tripleBase;
+    this.quadrupleBase = quadrupleBase;
+    this.minor = minor;
+    this.inapam = inapam;
+    this.status = status;
+  }
 }
 
 export type PriceDocument = HydratedDocument<Price>;

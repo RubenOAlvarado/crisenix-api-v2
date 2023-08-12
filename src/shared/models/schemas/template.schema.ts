@@ -13,7 +13,13 @@ export class Template {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(name: string, description: string, status: string) {
+    this.name = name;
+    this.description = description;
+    this.status = status;
+  }
 }
 
 export type TemplateDocument = HydratedDocument<Template>;

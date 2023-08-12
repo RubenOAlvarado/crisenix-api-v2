@@ -1,6 +1,5 @@
 import {
   Controller,
-  Res,
   HttpStatus,
   Post,
   Get,
@@ -24,38 +23,30 @@ import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @ApiResponse({ status: 201 })
+  @ApiResponse({ status: HttpStatus.CREATED })
   @Post('create')
-  async createWebUser(@Res() res, @Body() webUserDTO: WebUserDTO) {
+  async createWebUser(@Body() webUserDTO: WebUserDTO) {
     const newWebUser = await this.userService.createWebUser(
       webUserDTO,
       'develop',
     );
 
-    return res.status(HttpStatus.CREATED).json({
-      status: HttpStatus.CREATED,
-      message: 'User created',
-      data: newWebUser,
-    });
+    return newWebUser;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Get('all')
-  async getUsers(@Res() res) {
+  async getUsers() {
     const users = await this.userService.getDbUsers();
 
     if (!users) throw new NotFoundException('No users found!');
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      data: users,
-    });
+    return users;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Put(':id')
   async updateWebUser(
-    @Res() res,
     @Param() params: UrlValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
   ) {
@@ -68,120 +59,69 @@ export class UserController {
     if (!updatedUser)
       throw new NotFoundException(`User with id ${params.id} not found`);
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `User ${params.id} updated`,
-      data: updatedUser,
-    });
+    return updatedUser;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Delete(':id')
-  async deleteWebUser(@Res() res, @Param() params: UrlValidator) {
+  async deleteWebUser(@Param() params: UrlValidator) {
     await this.userService.deletedWebUser(params, 'develop');
-
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `User ${params.id} deleted`,
-    });
   }
 
-  @ApiResponse({ status: 201 })
+  @ApiResponse({ status: HttpStatus.CREATED })
   @Post('profile/create')
-  async createDbUser(@Res() res, @Body() createUserDTO: CreateUserDTO) {
+  async createDbUser(@Body() createUserDTO: CreateUserDTO) {
     const newUser = await this.userService.createDbUser(
       createUserDTO,
       'develop',
     );
 
-    return res.status(HttpStatus.CREATED).json({
-      status: HttpStatus.CREATED,
-      message: 'Profile created',
-      data: newUser,
-    });
+    return newUser;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Get('profile/:id')
-  async getUserProfile(@Res() res, @Param() params: UrlValidator) {
+  async getUserProfile(@Param() params: UrlValidator) {
     const profile = await this.userService.getDbUserById(params);
 
     if (!profile)
       throw new NotFoundException(`Profile for user ${params.id} not found`);
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      data: profile,
-    });
+    return profile;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Get('profileFb/:id')
-  async getUserProfileByFbId(@Res() res, @Param('id') id: string) {
+  async getUserProfileByFbId(@Param('id') id: string) {
     const profile = await this.userService.getDbUserByFbUid(id);
 
     if (!profile)
       throw new NotFoundException(`Profile for user ${id} not found`);
 
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      data: profile,
-    });
+    return profile;
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Patch('profile/:id')
   async updateProfile(
-    @Res() res,
     @Body() updateUserDTO: UpdateUserDTO,
     @Param() params: UrlValidator,
   ) {
-    const updatedUser = await this.userService.updateDbUser(
-      params,
-      updateUserDTO,
-      'develop',
-    );
-
-    if (!updatedUser)
-      throw new NotFoundException(`Profile for user ${params.id} not found`);
-
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `User ${params.id} updated`,
-      data: updatedUser,
-    });
+    await this.userService.updateDbUser(params, updateUserDTO, 'develop');
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Patch('replaceProfile/:id')
   async replaceProfile(
-    @Res() res,
     @Body() updateUserDTO: UpdateUserDTO,
     @Param() params: UrlValidator,
   ) {
-    const updatedUser = await this.userService.replaceDbUser(
-      params,
-      updateUserDTO,
-      'develop',
-    );
-
-    if (!updatedUser)
-      throw new NotFoundException(`Profile for user ${params.id} not found`);
-
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `User ${params.id} updated`,
-    });
+    await this.userService.replaceDbUser(params, updateUserDTO, 'develop');
   }
 
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: HttpStatus.OK })
   @Delete('profile/:id')
-  async deleteProfile(@Res() res, @Param() params: UrlValidator) {
+  async deleteProfile(@Param() params: UrlValidator) {
     await this.userService.deleteDbUser(params, 'develop');
-
-    return res.status(HttpStatus.OK).json({
-      status: HttpStatus.OK,
-      message: `User ${params.id} deleted`,
-    });
   }
 }

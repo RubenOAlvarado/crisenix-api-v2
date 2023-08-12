@@ -6,4 +6,8 @@ export class TourByIncluded {
   @IsNotEmpty()
   @IsMongoId()
   included: string;
+
+  constructor(included: string) {
+    this.included = included;
+  }
 }

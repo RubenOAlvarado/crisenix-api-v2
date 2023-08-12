@@ -6,10 +6,10 @@ export class Included {
   @Prop({ required: true, index: true })
   concept: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   included: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   publish: string;
 
   @Prop({
@@ -25,64 +25,76 @@ export class Included {
       'Recorrido',
     ],
     required: true,
-    index: true,
   })
   entry: string;
 
-  @Prop({ required: true, index: true })
-  city: string;
+  @Prop()
+  city?: string;
 
-  @Prop({ required: true, index: true })
-  hotel: string;
+  @Prop()
+  hotel?: string;
 
   @Prop({
     enum: ['Tentativo', 'Previsto', 'Definitivo'],
-    required: true,
     index: true,
   })
-  hotelStatus: string;
+  hotelStatus?: string;
 
-  @Prop({ required: true, index: true })
-  address: string;
+  @Prop()
+  address?: string;
 
-  @Prop({ required: true, index: true })
-  phone: string;
+  @Prop()
+  phone?: string;
 
-  @Prop({ required: true, index: true })
-  nights: number;
+  @Prop()
+  nights?: number;
 
-  @Prop({ required: true, index: true })
-  checkIn: Date;
+  @Prop()
+  checkIn?: Date;
 
-  @Prop({ required: true, index: true })
-  checkOut: Date;
+  @Prop()
+  checkOut?: Date;
 
-  @Prop({ required: true, index: true })
-  single: number;
+  @Prop()
+  single?: number;
 
-  @Prop({ required: true, index: true })
-  singleBase: number;
+  @Prop()
+  singleBase?: number;
 
-  @Prop({ required: true, index: true })
-  doubleBase: number;
+  @Prop()
+  doubleBase?: number;
 
-  @Prop({ required: true, index: true })
-  tripleBase: number;
+  @Prop()
+  tripleBase?: number;
 
-  @Prop({ required: true, index: true })
-  quadrupleBase: number;
+  @Prop()
+  quadrupleBase?: number;
 
-  @Prop({ required: true, index: true })
-  minor: number;
+  @Prop()
+  minor?: number;
 
-  @Prop({ required: true, index: true })
-  inapam: number;
+  @Prop()
+  inapam?: number;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    concept: string,
+    included: string,
+    publish: string,
+    entry: string,
+    status: string,
+  ) {
+    this.concept = concept;
+    this.included = included;
+    this.publish = publish;
+    this.entry = entry;
+    this.status = status;
+  }
 }
 
 export type IncludedDocument = HydratedDocument<Included>;

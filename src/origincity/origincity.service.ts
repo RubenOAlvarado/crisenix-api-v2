@@ -7,13 +7,19 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AboardpointService } from 'src/aboardpoint/aboardpoint.service';
+import { FilerService } from 'src/filer/filer.service';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { SearcherDTO } from 'src/shared/dtos/searcher.dto';
 import { Status } from 'src/shared/enums/status.enum';
+import { OriginCityExcel } from 'src/shared/interfaces/excel/originCity.excel.interface';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
 import { CreateOriginCityDTO } from 'src/shared/models/dtos/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateorigincity.dto';
-import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
+import {
+  OriginCity,
+  OriginCityDocument,
+} from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 
 @Injectable()
@@ -21,15 +27,18 @@ export class OriginCityService {
   constructor(
     @InjectModel(OriginCity.name)
     private readonly originCityModel: Model<OriginCity>,
+    private readonly filerService: FilerService,
+    private readonly aboardPointService: AboardpointService,
   ) {}
 
+  limit: any;
   private readonly logger = new Logger(OriginCityService.name);
 
-  async create(createOriginCityDTO: CreateOriginCityDTO): Promise<OriginCity> {
+  async create(
+    createOriginCityDTO: CreateOriginCityDTO,
+  ): Promise<OriginCityDocument> {
     try {
-      this.logger.debug(
-        `creating new origin city: ${JSON.stringify(createOriginCityDTO)}`,
-      );
+      this.logger.debug(`creating new origin city`);
       const createdOriginCity = new this.originCityModel(createOriginCityDTO);
       return createdOriginCity.save();
     } catch (error) {
@@ -42,7 +51,7 @@ export class OriginCityService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<OriginCity> {
+  async findOne({ id }: UrlValidator): Promise<OriginCity | null> {
     try {
       this.logger.debug(`getting origin city: ${id}`);
       return this.originCityModel
@@ -61,7 +70,7 @@ export class OriginCityService {
   async findAll({
     page,
     limit,
-    status = Status.ACTIVE,
+    status,
   }: QueryDTO): Promise<PaginateResult<OriginCity> | Array<OriginCity>> {
     try {
       this.logger.debug(`getting all origin cities`);
@@ -85,7 +94,9 @@ export class OriginCityService {
         };
       }
 
-      return this.originCityModel.find({ status }).exec();
+      return status
+        ? this.originCityModel.find({ status }).exec()
+        : this.originCityModel.find().exec();
     } catch (error) {
       this.logger.error(`error getting all origin cities: ${error}`);
       throw new InternalServerErrorException(
@@ -116,11 +127,11 @@ export class OriginCityService {
   async update(
     { id }: UrlValidator,
     updateOriginCity: UpdateOriginCityDTO,
-  ): Promise<OriginCity> {
+  ): Promise<void> {
     try {
       this.logger.debug('Updating origin city');
       if (await this.validateOriginCity(id))
-        return this.originCityModel
+        await this.originCityModel
           .findByIdAndUpdate(id, updateOriginCity, { new: true })
           .exec();
     } catch (error) {
@@ -134,11 +145,11 @@ export class OriginCityService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<OriginCity> {
+  async delete({ id }: UrlValidator): Promise<void> {
     try {
       this.logger.debug('Deleting origin city');
       if (await this.validateOriginCity(id))
-        return this.originCityModel
+        await this.originCityModel
           .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
           .exec();
     } catch (error) {
@@ -152,11 +163,11 @@ export class OriginCityService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<OriginCity> {
+  async reactivate({ id }: UrlValidator): Promise<void> {
     try {
       this.logger.debug('Reactivating OriginCity');
       if (await this.validateOriginCity(id))
-        return this.originCityModel
+        await this.originCityModel
           .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
           .exec();
     } catch (error) {
@@ -194,11 +205,11 @@ export class OriginCityService {
   async addAboardPoints(
     { id }: UrlValidator,
     { aboardPoints }: UpdateOriginCityDTO,
-  ): Promise<OriginCity> {
+  ): Promise<void> {
     try {
       this.logger.debug(`Adding aboard points to origin city: ${id}`);
       if (await this.validateOriginCity(id))
-        return this.originCityModel
+        await this.originCityModel
           .findByIdAndUpdate(id, { $push: { aboardPoints } }, { new: true })
           .exec();
     } catch (error) {
@@ -212,6 +223,41 @@ export class OriginCityService {
         throw new InternalServerErrorException(
           'Error adding aboard points to origin city',
         );
+    }
+  }
+
+  private async mapToDTO(
+    jsonObject: OriginCityExcel[],
+  ): Promise<CreateOriginCityDTO[]> {
+    const mappedOriginCities = jsonObject.map(async (originCity) => {
+      const { puntosDeAbordaje } = originCity;
+      const aboardPoints = await this.aboardPointService.mapFromNameToObjectId(
+        puntosDeAbordaje?.split(','),
+      );
+      const originCityDTO: CreateOriginCityDTO = {
+        state: originCity.estado,
+        name: originCity.nombre,
+        status: originCity.status as Status,
+        aboardPoints,
+      };
+      return originCityDTO;
+    });
+
+    return Promise.all(mappedOriginCities);
+  }
+
+  async loadFromExcel(filePath: string): Promise<void> {
+    try {
+      this.logger.debug(`Loading origin cities from excel`);
+      const jsonObject: OriginCityExcel[] =
+        this.filerService.excelToJson(filePath);
+      const originCitiesDTO = await this.mapToDTO(jsonObject);
+      await this.originCityModel.insertMany(originCitiesDTO);
+    } catch (error) {
+      this.logger.error(`Error loading origin cities from excel: ${error}`);
+      throw new InternalServerErrorException(
+        `Error loading origin cities from excel: ${error}`,
+      );
     }
   }
 }

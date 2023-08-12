@@ -10,7 +10,12 @@ export class Caption {
   status: string;
 
   @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(name: string, status: string) {
+    this.name = name;
+    this.status = status;
+  }
 }
 
 export type CaptionDocument = HydratedDocument<Caption>;

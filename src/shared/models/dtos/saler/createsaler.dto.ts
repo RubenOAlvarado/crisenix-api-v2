@@ -42,4 +42,11 @@ export class CreateSalerDTO {
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(code: string, name: string, lastName: string, salerType: string) {
+    this.code = code;
+    this.name = name;
+    this.lastName = lastName;
+    this.salerType = salerType;
+  }
 }

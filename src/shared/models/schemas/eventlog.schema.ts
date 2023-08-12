@@ -30,6 +30,22 @@ export class EventLog {
 
   @Prop({ type: Object })
   registry: any;
+
+  constructor(
+    serviceId: string,
+    service: string,
+    move: string,
+    user: string,
+    timestamp: Date,
+    registry: any,
+  ) {
+    this.serviceId = serviceId;
+    this.service = service;
+    this.move = move;
+    this.user = user;
+    this.timestamp = timestamp;
+    this.registry = registry;
+  }
 }
 
 export type EventLogDocument = HydratedDocument<EventLog>;

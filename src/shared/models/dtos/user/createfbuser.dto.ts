@@ -25,7 +25,7 @@ export class CreateFbUserDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsPhoneNumber(null)
+  @IsPhoneNumber()
   phoneNumber?: string;
 
   @ApiPropertyOptional()
@@ -48,4 +48,9 @@ export class CreateFbUserDTO {
   @IsOptional()
   @IsBoolean()
   disabled?: boolean;
+
+  constructor(email: string, displayName: string) {
+    this.email = email;
+    this.displayName = displayName;
+  }
 }

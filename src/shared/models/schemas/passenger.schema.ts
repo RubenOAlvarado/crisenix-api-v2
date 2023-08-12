@@ -38,17 +38,35 @@ export class Passenger {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Price', required: true })
   price: Price;
 
-  @Prop({})
-  passportPhoto: string;
-
-  @Prop({})
-  visaPhoto: string;
+  @Prop()
+  passportPhoto?: string;
 
   @Prop()
-  seat: string;
+  visaPhoto?: string;
 
-  @Prop({ default: Date.now, index: true })
-  createdAt: Date;
+  @Prop()
+  seat?: string;
+
+  @Prop({ default: Date.now })
+  createdAt?: Date;
+
+  constructor(
+    room: string,
+    name: string,
+    lastName: string,
+    secondLastName: string,
+    originCity: OriginCity,
+    aboardPoint: AboardPoint,
+    price: Price,
+  ) {
+    this.room = room;
+    this.name = name;
+    this.lastName = lastName;
+    this.secondLastName = secondLastName;
+    this.originCity = originCity;
+    this.aboardPoint = aboardPoint;
+    this.price = price;
+  }
 }
 
 export type PassengerDocument = HydratedDocument<Passenger>;

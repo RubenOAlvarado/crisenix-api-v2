@@ -7,13 +7,18 @@ export class Category {
   label: string;
 
   @Prop()
-  main: string;
+  main?: string;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(label: string, status: string) {
+    this.label = label;
+    this.status = status;
+  }
 }
 
 export type CategoryDocument = HydratedDocument<Category>;

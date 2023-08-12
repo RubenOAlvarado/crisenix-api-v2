@@ -80,4 +80,11 @@ export class CreateDestinationDTO {
   @ArrayNotEmpty()
   @MaxLength(300, { each: true, message: 'url too long' })
   photos?: Array<string>;
+
+  constructor(code: string, name: string, passport: boolean, visa: Visa) {
+    this.code = code;
+    this.name = name;
+    this.passport = passport;
+    this.visa = visa;
+  }
 }

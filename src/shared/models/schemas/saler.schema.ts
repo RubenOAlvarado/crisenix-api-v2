@@ -14,7 +14,7 @@ export class Saler {
   lastName: string;
 
   @Prop()
-  secondLastName: string;
+  secondLastName?: string;
 
   // reference to SalerType
   @Prop({
@@ -28,7 +28,21 @@ export class Saler {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    code: string,
+    name: string,
+    lastName: string,
+    salerType: SalerType,
+    status: string,
+  ) {
+    this.code = code;
+    this.name = name;
+    this.lastName = lastName;
+    this.salerType = salerType;
+    this.status = status;
+  }
 }
 
 export type SalerDocument = HydratedDocument<Saler>;

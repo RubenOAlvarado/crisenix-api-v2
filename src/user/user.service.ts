@@ -22,6 +22,7 @@ import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto'
 import { FbUser } from 'src/shared/interfaces/fbUser.interface';
 import { Status } from 'src/shared/enums/status.enum';
 import { RolesService } from 'src/roles/roles.service';
+import { FirebaseError } from 'firebase-admin';
 
 @Injectable()
 export class UserService {
@@ -60,20 +61,25 @@ export class UserService {
   //Database methods
   async createDbUser(
     createUserDTO: CreateUserDTO,
-    roleId: string,
+    creatorRoleId: string,
   ): Promise<User> {
     try {
       this.logger.debug('Creating new user profile');
       const dbUser = new this.userModel(createUserDTO);
-      const { firebaseUid, role } = createUserDTO;
-      const { description } = await this.roleService.getRoleById({
-        id: role,
-      });
-
-      if (!description) throw new BadRequestException('Role not found');
-
-      await this.addClaimsToUser(firebaseUid, description);
-      await this.setLogDto(dbUser._id.toString(), MOVES.CREATE, dbUser, roleId);
+      const { firebaseUid, role: roleId } = createUserDTO;
+      if (!roleId) {
+        await this.addClaimsToUser(firebaseUid);
+      } else {
+        const role = await this.roleService.getRoleById({ id: roleId });
+        if (!role) throw new BadRequestException('Sended role not found');
+        await this.addClaimsToUser(firebaseUid, role?._id?.toString());
+      }
+      await this.setLogDto(
+        dbUser._id.toString(),
+        MOVES.CREATE,
+        dbUser,
+        creatorRoleId,
+      );
       return dbUser.save();
     } catch (e) {
       this.logger.error(`Error creating user profile: ${e}`);
@@ -81,28 +87,26 @@ export class UserService {
     }
   }
 
-  async getDbUserById({ id }: UrlValidator): Promise<User> {
+  async getDbUserById({ id }: UrlValidator): Promise<User | null> {
     try {
       this.logger.debug('Looking user profile');
-      const dbUSer = await this.userModel
+      return await this.userModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
         .exec();
-      return dbUSer;
     } catch (e) {
       this.logger.error(`Error looking user profile: ${e}`);
       throw new InternalServerErrorException('Error looking user profile');
     }
   }
 
-  async getDbUserByFbUid(firebaseUid: string): Promise<User> {
+  async getDbUserByFbUid(firebaseUid: string): Promise<User | null> {
     try {
       this.logger.debug('Looking user profile by his firebaseid');
-      const user = await this.userModel
+      return await this.userModel
         .findOne({ firebaseUid })
         .select({ __v: 0, createdAt: 0 })
         .exec();
-      return user;
     } catch (e) {
       this.logger.error(`Error looking user profile by firebaseid: ${e}`);
       throw new InternalServerErrorException(
@@ -128,7 +132,7 @@ export class UserService {
     { id }: UrlValidator,
     updateUserDTO: UpdateUserDTO,
     user: string,
-  ): Promise<User> {
+  ): Promise<void> {
     try {
       this.logger.debug('Updating user profile');
       const dbUpdatedUser = await this.userModel.findByIdAndUpdate(
@@ -136,13 +140,14 @@ export class UserService {
         updateUserDTO,
         { new: true },
       );
+
+      if (!dbUpdatedUser) throw new BadRequestException('User not found');
       await this.setLogDto(
         dbUpdatedUser._id.toString(),
         MOVES.UPDATE,
         dbUpdatedUser,
         user,
       );
-      return dbUpdatedUser;
     } catch (e) {
       this.logger.error(`Error updating user profile: ${e}`);
       throw new InternalServerErrorException('Error updating user profile');
@@ -153,27 +158,28 @@ export class UserService {
     { id }: UrlValidator,
     updateUserDTO: UpdateUserDTO,
     user: string,
-  ): Promise<string> {
+  ): Promise<void> {
     try {
       this.logger.debug('Updating user profile');
-      const dbUpdatedUser = await this.userModel.replaceOne(
-        { _id: id },
+      const dbUpdatedUser = await this.userModel.findByIdAndUpdate(
+        id,
         updateUserDTO,
+        { new: true },
       );
+      if (!dbUpdatedUser) throw new BadRequestException('User not found');
       await this.setLogDto(
-        dbUpdatedUser.upsertedId._id.toString(),
+        dbUpdatedUser._id.toString(),
         MOVES.UPDATE,
         dbUpdatedUser,
         user,
       );
-      return 'User replaced';
     } catch (e) {
       this.logger.error(`Error updating user profile: ${e}`);
       throw new InternalServerErrorException('Error updating user profile');
     }
   }
 
-  async deleteDbUser({ id }: UrlValidator, user: string): Promise<User> {
+  async deleteDbUser({ id }: UrlValidator, user: string): Promise<void> {
     try {
       this.logger.debug('Deleting user profile');
       const deletedAt = new Date();
@@ -182,13 +188,13 @@ export class UserService {
         { status: Status.INACTIVE, deletedAt },
         { new: true },
       );
+      if (!deletedUser) throw new BadRequestException('User not found');
       await this.setLogDto(
         deletedUser._id.toString(),
         MOVES.DELETE,
         deletedUser,
         user,
       );
-      return deletedUser;
     } catch (e) {
       this.logger.error(`Error deleting user profle: ${e}`);
       throw new InternalServerErrorException('Error deleting user profle');
@@ -249,7 +255,7 @@ export class UserService {
       const checkRevoked = true;
       const decodeToken = await getAuth().verifyIdToken(token, checkRevoked);
       return this.getFbUserById(decodeToken.uid);
-    } catch (e) {
+    } catch (e: FirebaseError | any) {
       if (e.code == 'auth/id-token-revoked') {
         this.logger.error('User token revoked');
         throw new BadRequestException('Token revoked');
@@ -314,6 +320,7 @@ export class UserService {
     try {
       this.logger.debug('Looking for web user');
       const user = await this.getDbUserById(params);
+      if (!user) throw new BadRequestException('User not found');
       const fbUser = await this.getFbUserById(user.firebaseUid);
       return { user, fbUser };
     } catch (e) {
@@ -329,12 +336,10 @@ export class UserService {
   ): Promise<any> {
     try {
       this.logger.debug('Updating web user');
-      const updatedDbUser = await this.updateDbUser(
-        params,
-        { ...updateWebUserDTO },
-        roleId,
-      );
+      await this.updateDbUser(params, { ...updateWebUserDTO }, roleId);
+      const updatedDbUser = await this.getDbUserById(params);
       this.logger.debug('Updated in db');
+      if (!updatedDbUser) throw new BadRequestException('User not found');
       const updatedFbUser = await this.updatefbUser(updatedDbUser.firebaseUid, {
         ...updateWebUserDTO,
       });
@@ -346,11 +351,13 @@ export class UserService {
     }
   }
 
-  async deletedWebUser(params: UrlValidator, user: string): Promise<void> {
+  async deletedWebUser(params: UrlValidator, roleId: string): Promise<void> {
     try {
       this.logger.debug('Deleting web user');
-      const deletdDbUser = await this.deleteDbUser(params, user);
+      await this.deleteDbUser(params, roleId);
       this.logger.debug('Deleted in db');
+      const deletdDbUser = await this.getDbUserById(params);
+      if (!deletdDbUser) throw new BadRequestException('User not found');
       await this.deleteFbUser(deletdDbUser.firebaseUid);
       this.logger.debug('Deleted in firebase');
     } catch (e) {

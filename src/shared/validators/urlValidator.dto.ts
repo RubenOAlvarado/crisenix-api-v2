@@ -6,4 +6,8 @@ export class UrlValidator {
   @IsString()
   @IsMongoId()
   id: string;
+
+  constructor(id: string) {
+    this.id = id;
+  }
 }

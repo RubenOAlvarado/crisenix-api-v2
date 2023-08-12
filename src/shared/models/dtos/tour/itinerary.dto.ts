@@ -70,4 +70,10 @@ export class ItineraryDTO {
   @IsNotEmpty()
   @IsNumber()
   order: number;
+
+  constructor(dayNumber: number, activity: string, order: number) {
+    this.dayNumber = dayNumber;
+    this.activity = activity;
+    this.order = order;
+  }
 }

@@ -10,7 +10,12 @@ export class SalerType {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(description: string, status: string) {
+    this.description = description;
+    this.status = status;
+  }
 }
 
 export type SalerTypeDocument = HydratedDocument<SalerType>;

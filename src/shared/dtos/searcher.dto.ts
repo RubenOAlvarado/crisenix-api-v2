@@ -5,7 +5,7 @@ import { Status } from '../enums/status.enum';
 export class SearcherDTO {
   @ApiProperty({
     description:
-      'value to search, it could be anything that we want tou type in the front',
+      'value to search, it could be anything that we want to type in the front',
   })
   @IsNotEmpty()
   @IsString()
@@ -16,4 +16,9 @@ export class SearcherDTO {
   @IsNotEmpty()
   @IsString()
   status: Status;
+
+  constructor(word: string, status: Status) {
+    this.word = word;
+    this.status = status;
+  }
 }

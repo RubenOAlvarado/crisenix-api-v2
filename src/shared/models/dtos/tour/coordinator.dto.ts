@@ -22,4 +22,10 @@ export class CoordinatorDTO {
   @MinLength(3)
   @MaxLength(50)
   phone: string;
+
+  constructor(transport: string, name: string, phone: string) {
+    this.transport = transport;
+    this.name = name;
+    this.phone = phone;
+  }
 }

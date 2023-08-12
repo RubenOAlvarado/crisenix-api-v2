@@ -28,10 +28,35 @@ export class PrivateTour {
   adults: number;
 
   @Prop()
-  children: number;
+  children?: number;
 
   @Prop({ required: true })
   tourDescription: string;
+
+  @Prop({ default: Date.now })
+  createdAt?: Date;
+
+  constructor(
+    name: string,
+    phone: string,
+    email: string,
+    destination: string,
+    origin: string,
+    initDate: string,
+    returnDate: string,
+    adults: number,
+    tourDescription: string,
+  ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.destination = destination;
+    this.origin = origin;
+    this.initDate = initDate;
+    this.returnDate = returnDate;
+    this.adults = adults;
+    this.tourDescription = tourDescription;
+  }
 }
 
 export type PrivateTourDocument = HydratedDocument<PrivateTour>;

@@ -7,15 +7,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Roles } from 'src/shared/models/schemas/roles.schema';
+import { Roles, RolesDocument } from 'src/shared/models/schemas/roles.schema';
 import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { Status } from 'src/shared/enums/status.enum';
-import { CreateCatalogDTO } from 'src/shared/models/dtos/catalogs/createCatalog.dto';
-import { UpdateCatalogDTO } from 'src/shared/models/dtos/catalogs/updateCatalog.dto';
+import { CreateRoleDTO } from '@/shared/models/dtos/role/createrole.dto';
+import { UpdateRoleDTO } from '@/shared/models/dtos/role/updaterole.dto';
 
-type CreateRoleDTO = Omit<CreateCatalogDTO, 'name'>;
-type UpdateRoleDTO = Omit<UpdateCatalogDTO, 'name'>;
 @Injectable()
 export class RolesService {
   constructor(
@@ -35,7 +33,7 @@ export class RolesService {
     }
   }
 
-  async getRoles(query?: StatusDTO): Promise<Array<Roles>> {
+  async getRoles(query: StatusDTO): Promise<Array<Roles>> {
     try {
       const { status } = query;
       this.logger.debug(
@@ -50,7 +48,7 @@ export class RolesService {
     }
   }
 
-  async getRoleById({ id }: UrlValidator): Promise<Roles> {
+  async getRoleById({ id }: UrlValidator): Promise<RolesDocument | null> {
     try {
       this.logger.debug('Looking role by his id');
       const role = await this.roleModel.findById(id).exec();
@@ -64,16 +62,13 @@ export class RolesService {
   async updateRole(
     updateRoleDTO: UpdateRoleDTO,
     { id }: UrlValidator,
-  ): Promise<Roles> {
+  ): Promise<void> {
     try {
       if (await this.validateRole(id)) {
         this.logger.debug('Updating role');
-        const updatedRole = await this.roleModel.findByIdAndUpdate(
-          id,
-          updateRoleDTO,
-          { new: true },
-        );
-        return updatedRole;
+        await this.roleModel.findByIdAndUpdate(id, updateRoleDTO, {
+          new: true,
+        });
       }
     } catch (e) {
       this.logger.error(`Error updating role: ${e}`);
@@ -81,16 +76,15 @@ export class RolesService {
     }
   }
 
-  async inactivateRole({ id }: UrlValidator): Promise<Roles> {
+  async inactivateRole({ id }: UrlValidator): Promise<void> {
     try {
       if (await this.validateRole(id)) {
         this.logger.debug('inactivating role');
-        const inactiveRole = await this.roleModel.findByIdAndUpdate(
+        await this.roleModel.findByIdAndUpdate(
           id,
           { status: Status.INACTIVE },
           { new: true },
         );
-        return inactiveRole;
       }
     } catch (e) {
       this.logger.error(`Error inactivating role: ${e}`);
@@ -115,20 +109,19 @@ export class RolesService {
     }
   }
 
-  async reactiveRole(params: UrlValidator): Promise<Roles> {
+  async reactiveRole(params: UrlValidator): Promise<void> {
     try {
       const { id } = params;
       const validRole = await this.getRoleById(params);
 
       if (validRole && validRole.status === Status.INACTIVE) {
         this.logger.debug('Reactivating Role');
-        const inactiveRole = await this.roleModel.findByIdAndUpdate(
+        await this.roleModel.findByIdAndUpdate(
           id,
           { status: Status.ACTIVE },
           { new: true },
         );
-        return inactiveRole;
-      } else if (validRole.status !== Status.INACTIVE) {
+      } else if (validRole && validRole.status !== Status.INACTIVE) {
         throw new BadRequestException('Role must be inactive');
       } else {
         throw new NotFoundException(`Role ${id} was not found`);
@@ -141,23 +134,7 @@ export class RolesService {
     }
   }
 
-  /*  async loadCatalog(file: any): Promise<any> {
-    try {
-      this.logger.debug('loading prices catalog from excel file');
-      const roles: Array<CreateRoleDTO> = await this.filerService.convert(
-        file.path,
-      );
-      if (roles) await this.roleModel.insertMany(roles, { ordered: true });
-      else throw new BadRequestException('No data loaded');
-      return roles;
-    } catch (e) {
-      this.logger.error(`Error loading catalog: ${e}`);
-      if (e instanceof BadRequestException) throw e;
-      else throw new InternalServerErrorException('Error loading catalog');
-    }
-  } */
-
-  async validateRoleName(description: string): Promise<Roles> {
+  async validateRoleName(description: string): Promise<RolesDocument> {
     try {
       this.logger.debug('Validating Role');
       const validRole = await this.roleModel.findOne({ description }).exec();

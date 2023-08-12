@@ -15,4 +15,9 @@ export class GetReportDTO {
   @IsNotEmpty()
   @IsString()
   dateToLook: string;
+
+  constructor(saler: string, dateToLook: string) {
+    this.saler = saler;
+    this.dateToLook = dateToLook;
+  }
 }

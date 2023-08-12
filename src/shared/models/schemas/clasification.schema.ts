@@ -7,13 +7,18 @@ export class Clasification {
   name: string;
 
   @Prop()
-  description: string;
+  description?: string;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(name: string, status: string) {
+    this.name = name;
+    this.status = status;
+  }
 }
 
 export type ClasificationDocument = HydratedDocument<Clasification>;

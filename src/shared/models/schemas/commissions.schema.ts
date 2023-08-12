@@ -28,7 +28,19 @@ export class Commissions {
   status: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    salerType: SalerType,
+    tourType: TourType,
+    amount: number,
+    status: string,
+  ) {
+    this.salerType = salerType;
+    this.tourType = tourType;
+    this.amount = amount;
+    this.status = status;
+  }
 }
 
 export type CommissionsDocument = HydratedDocument<Commissions>;

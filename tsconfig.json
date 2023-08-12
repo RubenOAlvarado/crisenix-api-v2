@@ -1,21 +1,82 @@
 {
+  /* Visit https://aka.ms/tsconfig.json to read more about this file */
+  "compileOnSave": true,
+  "include": ["src", "@types", "test"],
+  "exclude": ["node_modules", "dist", "coverage", "__mocks__", "**/__mocks__"],
   "compilerOptions": {
-    "module": "commonjs",
     "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
+    "rootDir": ".",
+
+    /* Projects */
+    "incremental": true,
+    "disableSizeLimit": true,
+
+    /* Language and Environment */
     "target": "ES2021",
+    "lib": ["esnext"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": true,
+
+    /* Modules */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": "./",
+    "typeRoots": ["node_modules/@types", "@types"],
+    "types": ["node", "jest", "Multer"],
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@configs": ["src/configs"],
+      "@configs/*": ["src/configs/*"],
+      "@shared/*": ["src/shared/*"]
+    },
+
+    /* JavaScript Support */
+    "allowJs": true,
+    "checkJs": true,
+
+    /* Emit */
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "removeComments": true,
+    "noEmit": false,
+    "importHelpers": false,
+    "downlevelIteration": true,
+    "inlineSources": true,
+    "newLine": "lf",
+    "noEmitHelpers": false,
+    "noEmitOnError": true,
+    "preserveConstEnums": true,
+
+    /* Interop Constraints */
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    /* Completeness */
+    "skipLibCheck": true
   }
 }

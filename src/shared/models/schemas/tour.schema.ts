@@ -35,16 +35,16 @@ export class Tour {
   seating: number;
 
   @Prop({ type: Number })
-  availableSeat: number;
+  availableSeat?: number;
 
   @Prop({ type: Number })
-  ocuppiedSeat: number;
+  ocuppiedSeat?: number;
 
   @Prop({ type: Date, required: true, index: true })
   initDate: Date;
 
   @Prop({ type: Array })
-  aboardHour: Array<{
+  aboardHour?: Array<{
     hour: string;
     aboardPoint: AboardPoint;
   }>;
@@ -66,23 +66,23 @@ export class Tour {
   returnDate: Date;
 
   @Prop({ type: Array })
-  returnHour: Array<{ hour: string; aboardPoint: AboardPoint }>;
+  returnHour?: Array<{ hour: string; aboardPoint: AboardPoint }>;
 
   @Prop({ type: Array, ref: 'Departure' })
-  departure: Array<Departure>;
+  departure?: Array<Departure>;
 
   @Prop({ type: Array })
-  coordinator: Array<{
+  coordinator?: Array<{
     transport: string;
     name: string;
     phone: string;
   }>;
 
   @Prop({ type: String })
-  front: string;
+  front?: string;
 
   @Prop({ type: String })
-  recommendations: string;
+  recommendations?: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -92,10 +92,10 @@ export class Tour {
   tourType: TourType;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Included' }] })
-  included: Array<Included>;
+  included?: Array<Included>;
 
   @Prop({ type: Array })
-  itinerary: Array<{
+  itinerary?: Array<{
     dayNumber: number;
     activity: Itinerary;
     additionalCost: number;
@@ -110,10 +110,36 @@ export class Tour {
   }>;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Price' }] })
-  price: Array<Price>;
+  price?: Array<Price>;
 
   @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    destination: Destination,
+    code: string,
+    status: string,
+    boxLunch: string,
+    seating: number,
+    initDate: Date,
+    days: number,
+    nights: number,
+    transport: Transports,
+    returnDate: Date,
+    tourType: TourType,
+  ) {
+    this.destination = destination;
+    this.code = code;
+    this.status = status;
+    this.boxLunch = boxLunch;
+    this.seating = seating;
+    this.initDate = initDate;
+    this.days = days;
+    this.nights = nights;
+    this.transport = transport;
+    this.returnDate = returnDate;
+    this.tourType = tourType;
+  }
 }
 
 export type TourDocument = HydratedDocument<Tour>;

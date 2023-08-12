@@ -54,4 +54,9 @@ export class CreatePriceDTO {
   @IsOptional()
   @IsNumber()
   inapam?: number;
+
+  constructor(city: string, currency: Currency) {
+    this.city = city;
+    this.currency = currency;
+  }
 }

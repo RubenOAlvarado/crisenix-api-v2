@@ -3,29 +3,47 @@ import { HydratedDocument } from 'mongoose';
 
 @Schema()
 export class Departure {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   terminal: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   aeroline: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   route: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   gate: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   flight: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   hour: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   date: Date;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt?: Date;
+
+  constructor(
+    terminal: string,
+    aeroline: string,
+    route: string,
+    gate: string,
+    flight: string,
+    hour: string,
+    date: Date,
+  ) {
+    this.terminal = terminal;
+    this.aeroline = aeroline;
+    this.route = route;
+    this.gate = gate;
+    this.flight = flight;
+    this.hour = hour;
+    this.date = date;
+  }
 }
 
 export type DepartureDocument = HydratedDocument<Departure>;

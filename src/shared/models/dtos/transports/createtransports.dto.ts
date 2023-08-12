@@ -24,4 +24,9 @@ export class CreateTransportsDTO {
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(name: string, translationType: string) {
+    this.name = name;
+    this.translationType = translationType;
+  }
 }

@@ -1,22 +1,27 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateCatalogDTO {
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  name?: string;
+  name: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  description?: string;
+  description: string;
 
   @ApiPropertyOptional({ enum: Status })
   @IsOptional()
   @IsString()
   status?: Status;
+
+  constructor(name: string, description: string) {
+    this.name = name;
+    this.description = description;
+  }
 }
