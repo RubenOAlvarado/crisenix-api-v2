@@ -23,7 +23,7 @@
     "moduleResolution": "NodeNext",
     "baseUrl": "./",
     "typeRoots": ["node_modules/@types", "@types"],
-    "types": ["node", "jest", "Multer"],
+    "types": ["node", "jest", "multer"],
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],

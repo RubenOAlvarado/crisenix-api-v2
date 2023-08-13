@@ -24,6 +24,7 @@ import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateori
 import { SearcherDTO } from 'src/shared/dtos/searcher.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
+import 'multer';
 
 @Controller('origincity')
 @ApiTags('Origin City')
