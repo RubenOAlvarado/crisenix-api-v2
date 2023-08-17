@@ -45,9 +45,7 @@ export class OriginCityService {
       this.logger.error(
         `error creating new origin city: ${JSON.stringify(error)}`,
       );
-      throw new InternalServerErrorException(
-        `Error creating origin city: ${error}`,
-      );
+      throw new InternalServerErrorException(`Error creating origin city`);
     }
   }
 
@@ -75,15 +73,22 @@ export class OriginCityService {
     try {
       this.logger.debug(`getting all origin cities`);
       if (page && limit) {
-        const docs = await this.originCityModel
-          .find({ status })
-          .limit(limit * 1)
-          .skip((page - 1) * limit)
-          .select({ __v: 0, createdAt: 0 })
-          .exec();
-        const totalDocs = await this.originCityModel
-          .countDocuments({ status })
-          .exec();
+        const docs = status
+          ? await this.originCityModel
+              .find({ status })
+              .limit(limit * 1)
+              .skip((page - 1) * limit)
+              .select({ __v: 0, createdAt: 0 })
+              .exec()
+          : await this.originCityModel
+              .find()
+              .limit(limit * 1)
+              .skip((page - 1) * limit)
+              .select({ __v: 0, createdAt: 0 })
+              .exec();
+        const totalDocs = status
+          ? await this.originCityModel.countDocuments({ status }).exec()
+          : await this.originCityModel.countDocuments().exec();
         return {
           docs,
           totalDocs,

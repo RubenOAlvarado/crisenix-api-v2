@@ -1,8 +1,11 @@
 import { CreateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/createaboardpoint.dto';
+import { UpdateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/updateaboardpoint.dto';
 import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -40,7 +43,7 @@ export class AboardpointService {
     try {
       return await this.aboardPointModel
         .findById(id)
-        .select({ _id: 0, __v: 0, createdAt: 0 })
+        .select({ __v: 0, createdAt: 0 })
         .exec();
     } catch (error) {
       this.logger.error(`Error getting aboard point: ${error}`);
@@ -63,6 +66,95 @@ export class AboardpointService {
     } catch (error) {
       this.logger.error(`Error getting all aboard points: ${error}`);
       throw new InternalServerErrorException('Error getting all aboard points');
+    }
+  }
+
+  async update(
+    { id }: UrlValidator,
+    updateAboardPointDTO: UpdateAboardPointDTO,
+  ): Promise<void> {
+    this.logger.debug(`updating aboard point`);
+    try {
+      if (!(await this.validateAboardPoint({ id }))) return;
+      await this.aboardPointModel
+        .findByIdAndUpdate(id, updateAboardPointDTO, { new: true })
+        .exec();
+    } catch (error) {
+      this.logger.error(`Error updating aboard point: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      else
+        throw new InternalServerErrorException('Error updating aboard point');
+    }
+  }
+
+  async delete({ id }: UrlValidator) {
+    this.logger.debug(`deleting aboard point ${id}`);
+    try {
+      if (!(await this.validateAboardPoint({ id }))) return;
+      await this.aboardPointModel
+        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
+        .exec();
+    } catch (error) {
+      this.logger.error(`Error deleting aboard point: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      else
+        throw new InternalServerErrorException('Error deleting aboard point');
+    }
+  }
+
+  async reactivate({ id }: UrlValidator) {
+    this.logger.debug(`reactivating aboard point ${id}`);
+    try {
+      const inactiveAboardPoint = await this.findOne({ id });
+      if (!inactiveAboardPoint)
+        throw new NotFoundException('Aboard point not found');
+      if (inactiveAboardPoint.status !== Status.INACTIVE)
+        throw new BadRequestException(
+          'Aboard point is already in active status',
+        );
+      await this.aboardPointModel
+        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
+        .exec();
+    } catch (error) {
+      this.logger.error(`Error reactivating aboard point: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      else
+        throw new InternalServerErrorException(
+          'Error reactivating aboard point',
+        );
+    }
+  }
+
+  private async validateAboardPoint({ id }: UrlValidator): Promise<boolean> {
+    this.logger.debug(`validating aboard point`);
+    try {
+      const foundAboardPoint = await this.aboardPointModel.findById(id).exec();
+      if (!foundAboardPoint)
+        throw new NotFoundException('Aboard point not found');
+      if (foundAboardPoint.status !== Status.ACTIVE)
+        throw new BadRequestException('Aboard point must be in active status');
+      return true;
+    } catch (error) {
+      this.logger.error(`Error validating aboard point: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      else
+        throw new InternalServerErrorException('Error validating aboard point');
     }
   }
 
