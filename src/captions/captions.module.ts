@@ -3,14 +3,14 @@ import { CaptionsService } from './captions.service';
 import { CaptionsController } from './captions.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  Caption,
+  Captions,
   CaptionSchema,
 } from '@/shared/models/schemas/captions.schema';
 import { FilerModule } from '@/filer/filer.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Caption.name, schema: CaptionSchema }]),
+    MongooseModule.forFeature([{ name: Captions.name, schema: CaptionSchema }]),
     FilerModule,
   ],
   controllers: [CaptionsController],

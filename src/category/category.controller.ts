@@ -25,7 +25,6 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDTO } from '@/shared/models/dtos/category/createcategory.dto';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/category/responsecategory.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { Status } from '../shared/enums/status.enum';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
 import { FileInterceptor } from '@nestjs/platform-express';

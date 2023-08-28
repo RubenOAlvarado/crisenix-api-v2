@@ -12,6 +12,8 @@ import { Config } from '../interfaces/config.interface';
 import { RolesModule } from 'src/roles/roles.module';
 import { OrigincityModule } from 'src/origincity/origincity.module';
 import { AboardpointModule } from 'src/aboardpoint/aboardpoint.module';
+import { CaptionsModule } from '@/captions/captions.module';
+import { CategoryModule } from '@/category/category.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -30,7 +32,14 @@ export const buildSwaggerModule = async (
     .build();
 
   const document = SwaggerModule.createDocument(scopedApplicationCore, config, {
-    include: [UserModule, RolesModule, OrigincityModule, AboardpointModule],
+    include: [
+      UserModule,
+      RolesModule,
+      OrigincityModule,
+      AboardpointModule,
+      CaptionsModule,
+      CategoryModule,
+    ],
   });
 
   return document;

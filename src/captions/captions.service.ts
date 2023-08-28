@@ -1,27 +1,27 @@
-import { FilerService } from '@/filer/filer.service';
+import { FilerService } from 'src/filer/filer.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { CreateCaptionDTO } from '@/shared/models/dtos/captions/createcaption.dto';
 import { UpdateCaptionDTO } from '@/shared/models/dtos/captions/updatecaption.dto';
 import {
-  Caption,
   CaptionDocument,
+  Captions,
 } from '@/shared/models/schemas/captions.schema';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   BadRequestException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class CaptionsService {
   constructor(
-    @Inject(Caption.name) private readonly captionModel: Model<Caption>,
+    @InjectModel(Captions.name) private readonly captionModel: Model<Captions>,
     private filer: FilerService,
   ) {}
 
@@ -140,7 +140,7 @@ export class CaptionsService {
   }
 
   private mapJsonToDTO(jsonObject: any): CreateCaptionDTO[] {
-    return jsonObject.map((caption: Caption) => {
+    return jsonObject.map((caption: Captions) => {
       return {
         name: caption.name,
         status: caption.status,

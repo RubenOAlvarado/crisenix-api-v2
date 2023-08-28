@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseCategoryDTO {
-  constructor(label: string, main?: string, status: string) {
+  constructor(label: string, status: string, main?: string) {
     this.label = label;
     this.main = main;
     this.status = status;

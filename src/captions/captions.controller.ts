@@ -24,7 +24,7 @@ import {
 import { CaptionsService } from './captions.service';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/aboardpoint/responseaboardpoint.dto';
 import { CreateCaptionDTO } from '@/shared/models/dtos/captions/createcaption.dto';
-import { Caption } from '@/shared/models/schemas/captions.schema';
+import { Captions } from '@/shared/models/schemas/captions.schema';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { excelFileFilter } from '@/filer/filer.utils';
@@ -47,7 +47,7 @@ export class CaptionsController {
     description: 'Caption object',
     type: CreateCaptionDTO,
   })
-  async create(@Body() createCaptionDTO: CreateCaptionDTO): Promise<Caption> {
+  async create(@Body() createCaptionDTO: CreateCaptionDTO): Promise<Captions> {
     return await this.captionService.create(createCaptionDTO);
   }
 
@@ -61,7 +61,7 @@ export class CaptionsController {
     description: 'Something went wrong finding all captions.',
   })
   @Get()
-  async findAll(@Query() query: QueryDTO): Promise<Caption[]> {
+  async findAll(@Query() query: QueryDTO): Promise<Captions[]> {
     const captions = await this.captionService.findAll(query);
     if (!captions) throw new NotFoundException('No captions registered.');
     return captions;
@@ -77,7 +77,7 @@ export class CaptionsController {
     description: 'Caption not found.',
   })
   @Get(':id')
-  async findOne(@Param() params: UrlValidator): Promise<Caption> {
+  async findOne(@Param() params: UrlValidator): Promise<Captions> {
     const caption = await this.captionService.findOne(params);
     if (!caption) throw new NotFoundException('Caption not found.');
     return caption;
