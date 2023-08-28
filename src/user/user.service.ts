@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -71,7 +72,7 @@ export class UserService {
         await this.addClaimsToUser(firebaseUid);
       } else {
         const role = await this.roleService.getRoleById({ id: roleId });
-        if (!role) throw new BadRequestException('Sended role not found');
+        if (!role) throw new BadRequestException('Sended role not found.');
         await this.addClaimsToUser(firebaseUid, role?._id?.toString());
       }
       await this.setLogDto(
@@ -82,8 +83,12 @@ export class UserService {
       );
       return dbUser.save();
     } catch (e) {
-      this.logger.error(`Error creating user profile: ${e}`);
-      throw new InternalServerErrorException('Error creating user profile');
+      this.logger.error(
+        `Something went wrong creating the user in database: ${e}`,
+      );
+      throw new InternalServerErrorException(
+        'Something went wrong creating the user in database.',
+      );
     }
   }
 
@@ -95,8 +100,10 @@ export class UserService {
         .select({ __v: 0, createdAt: 0 })
         .exec();
     } catch (e) {
-      this.logger.error(`Error looking user profile: ${e}`);
-      throw new InternalServerErrorException('Error looking user profile');
+      this.logger.error(`Something went wrong finding the user: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong finding the user profile.',
+      );
     }
   }
 
@@ -108,9 +115,11 @@ export class UserService {
         .select({ __v: 0, createdAt: 0 })
         .exec();
     } catch (e) {
-      this.logger.error(`Error looking user profile by firebaseid: ${e}`);
+      this.logger.error(
+        `Something went wrong finding the user profile by his firebase id: ${e}`,
+      );
       throw new InternalServerErrorException(
-        'Error looking user profile by firebaseid',
+        'Something went wrong finding the user profile by his firebase id.',
       );
     }
   }
@@ -124,7 +133,9 @@ export class UserService {
         .exec();
     } catch (e) {
       this.logger.error(`Error looking users profiles: ${e}`);
-      throw new InternalServerErrorException('Error looking users profiles');
+      throw new InternalServerErrorException(
+        'Something went wrong finding the users profiles.',
+      );
     }
   }
 
@@ -141,7 +152,8 @@ export class UserService {
         { new: true },
       );
 
-      if (!dbUpdatedUser) throw new BadRequestException('User not found');
+      if (!dbUpdatedUser)
+        throw new NotFoundException('User profile not found.');
       await this.setLogDto(
         dbUpdatedUser._id.toString(),
         MOVES.UPDATE,
@@ -166,7 +178,7 @@ export class UserService {
         updateUserDTO,
         { new: true },
       );
-      if (!dbUpdatedUser) throw new BadRequestException('User not found');
+      if (!dbUpdatedUser) throw new BadRequestException('User not found.');
       await this.setLogDto(
         dbUpdatedUser._id.toString(),
         MOVES.UPDATE,
@@ -292,7 +304,7 @@ export class UserService {
       if (!createWebUserDTO.fbregistered) {
         if (!createWebUserDTO.password) {
           throw new BadRequestException(
-            'Password is required in order to register user on firebase',
+            'Password is required in order to register user on firebase.',
           );
         }
         fbNewUser = await this.createFbUser({ ...createWebUserDTO });
@@ -311,8 +323,10 @@ export class UserService {
       this.logger.debug('User created in db');
       return dbNewUser;
     } catch (e) {
-      this.logger.error(`Error creating webuser: ${e}`);
-      throw new InternalServerErrorException('Error creating webuser');
+      this.logger.error(`Something went wrong creating the user: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong creating the user.',
+      );
     }
   }
 
@@ -346,8 +360,10 @@ export class UserService {
       this.logger.debug('Updated in fb');
       return { user: updatedDbUser, fbUser: updatedFbUser };
     } catch (e) {
-      this.logger.error(`Error updating web user: ${e}`);
-      throw new InternalServerErrorException('Error updating web user');
+      this.logger.error(`Something went wrong updating the user profile: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong updating the user profile.',
+      );
     }
   }
 
@@ -361,8 +377,10 @@ export class UserService {
       await this.deleteFbUser(deletdDbUser.firebaseUid);
       this.logger.debug('Deleted in firebase');
     } catch (e) {
-      this.logger.error(`Error deleting web user`);
-      throw new InternalServerErrorException('Error deleting web user');
+      this.logger.error(`Something went wrong deleting the user: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong deleting the user.',
+      );
     }
   }
 }

@@ -38,13 +38,15 @@ export class AboardpointService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<AboardPointDocument | null> {
+  async findOne({ id }: UrlValidator): Promise<AboardPointDocument> {
     this.logger.debug(`getting aboard point`);
     try {
-      return await this.aboardPointModel
+      const aboardPoint = await this.aboardPointModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
         .exec();
+      if (!aboardPoint) throw new NotFoundException('Aboard point not found');
+      return aboardPoint;
     } catch (error) {
       this.logger.error(`Error getting aboard point: ${error}`);
       throw new InternalServerErrorException('Error getting aboard point');

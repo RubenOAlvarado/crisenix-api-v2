@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumberString,
@@ -7,19 +7,25 @@ import {
 } from 'class-validator';
 
 export class QueryDTO {
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsOptional()
   @IsNumberString()
-  page?: number;
+  page: number;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsOptional()
   @IsNumberString()
-  limit?: number;
+  limit: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   status?: string;
+
+  constructor(page: number, limit: number, status?: string) {
+    this.page = page;
+    this.limit = limit;
+    this.status = status;
+  }
 }

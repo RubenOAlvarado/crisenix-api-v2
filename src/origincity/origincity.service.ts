@@ -69,39 +69,33 @@ export class OriginCityService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<OriginCity> | Array<OriginCity>> {
+  }: QueryDTO): Promise<PaginateResult<OriginCity>> {
     try {
       this.logger.debug(`getting all origin cities`);
-      if (page && limit) {
-        const docs = status
-          ? await this.originCityModel
-              .find({ status })
-              .limit(limit * 1)
-              .skip((page - 1) * limit)
-              .select({ __v: 0, createdAt: 0 })
-              .exec()
-          : await this.originCityModel
-              .find()
-              .limit(limit * 1)
-              .skip((page - 1) * limit)
-              .select({ __v: 0, createdAt: 0 })
-              .exec();
-        const totalDocs = status
-          ? await this.originCityModel.countDocuments({ status }).exec()
-          : await this.originCityModel.countDocuments().exec();
-        return {
-          docs,
-          totalDocs,
-          hasPrevPage: page > 1,
-          hasNextPage: page < Math.ceil(totalDocs / limit),
-          page,
-          totalPages: Math.ceil(totalDocs / limit),
-        };
-      }
-
-      return status
-        ? this.originCityModel.find({ status }).exec()
-        : this.originCityModel.find().exec();
+      const docs = status
+        ? await this.originCityModel
+            .find({ status })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .select({ __v: 0, createdAt: 0 })
+            .exec()
+        : await this.originCityModel
+            .find()
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .select({ __v: 0, createdAt: 0 })
+            .exec();
+      const totalDocs = status
+        ? await this.originCityModel.countDocuments({ status }).exec()
+        : await this.originCityModel.countDocuments().exec();
+      return {
+        docs,
+        totalDocs,
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(totalDocs / limit),
+        page,
+        totalPages: Math.ceil(totalDocs / limit),
+      };
     } catch (error) {
       this.logger.error(`error getting all origin cities: ${error}`);
       throw new InternalServerErrorException(

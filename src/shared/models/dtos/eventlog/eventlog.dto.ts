@@ -1,5 +1,5 @@
 import { IsMongoId, IsNotEmpty, IsObject, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateEventLogDTO {
   @ApiProperty()
@@ -7,10 +7,10 @@ export class CreateEventLogDTO {
   @IsMongoId()
   serviceId: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsNotEmpty()
   @IsString()
-  service: string;
+  service?: string;
 
   @ApiProperty()
   @IsNotEmpty()
