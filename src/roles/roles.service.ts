@@ -13,6 +13,7 @@ import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { CreateRoleDTO } from '@/shared/models/dtos/role/createrole.dto';
 import { UpdateRoleDTO } from '@/shared/models/dtos/role/updaterole.dto';
+import { DescriptionDTO } from '@/shared/models/dtos/role/findByDescription.dto';
 
 @Injectable()
 export class RolesService {
@@ -28,51 +29,76 @@ export class RolesService {
       const newRole = new this.roleModel(createRoleDTO);
       return newRole.save();
     } catch (e) {
-      this.logger.error(`Error creating role: ${e}`);
-      throw new InternalServerErrorException('Error creating role');
+      this.logger.error(`Something went wrong creating role: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong creating role.',
+      );
     }
   }
 
-  async getRoles(query: StatusDTO): Promise<Array<Roles>> {
+  async getRoles({ status }: StatusDTO): Promise<Array<Roles>> {
     try {
-      const { status } = query;
       this.logger.debug(
         status ? `Looking roles with status ${status}` : `Looking roles`,
       );
-      return status
-        ? await this.roleModel.find({ status }).exec()
-        : await this.roleModel.find().exec();
+      const roles = status
+        ? await this.roleModel
+            .find({ status })
+            .select({ __v: 0, createdAt: 0 })
+            .exec()
+        : await this.roleModel.find().select({ __v: 0, createdAt: 0 }).exec();
+      if (!roles) throw new NotFoundException('No roles registered.');
+      return roles;
     } catch (e) {
-      this.logger.error(`Error looking for Roles: ${e}`);
-      throw new InternalServerErrorException('Error looking for roles');
+      this.logger.error(`Something went wrong looking roles: ${e}`);
+      if (e instanceof NotFoundException) throw e;
+      throw new InternalServerErrorException(
+        'Something went wrong looking roles.',
+      );
     }
   }
 
-  async getRoleById({ id }: UrlValidator): Promise<RolesDocument | null> {
+  async getRoleById({ id }: UrlValidator): Promise<RolesDocument> {
     try {
       this.logger.debug('Looking role by his id');
-      const role = await this.roleModel.findById(id).exec();
+      const role = await this.roleModel
+        .findById(id)
+        .select({ __v: 0, createdAt: 0 })
+        .exec();
+      if (!role) throw new NotFoundException(`Role not found.`);
       return role;
     } catch (e) {
-      this.logger.error(`Error looking role: ${e}`);
-      throw new InternalServerErrorException('Error looking role');
+      this.logger.error(`Something went wrong while looking role by id: ${e}`);
+      if (e instanceof NotFoundException) throw e;
+      throw new InternalServerErrorException(
+        'Something went wrong while looking role by id.',
+      );
     }
   }
 
   async updateRole(
     updateRoleDTO: UpdateRoleDTO,
     { id }: UrlValidator,
-  ): Promise<void> {
+  ): Promise<Roles> {
     try {
       if (await this.validateRole(id)) {
         this.logger.debug('Updating role');
-        await this.roleModel.findByIdAndUpdate(id, updateRoleDTO, {
-          new: true,
-        });
+        const updatedRole = await this.roleModel.findByIdAndUpdate(
+          id,
+          updateRoleDTO,
+          {
+            new: true,
+          },
+        );
+        if (updatedRole) return updatedRole;
+        else throw new NotFoundException(`Role not found.`);
       }
+      return {} as Roles;
     } catch (e) {
-      this.logger.error(`Error updating role: ${e}`);
-      throw new InternalServerErrorException('Error updating role');
+      this.logger.error(`Something went wrong updating role: ${e}`);
+      throw new InternalServerErrorException(
+        'Something went wrong updating role.',
+      );
     }
   }
 
@@ -96,9 +122,9 @@ export class RolesService {
     try {
       this.logger.debug('Validating Role');
       const validRole = await this.roleModel.findById(id);
-      if (!validRole) throw new NotFoundException(`Role ${id} was not found`);
+      if (!validRole) throw new NotFoundException(`Role not found.`);
       if (validRole.status !== Status.ACTIVE)
-        throw new BadRequestException('Role must be active');
+        throw new BadRequestException('Role must be in active status.');
 
       return true;
     } catch (e) {
@@ -115,42 +141,53 @@ export class RolesService {
       const validRole = await this.getRoleById(params);
 
       if (validRole && validRole.status === Status.INACTIVE) {
-        this.logger.debug('Reactivating Role');
+        this.logger.debug('Reactivating role');
         await this.roleModel.findByIdAndUpdate(
           id,
           { status: Status.ACTIVE },
           { new: true },
         );
       } else if (validRole && validRole.status !== Status.INACTIVE) {
-        throw new BadRequestException('Role must be inactive');
+        throw new BadRequestException('Role already active.');
       } else {
-        throw new NotFoundException(`Role ${id} was not found`);
+        throw new NotFoundException(`Role not found`);
       }
     } catch (e) {
-      this.logger.error(`Error reactivating Role: ${e}`);
+      this.logger.error(`Something went wrong reactivating role: ${e}`);
       if (e instanceof NotFoundException || e instanceof BadRequestException)
         throw e;
-      else throw new InternalServerErrorException('Error reactivating Role');
+      else
+        throw new InternalServerErrorException(
+          'Something went wrong reactivating role.',
+        );
     }
   }
 
-  async validateRoleName(description: string): Promise<RolesDocument> {
+  async getRoleByDescription({
+    description,
+  }: DescriptionDTO): Promise<RolesDocument> {
     try {
-      this.logger.debug('Validating Role');
-      const validRole = await this.roleModel.findOne({ description }).exec();
+      this.logger.debug('Looking role by description.');
+      const validRole = await this.roleModel
+        .findOne({ description })
+        .select({ __v: 0, createdAt: 0 })
+        .exec();
       if (!validRole)
         throw new NotFoundException(
           `Role ${description} was not registered on DB`,
         );
       if (validRole.status !== Status.ACTIVE)
-        throw new BadRequestException('Role must be active');
+        throw new BadRequestException('Role must be in active status.');
 
       return validRole;
     } catch (e) {
-      this.logger.error(`Error validating Role: ${e}`);
+      this.logger.error(`Something went wrong looking role description: ${e}`);
       if (e instanceof NotFoundException || e instanceof BadRequestException)
         throw e;
-      else throw new InternalServerErrorException('Error validating Role');
+      else
+        throw new InternalServerErrorException(
+          'Something went wrong looking role description.',
+        );
     }
   }
 }

@@ -3,79 +3,133 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RolesService } from './roles.service';
-import { CreateCatalogDTO } from 'src/shared/models/dtos/catalogs/createCatalog.dto';
 import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { UpdateCatalogDTO } from 'src/shared/models/dtos/catalogs/updateCatalog.dto';
+import { CreateRoleDTO } from '@/shared/models/dtos/role/createrole.dto';
+import { UpdateRoleDTO } from '@/shared/models/dtos/role/updaterole.dto';
+import { Roles } from '@/shared/models/schemas/roles.schema';
+import { DescriptionDTO } from '@/shared/models/dtos/role/findByDescription.dto';
 
 @ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
   constructor(private rolesService: RolesService) {}
 
-  @ApiResponse({ status: HttpStatus.CREATED })
+  @ApiCreatedResponse({
+    type: CreateRoleDTO,
+    description: 'Role created successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong creating role.',
+  })
   @Post('create')
-  async createRole(@Body() createRoleDTO: CreateCatalogDTO) {
+  @ApiBody({ type: CreateRoleDTO })
+  async createRole(@Body() createRoleDTO: CreateRoleDTO) {
     return await this.rolesService.createRole(createRoleDTO);
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    type: [CreateRoleDTO],
+    description: 'Roles found successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'No roles registered.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong looking roles.',
+  })
   @Get()
   async getAllRoles(@Query() query: StatusDTO) {
-    const roles = await this.rolesService.getRoles(query);
-
-    if (!roles) throw new NotFoundException('No Roles registered');
-
-    return roles;
+    return await this.rolesService.getRoles(query);
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    type: CreateRoleDTO,
+    description: 'Role found successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'Role not found.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong looking role.',
+  })
   @Get(':id')
   async findRole(@Param() params: UrlValidator) {
-    const role = await this.rolesService.getRoleById(params);
-
-    if (!role)
-      throw new NotFoundException(`Role with id: ${params.id} doesn't exist`);
-
-    return role;
+    return await this.rolesService.getRoleById(params);
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    type: CreateRoleDTO,
+    description: 'Role updated successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'Role not found.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating role.',
+  })
   @Put(':id')
+  @ApiBody({ type: CreateRoleDTO })
   async updateRole(
-    @Body() updateRoleDTO: UpdateCatalogDTO,
+    @Body() updateRoleDTO: UpdateRoleDTO,
     @Param() params: UrlValidator,
   ) {
-    const updatedRole = await this.rolesService.updateRole(
-      updateRoleDTO,
-      params,
-    );
-
-    return updatedRole;
+    return await this.rolesService.updateRole(updateRoleDTO, params);
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    type: String,
+    description: 'Role updated successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'Role not found.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating role.',
+  })
+  @ApiBadRequestResponse({ description: 'Role already inactive.' })
   @Delete(':id')
   async inactiveRole(@Param() params: UrlValidator) {
     await this.rolesService.inactivateRole(params);
+    return 'Role inactivated successfully.';
   }
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    type: String,
+    description: 'Role reactivated successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'Role not found.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong reactivating role.',
+  })
+  @ApiBadRequestResponse({ description: 'Role already active.' })
   @Patch('reactivate/:id')
   async reactivateRole(@Param() params: UrlValidator) {
-    const reactivatedRole = await this.rolesService.reactiveRole(params);
+    await this.rolesService.reactiveRole(params);
 
-    return reactivatedRole;
+    return 'Role reactivated successfully.';
+  }
+
+  @ApiOkResponse({
+    type: Roles,
+    description: 'Role found successfully.',
+  })
+  @ApiNotFoundResponse({ description: 'Role not found.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong looking role description.',
+  })
+  @ApiBadRequestResponse({ description: 'Role must be in active status.' })
+  @Get('search/:description')
+  async findRoleByDescription(@Param() params: DescriptionDTO) {
+    return await this.rolesService.getRoleByDescription(params);
   }
 
   /* @ApiResponse({ status: 201 })

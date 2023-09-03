@@ -5,4 +5,5 @@ export enum UserRoles {
   VENTAS = 'ventas',
   GERENTE = 'gerente',
   CONSULTA = 'consulta',
+  CLIENTE = 'cliente',
 }

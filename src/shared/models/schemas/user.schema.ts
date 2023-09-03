@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Roles } from './roles.schema';
 
 @Schema()
 export class User {
@@ -28,7 +29,7 @@ export class User {
   deletedAt?: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Roles' })
-  role?: string;
+  role?: Roles;
 
   constructor(
     firebaseUid: string,

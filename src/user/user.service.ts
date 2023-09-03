@@ -97,6 +97,7 @@ export class UserService {
       this.logger.debug('Looking user profile');
       return await this.userModel
         .findById(id)
+        .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
         .exec();
     } catch (e) {
@@ -280,7 +281,7 @@ export class UserService {
 
   async addClaimsToUser(
     uid: string,
-    role: string = UserRoles.CONSULTA,
+    role: string = UserRoles.CLIENTE,
   ): Promise<void> {
     try {
       this.logger.debug('Adding claims to user');
@@ -291,7 +292,6 @@ export class UserService {
     }
   }
 
-  // TODO - add roles service
   //WebUsers methods
   async createWebUser(
     createWebUserDTO: WebUserDTO,

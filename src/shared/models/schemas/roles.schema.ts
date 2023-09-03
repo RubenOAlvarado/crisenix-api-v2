@@ -9,12 +9,16 @@ export class Roles {
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
+  @Prop({ type: Object })
+  permissions?: object;
+
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(description: string, status: string) {
+  constructor(description: string, status: string, permissions?: object) {
     this.description = description;
     this.status = status;
+    this.permissions = permissions;
   }
 }
 

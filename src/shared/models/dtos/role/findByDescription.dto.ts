@@ -1,9 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class DescriptionDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Description of the role.',
+    example: 'admin',
+  })
   @IsNotEmpty()
+  @IsString()
   description: string;
 
   constructor(description: string) {
