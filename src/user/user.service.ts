@@ -1,4 +1,3 @@
-import { UserRoles } from '../shared/enums/roles';
 import {
   BadRequestException,
   Injectable,
@@ -23,7 +22,7 @@ import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto'
 import { FbUser } from 'src/shared/interfaces/fbUser.interface';
 import { Status } from 'src/shared/enums/status.enum';
 import { RolesService } from 'src/roles/roles.service';
-import { FirebaseError } from 'firebase-admin';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -32,6 +31,7 @@ export class UserService {
     private readonly userModel: Model<User>,
     private logService: EventlogService,
     private roleService: RolesService,
+    private authService: AuthService,
   ) {}
 
   private readonly logger = new Logger(UserService.name);
@@ -69,11 +69,11 @@ export class UserService {
       const dbUser = new this.userModel(createUserDTO);
       const { firebaseUid, role: roleId } = createUserDTO;
       if (!roleId) {
-        await this.addClaimsToUser(firebaseUid);
+        await this.authService.addClaimsToUser(firebaseUid);
       } else {
         const role = await this.roleService.getRoleById({ id: roleId });
         if (!role) throw new BadRequestException('Sended role not found.');
-        await this.addClaimsToUser(firebaseUid, role?._id?.toString());
+        await this.authService.addClaimsToUser(firebaseUid, role.description);
       }
       await this.setLogDto(
         dbUser._id.toString(),
@@ -261,37 +261,6 @@ export class UserService {
     }
   }
 
-  //Auth method
-  async verifiedUserToken(token: string): Promise<FbUser> {
-    try {
-      this.logger.debug('Verifying user token');
-      const checkRevoked = true;
-      const decodeToken = await getAuth().verifyIdToken(token, checkRevoked);
-      return this.getFbUserById(decodeToken.uid);
-    } catch (e: FirebaseError | any) {
-      if (e.code == 'auth/id-token-revoked') {
-        this.logger.error('User token revoked');
-        throw new BadRequestException('Token revoked');
-      } else {
-        this.logger.error('User token invalid');
-        throw new BadRequestException('Token invalid');
-      }
-    }
-  }
-
-  async addClaimsToUser(
-    uid: string,
-    role: string = UserRoles.CLIENTE,
-  ): Promise<void> {
-    try {
-      this.logger.debug('Adding claims to user');
-      const claims = { role };
-      await getAuth().createCustomToken(uid, claims);
-    } catch (e) {
-      this.logger.error(`Error adding claims to user: ${e}`);
-    }
-  }
-
   //WebUsers methods
   async createWebUser(
     createWebUserDTO: WebUserDTO,
@@ -334,7 +303,7 @@ export class UserService {
     try {
       this.logger.debug('Looking for web user');
       const user = await this.getDbUserById(params);
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) throw new BadRequestException('User not found.');
       const fbUser = await this.getFbUserById(user.firebaseUid);
       return { user, fbUser };
     } catch (e) {
@@ -353,7 +322,7 @@ export class UserService {
       await this.updateDbUser(params, { ...updateWebUserDTO }, roleId);
       const updatedDbUser = await this.getDbUserById(params);
       this.logger.debug('Updated in db');
-      if (!updatedDbUser) throw new BadRequestException('User not found');
+      if (!updatedDbUser) throw new BadRequestException('User not found.');
       const updatedFbUser = await this.updatefbUser(updatedDbUser.firebaseUid, {
         ...updateWebUserDTO,
       });
@@ -373,7 +342,7 @@ export class UserService {
       await this.deleteDbUser(params, roleId);
       this.logger.debug('Deleted in db');
       const deletdDbUser = await this.getDbUserById(params);
-      if (!deletdDbUser) throw new BadRequestException('User not found');
+      if (!deletdDbUser) throw new BadRequestException('User not found.');
       await this.deleteFbUser(deletdDbUser.firebaseUid);
       this.logger.debug('Deleted in firebase');
     } catch (e) {

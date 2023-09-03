@@ -33,6 +33,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { firebaseProvider } from './shared/providers/firebase.provider';
 import configuration from './configs/configuration';
 import { MulterModule } from '@nestjs/platform-express';
+import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
 
 @Module({
   imports: [
@@ -77,6 +78,6 @@ import { MulterModule } from '@nestjs/platform-express';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, firebaseProvider],
+  providers: [AppService, firebaseProvider, FirebaseAuthStrategy],
 })
 export class AppModule {}

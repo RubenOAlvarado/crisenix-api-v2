@@ -8,6 +8,7 @@ import {
   Delete,
   NotFoundException,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -25,6 +26,7 @@ import { CreateUserDTO } from 'src/shared/models/dtos/user/createuser.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
+import { FirebaseAuthGuard } from '@/auth/firebase-auth.guard';
 
 @ApiTags('User')
 @Controller('user')
@@ -46,6 +48,7 @@ export class UserController {
     description: 'User object',
     type: CreateUserDTO,
   })
+  @UseGuards(FirebaseAuthGuard)
   async createWebUser(@Body() webUserDTO: WebUserDTO) {
     return await this.userService.createWebUser(webUserDTO, 'develop');
   }
@@ -61,6 +64,7 @@ export class UserController {
     description: 'Something went wrong finding the users profiles.',
   })
   @Get('all')
+  @UseGuards(FirebaseAuthGuard)
   async getUsers() {
     const users = await this.userService.getDbUsers();
 
