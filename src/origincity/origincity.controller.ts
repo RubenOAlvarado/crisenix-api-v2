@@ -36,6 +36,7 @@ import 'multer';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
+import { Public } from '@/auth/public.decorator';
 
 @Controller('origincity')
 @ApiTags('Origin City')
@@ -71,6 +72,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin city.',
   })
+  @Public()
   @Get(':id')
   async findOne(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
     const city = await this.originCityService.findOne(urlValidator);
@@ -83,6 +85,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin cities.',
   })
+  @Public()
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,

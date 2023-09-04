@@ -34,6 +34,7 @@ import { firebaseProvider } from './shared/providers/firebase.provider';
 import configuration from './configs/configuration';
 import { MulterModule } from '@nestjs/platform-express';
 import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
+import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
 
 @Module({
   imports: [
@@ -78,6 +79,14 @@ import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, firebaseProvider, FirebaseAuthStrategy],
+  providers: [
+    AppService,
+    firebaseProvider,
+    FirebaseAuthStrategy,
+    {
+      provide: 'APP_GUARD',
+      useClass: FirebaseAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
