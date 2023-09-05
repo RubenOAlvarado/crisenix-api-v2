@@ -13,6 +13,7 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api', { exclude: ['health'] });
   const configService = app.get(ConfigService);
+  app.enableCors();
 
   const API_VERSION = configService.get('API_VERSION');
   const NODE_ENV = configService.get('NODE_ENV');
