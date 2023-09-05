@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -27,6 +28,7 @@ import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
@@ -234,9 +236,8 @@ export class UserController {
     return await this.userService.getWebUser(params);
   }
 
-  /*  @Get('test/:uid')
-  async test(@Param('uid') uid: string) {
-    const userComplete = await this.userService.test(uid);
-    return userComplete;
+  /* @Get('test')
+  async test(@Request() req: any) {
+    return req.user;
   } */
 }

@@ -14,6 +14,7 @@ import { AboardpointService } from './aboardpoint.service';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/createaboardpoint.dto';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -26,6 +27,7 @@ import { UpdateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/updateabo
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/aboardpoint/responseaboardpoint.dto';
 
 @ApiTags('Aboard Point')
+@ApiBearerAuth()
 @Controller('aboardpoint')
 export class AboardPointController {
   constructor(private service: AboardpointService) {}

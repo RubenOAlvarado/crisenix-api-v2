@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
@@ -31,6 +32,7 @@ import { excelFileFilter } from '@/filer/filer.utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Captions')
+@ApiBearerAuth()
 @Controller('captions')
 export class CaptionsController {
   constructor(private readonly captionService: CaptionsService) {}

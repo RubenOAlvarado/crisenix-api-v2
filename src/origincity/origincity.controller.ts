@@ -1,4 +1,5 @@
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
@@ -38,6 +39,7 @@ import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 import { Public } from '@/auth/public.decorator';
 
+@ApiBearerAuth()
 @Controller('origincity')
 @ApiTags('Origin City')
 @ApiExtraModels(PaginatedDTO)

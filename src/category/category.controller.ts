@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
@@ -31,6 +32,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 
 @ApiTags('Category')
+@ApiBearerAuth()
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

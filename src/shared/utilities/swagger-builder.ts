@@ -14,6 +14,7 @@ import { OrigincityModule } from 'src/origincity/origincity.module';
 import { AboardpointModule } from 'src/aboardpoint/aboardpoint.module';
 import { CaptionsModule } from '@/captions/captions.module';
 import { CategoryModule } from '@/category/category.module';
+import { TourModule } from '@/tour/tour.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -29,6 +30,7 @@ export const buildSwaggerModule = async (
     .setTitle(OPENAPI_TITLE)
     .setDescription(OPENAPI_DESCRIPTION)
     .setVersion(VERSION)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(scopedApplicationCore, config, {
@@ -39,6 +41,7 @@ export const buildSwaggerModule = async (
       AboardpointModule,
       CaptionsModule,
       CategoryModule,
+      TourModule,
     ],
   });
 

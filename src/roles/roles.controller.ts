@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -27,6 +28,7 @@ import { Roles } from '@/shared/models/schemas/roles.schema';
 import { DescriptionDTO } from '@/shared/models/dtos/role/findByDescription.dto';
 
 @ApiTags('Roles')
+@ApiBearerAuth()
 @Controller('roles')
 export class RolesController {
   constructor(private rolesService: RolesService) {}
