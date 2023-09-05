@@ -32,9 +32,24 @@ export class AuthService {
     try {
       this.logger.debug('Adding claims to user');
       const claims = { role };
-      await getAuth().createCustomToken(uid, claims);
+      await getAuth().setCustomUserClaims(uid, claims);
+      //this.logger.debug(`User with claims: ${userWithCustClaims}`);
     } catch (e) {
       this.logger.error(`Error adding claims to user: ${e}`);
     }
   }
+
+  /* async getFirebaseUser(uid: string): Promise<any> {
+    try {
+      this.logger.debug('Getting firebase user');
+      const user = await getAuth().getUser(uid);
+      if (!user) {
+        this.logger.error('User not found.');
+        throw new BadRequestException('User not found.');
+      }
+      return user;
+    } catch (e) {
+      this.logger.error(`Error getting firebase user: ${e}`);
+    }
+  } */
 }

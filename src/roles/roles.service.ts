@@ -174,7 +174,7 @@ export class RolesService {
         .exec();
       if (!validRole)
         throw new NotFoundException(
-          `Role ${description} was not registered on DB`,
+          `Role ${description} was not registered on DB.`,
         );
       if (validRole.status !== Status.ACTIVE)
         throw new BadRequestException('Role must be in active status.');

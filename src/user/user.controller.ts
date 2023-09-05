@@ -62,11 +62,7 @@ export class UserController {
   })
   @Get('all')
   async getUsers() {
-    const users = await this.userService.getDbUsers();
-
-    if (!users) throw new NotFoundException('No users found!');
-
-    return users;
+    return await this.userService.getDbUsers();
   }
 
   @ApiOkResponse({
@@ -152,12 +148,7 @@ export class UserController {
   })
   @Get('profile/:id')
   async getUserProfile(@Param() params: UrlValidator) {
-    const profile = await this.userService.getDbUserById(params);
-
-    if (!profile)
-      throw new NotFoundException(`Profile for user ${params.id} not found.`);
-
-    return profile;
+    return await this.userService.getDbUserById(params);
   }
 
   @ApiOkResponse({
@@ -173,12 +164,7 @@ export class UserController {
   })
   @Get('profileFb/:id')
   async getUserProfileByFbId(@Param('id') id: string) {
-    const profile = await this.userService.getDbUserByFbUid(id);
-
-    if (!profile)
-      throw new NotFoundException(`Profile for user ${id} not found`);
-
-    return profile;
+    return await this.userService.getDbUserByFbUid(id);
   }
 
   @ApiOkResponse({
@@ -193,6 +179,7 @@ export class UserController {
     @Param() params: UrlValidator,
   ) {
     await this.userService.updateDbUser(params, updateUserDTO, 'develop');
+    return 'The user profiles have been succesfully updated.';
   }
 
   @ApiOkResponse({
@@ -214,6 +201,7 @@ export class UserController {
     @Param() params: UrlValidator,
   ) {
     await this.userService.replaceDbUser(params, updateUserDTO, 'develop');
+    return 'The user profiles have been succesfully updated.';
   }
 
   @ApiOkResponse({
@@ -228,5 +216,27 @@ export class UserController {
   @Delete('profile/:id')
   async deleteProfile(@Param() params: UrlValidator) {
     await this.userService.deleteDbUser(params, 'develop');
+    return 'The user profile has been successfully deleted.';
   }
+
+  @ApiOkResponse({
+    description: 'The user profiles have been succesfully found.',
+    type: [WebUserDTO],
+  })
+  @ApiNotFoundResponse({
+    description: 'No user profile found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the user profiles.',
+  })
+  @Get('profiles/:id')
+  async getProfiles(@Param() params: UrlValidator) {
+    return await this.userService.getWebUser(params);
+  }
+
+  /*  @Get('test/:uid')
+  async test(@Param('uid') uid: string) {
+    const userComplete = await this.userService.test(uid);
+    return userComplete;
+  } */
 }

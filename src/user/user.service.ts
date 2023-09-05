@@ -68,9 +68,9 @@ export class UserService {
       this.logger.debug('Creating new user profile');
       const dbUser = new this.userModel(createUserDTO);
       const { firebaseUid, role: roleId } = createUserDTO;
-      if (!roleId) {
+      if (!roleId && firebaseUid) {
         await this.authService.addClaimsToUser(firebaseUid);
-      } else {
+      } else if (roleId && firebaseUid) {
         const role = await this.roleService.getRoleById({ id: roleId });
         if (!role) throw new BadRequestException('Sended role not found.');
         await this.authService.addClaimsToUser(firebaseUid, role.description);
@@ -92,14 +92,17 @@ export class UserService {
     }
   }
 
-  async getDbUserById({ id }: UrlValidator): Promise<User | null> {
+  async getDbUserById({ id }: UrlValidator): Promise<User> {
     try {
       this.logger.debug('Looking user profile');
-      return await this.userModel
+      const profile = await this.userModel
         .findById(id)
         .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
         .exec();
+      if (!profile)
+        throw new NotFoundException(`Profile for user ${id} not found.`);
+      return profile;
     } catch (e) {
       this.logger.error(`Something went wrong finding the user: ${e}`);
       throw new InternalServerErrorException(
@@ -111,14 +114,21 @@ export class UserService {
   async getDbUserByFbUid(firebaseUid: string): Promise<User | null> {
     try {
       this.logger.debug('Looking user profile by his firebaseid');
-      return await this.userModel
+      const profile = await this.userModel
         .findOne({ firebaseUid })
+        .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
         .exec();
+      if (!profile)
+        throw new NotFoundException(
+          `Profile for user ${firebaseUid} not found.`,
+        );
+      return profile;
     } catch (e) {
       this.logger.error(
         `Something went wrong finding the user profile by his firebase id: ${e}`,
       );
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
         'Something went wrong finding the user profile by his firebase id.',
       );
@@ -128,12 +138,16 @@ export class UserService {
   async getDbUsers(): Promise<User[]> {
     try {
       this.logger.debug('looking users profiles');
-      return await this.userModel
+      const users = await this.userModel
         .find()
+        .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
         .exec();
+      if (!users) throw new NotFoundException('No users found.');
+      return users;
     } catch (e) {
       this.logger.error(`Error looking users profiles: ${e}`);
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
         'Something went wrong finding the users profiles.',
       );
@@ -201,7 +215,7 @@ export class UserService {
         { status: Status.INACTIVE, deletedAt },
         { new: true },
       );
-      if (!deletedUser) throw new BadRequestException('User not found');
+      if (!deletedUser) throw new NotFoundException('User not found');
       await this.setLogDto(
         deletedUser._id.toString(),
         MOVES.DELETE,
@@ -210,6 +224,7 @@ export class UserService {
       );
     } catch (e) {
       this.logger.error(`Error deleting user profle: ${e}`);
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException('Error deleting user profle');
     }
   }
@@ -293,6 +308,7 @@ export class UserService {
       return dbNewUser;
     } catch (e) {
       this.logger.error(`Something went wrong creating the user: ${e}`);
+      if (e instanceof BadRequestException) throw e;
       throw new InternalServerErrorException(
         'Something went wrong creating the user.',
       );
@@ -303,12 +319,15 @@ export class UserService {
     try {
       this.logger.debug('Looking for web user');
       const user = await this.getDbUserById(params);
-      if (!user) throw new BadRequestException('User not found.');
+      if (!user) throw new NotFoundException('No user profile found.');
       const fbUser = await this.getFbUserById(user.firebaseUid);
       return { user, fbUser };
     } catch (e) {
-      this.logger.error(`Error looking for web user: ${e}`);
-      throw new InternalServerErrorException('Error looking for web user');
+      this.logger.error(`Something went wrong finding the user profiles: ${e}`);
+      if (e instanceof NotFoundException) throw e;
+      throw new InternalServerErrorException(
+        'Something went wrong finding the user profiles.',
+      );
     }
   }
 
@@ -322,7 +341,7 @@ export class UserService {
       await this.updateDbUser(params, { ...updateWebUserDTO }, roleId);
       const updatedDbUser = await this.getDbUserById(params);
       this.logger.debug('Updated in db');
-      if (!updatedDbUser) throw new BadRequestException('User not found.');
+      if (!updatedDbUser) throw new NotFoundException('User not found.');
       const updatedFbUser = await this.updatefbUser(updatedDbUser.firebaseUid, {
         ...updateWebUserDTO,
       });
@@ -330,6 +349,7 @@ export class UserService {
       return { user: updatedDbUser, fbUser: updatedFbUser };
     } catch (e) {
       this.logger.error(`Something went wrong updating the user profile: ${e}`);
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
         'Something went wrong updating the user profile.',
       );
@@ -342,14 +362,24 @@ export class UserService {
       await this.deleteDbUser(params, roleId);
       this.logger.debug('Deleted in db');
       const deletdDbUser = await this.getDbUserById(params);
-      if (!deletdDbUser) throw new BadRequestException('User not found.');
+      if (!deletdDbUser) throw new NotFoundException('User not found.');
       await this.deleteFbUser(deletdDbUser.firebaseUid);
       this.logger.debug('Deleted in firebase');
     } catch (e) {
       this.logger.error(`Something went wrong deleting the user: ${e}`);
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
         'Something went wrong deleting the user.',
       );
     }
   }
+
+  /* async test(uid: string) {
+    try {
+      const user = await this.authService.getFirebaseUser(uid);
+      console.log(user);
+    } catch (e) {
+      console.log(e);
+    }
+  } */
 }
