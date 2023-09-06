@@ -28,7 +28,6 @@ import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { Public } from '@/auth/public.decorator';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -62,7 +61,6 @@ export class UserController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the users profiles.',
   })
-  @Public()
   @Get('all')
   async getUsers(@Query() query: PaginationDTO) {
     return await this.userService.getDbUsers(query);
@@ -77,7 +75,6 @@ export class UserController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong updating the user profile.',
   })
-  @Public()
   @Put(':id')
   @ApiBody({
     description: 'User object',
