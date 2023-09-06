@@ -49,14 +49,16 @@ export class OriginCityService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<OriginCity | null> {
+  async findOne({ id }: UrlValidator): Promise<OriginCity> {
     try {
       this.logger.debug(`getting origin city: ${id}`);
-      return this.originCityModel
+      const city = await this.originCityModel
         .findById(id)
         .select({ _id: 0, __v: 0, createdAt: 0 })
         .populate('aboardPoints')
         .exec();
+      if (!city) throw new NotFoundException('Origin city not found.');
+      return city;
     } catch (error) {
       this.logger.error(`error getting origin city: ${JSON.stringify(error)}`);
       throw new InternalServerErrorException(
@@ -85,6 +87,8 @@ export class OriginCityService {
             .skip((page - 1) * limit)
             .select({ __v: 0, createdAt: 0 })
             .exec();
+      if (!docs.length)
+        throw new NotFoundException('No origin cities registered.');
       const totalDocs = status
         ? await this.originCityModel.countDocuments({ status }).exec()
         : await this.originCityModel.countDocuments().exec();
@@ -98,9 +102,11 @@ export class OriginCityService {
       };
     } catch (error) {
       this.logger.error(`error getting all origin cities: ${error}`);
-      throw new InternalServerErrorException(
-        `Error getting all origin cities: ${error}`,
-      );
+      if (error instanceof NotFoundException) throw error;
+      else
+        throw new InternalServerErrorException(
+          `Error getting all origin cities: ${error}`,
+        );
     }
   }
 
@@ -184,7 +190,7 @@ export class OriginCityService {
   async searcher({ word, status }: SearcherDTO): Promise<Array<OriginCity>> {
     try {
       this.logger.debug(`Searching origin cities: ${word}`);
-      return this.originCityModel
+      const searchResult = this.originCityModel
         .find({
           $or: [
             { name: { $regex: word, $options: 'i' } },
@@ -193,11 +199,16 @@ export class OriginCityService {
           status,
         })
         .exec();
+      if (!searchResult)
+        throw new NotFoundException('Any origin city match your search.');
+      return searchResult;
     } catch (error) {
       this.logger.error(`Error searching origin cities: ${error}`);
-      throw new InternalServerErrorException(
-        `Error searching origin cities: ${error}`,
-      );
+      if (error instanceof NotFoundException) throw error;
+      else
+        throw new InternalServerErrorException(
+          `Error searching origin cities: ${error}`,
+        );
     }
   }
 

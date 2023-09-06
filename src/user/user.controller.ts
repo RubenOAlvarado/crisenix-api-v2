@@ -6,8 +6,8 @@ import {
   Body,
   Patch,
   Delete,
-  NotFoundException,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -26,6 +26,8 @@ import { CreateUserDTO } from 'src/shared/models/dtos/user/createuser.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
+import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -52,24 +54,20 @@ export class UserController {
     return await this.userService.createWebUser(webUserDTO, 'develop');
   }
 
+  @ApiPaginatedResponse(CreateUserDTO)
   @ApiNotFoundResponse({
     description: 'No users found!',
-  })
-  @ApiOkResponse({
-    description: 'The users have been found.',
-    type: [WebUserDTO],
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the users profiles.',
   })
   @Get('all')
-  async getUsers() {
-    return await this.userService.getDbUsers();
+  async getUsers(@Query() query: PaginationDTO) {
+    return await this.userService.getDbUsers(query);
   }
 
   @ApiOkResponse({
     description: 'The user has been updated succesfully.',
-    type: WebUserDTO,
   })
   @ApiNotFoundResponse({
     description: 'User profile not found.',
@@ -86,18 +84,8 @@ export class UserController {
     @Param() params: UrlValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
   ) {
-    const updatedUser = await this.userService.updateWebUser(
-      params,
-      updateWebUserDTO,
-      'develop',
-    );
-
-    if (!updatedUser)
-      throw new NotFoundException(
-        `User profile with id ${params.id} not found.`,
-      );
-
-    return updatedUser;
+    await this.userService.updateWebUser(params, updateWebUserDTO, 'develop');
+    return 'The user has been updated succesfully.';
   }
 
   @ApiOkResponse({
@@ -112,6 +100,7 @@ export class UserController {
   @Delete(':id')
   async deleteWebUser(@Param() params: UrlValidator) {
     await this.userService.deletedWebUser(params, 'develop');
+    return 'The user has been successfully deleted.';
   }
 
   @ApiCreatedResponse({

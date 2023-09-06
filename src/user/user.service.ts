@@ -23,6 +23,8 @@ import { FbUser } from 'src/shared/interfaces/fbUser.interface';
 import { Status } from 'src/shared/enums/status.enum';
 import { RolesService } from 'src/roles/roles.service';
 import { AuthService } from '@/auth/auth.service';
+import { QueryDTO } from '@/shared/dtos/query.dto';
+import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 
 @Injectable()
 export class UserService {
@@ -135,16 +137,26 @@ export class UserService {
     }
   }
 
-  async getDbUsers(): Promise<User[]> {
+  async getDbUsers({ page, limit }: QueryDTO): Promise<PaginateResult<User>> {
     try {
       this.logger.debug('looking users profiles');
-      const users = await this.userModel
+      const docs = await this.userModel
         .find()
         .populate('role', { __v: 0, createdAt: 0 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
         .select({ __v: 0, createdAt: 0 })
         .exec();
-      if (!users) throw new NotFoundException('No users found.');
-      return users;
+      if (!docs) throw new NotFoundException('No users found.');
+      const totalDocs = await this.userModel.countDocuments().exec();
+      return {
+        docs,
+        totalDocs,
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(totalDocs / limit),
+        page,
+        totalPages: Math.ceil(totalDocs / limit),
+      };
     } catch (e) {
       this.logger.error(`Error looking users profiles: ${e}`);
       if (e instanceof NotFoundException) throw e;

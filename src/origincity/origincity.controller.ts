@@ -15,7 +15,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -77,9 +76,7 @@ export class OriginCityController {
   @Public()
   @Get(':id')
   async findOne(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
-    const city = await this.originCityService.findOne(urlValidator);
-    if (!city) throw new NotFoundException('Origin city not found.');
-    return city;
+    return await this.originCityService.findOne(urlValidator);
   }
 
   @ApiPaginatedResponse(ResponseOriginCityDTO)
@@ -91,13 +88,8 @@ export class OriginCityController {
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
-  ): Promise<PaginateResult<OriginCity> | Array<OriginCity>> {
-    const paginatedOriginCities = await this.originCityService.findAll(
-      queryDTO,
-    );
-    if (!paginatedOriginCities)
-      throw new NotFoundException('No origin cities registered.');
-    return paginatedOriginCities;
+  ): Promise<PaginateResult<OriginCity>> {
+    return await this.originCityService.findAll(queryDTO);
   }
 
   @ApiOkResponse({
@@ -117,8 +109,9 @@ export class OriginCityController {
   async update(
     @Param() urlValidator: UrlValidator,
     @Body() updateOriginCityDTO: UpdateOriginCityDTO,
-  ): Promise<void> {
+  ): Promise<string> {
     await this.originCityService.update(urlValidator, updateOriginCityDTO);
+    return 'The origin city has been successfully updated.';
   }
 
   @ApiOkResponse({
@@ -131,8 +124,9 @@ export class OriginCityController {
     description: 'Something went wrong deleting the origin city.',
   })
   @Delete('delete/:id')
-  async delete(@Param() urlValidator: UrlValidator): Promise<void> {
+  async delete(@Param() urlValidator: UrlValidator): Promise<string> {
     await this.originCityService.delete(urlValidator);
+    return 'The origin city has been successfully deleted.';
   }
 
   @ApiOkResponse({
@@ -145,8 +139,9 @@ export class OriginCityController {
     description: 'Something went wrong activating the origin city.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() urlValidator: UrlValidator): Promise<void> {
+  async reactivate(@Param() urlValidator: UrlValidator): Promise<string> {
     await this.originCityService.reactivate(urlValidator);
+    return 'The origin city has been successfully activated.';
   }
 
   @ApiOkResponse({
@@ -166,10 +161,7 @@ export class OriginCityController {
     type: SearcherDTO,
   })
   async search(@Body() searcherDTO: SearcherDTO): Promise<Array<OriginCity>> {
-    const searchResult = await this.originCityService.searcher(searcherDTO);
-    if (!searchResult)
-      throw new NotFoundException('Any origin city match your search.');
-    return searchResult;
+    return await this.originCityService.searcher(searcherDTO);
   }
 
   @ApiOkResponse({
@@ -190,11 +182,12 @@ export class OriginCityController {
   async addPoints(
     @Param() urlValidator: UrlValidator,
     @Body() updateOriginCityDTO: UpdateOriginCityDTO,
-  ): Promise<void> {
+  ): Promise<string> {
     await this.originCityService.addAboardPoints(
       urlValidator,
       updateOriginCityDTO,
     );
+    return 'The aboard point/s has been successfully added to the origin city.';
   }
 
   @ApiExcludeEndpoint()
