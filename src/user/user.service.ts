@@ -113,7 +113,7 @@ export class UserService {
     }
   }
 
-  async getDbUserByFbUid(firebaseUid: string): Promise<User | null> {
+  async getDbUserByFbUid(firebaseUid: string): Promise<User> {
     try {
       this.logger.debug('Looking user profile by his firebaseid');
       const profile = await this.userModel

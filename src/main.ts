@@ -20,7 +20,13 @@ async function bootstrap() {
   const port = configService.get('port');
 
   app.setGlobalPrefix(`api/${API_VERSION}`);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  );
 
   const isDevelopmentOrQaEnvironment = NODE_ENV !== NodeEnvs.production;
 
