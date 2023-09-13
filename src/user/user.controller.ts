@@ -215,7 +215,7 @@ export class UserController {
 
   @ApiOkResponse({
     description: 'The user profiles have been succesfully found.',
-    type: [ResponseWebUserDTO],
+    type: ResponseWebUserDTO,
   })
   @ApiNotFoundResponse({
     description: 'No user profile found.',
