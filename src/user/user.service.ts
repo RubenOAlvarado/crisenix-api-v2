@@ -21,7 +21,6 @@ import { CreateFbUserDTO } from 'src/shared/models/dtos/user/createfbuser.dto';
 import { UpdateFbUserDTO } from 'src/shared/models/dtos/user/updatefbuser.dto';
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
-import { FbUser } from 'src/shared/interfaces/fbUser.interface';
 import { Status } from 'src/shared/enums/status.enum';
 import { RolesService } from 'src/roles/roles.service';
 import { AuthService } from '@/auth/auth.service';

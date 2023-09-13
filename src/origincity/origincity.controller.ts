@@ -36,7 +36,6 @@ import 'multer';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
-import { Public } from '@/auth/public.decorator';
 
 @ApiBearerAuth()
 @Controller('origincity')
