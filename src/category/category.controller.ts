@@ -30,6 +30,7 @@ import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
+import { Public } from '@/auth/public.decorator';
 
 @ApiTags('Category')
 @ApiBearerAuth()
@@ -60,6 +61,7 @@ export class CategoryController {
   @ApiNotFoundResponse({
     description: 'No categories registered.',
   })
+  @Public()
   @Get()
   async findAll(@Query() { status }: QueryDTO) {
     return await this.categoryService.findAll(status);

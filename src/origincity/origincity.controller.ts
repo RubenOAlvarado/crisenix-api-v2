@@ -73,7 +73,6 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin city.',
   })
-  @Public()
   @Get(':id')
   async findOne(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
     return await this.originCityService.findOne(urlValidator);
@@ -84,7 +83,6 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin cities.',
   })
-  @Public()
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,

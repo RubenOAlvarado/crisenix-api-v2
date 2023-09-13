@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -25,6 +27,9 @@ import { RolesService } from 'src/roles/roles.service';
 import { AuthService } from '@/auth/auth.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
+import { UserRecord } from 'firebase-admin/auth';
+import { ResponseRoleDTO } from '@/shared/models/dtos/role/response-role.dto';
 
 @Injectable()
 export class UserService {
@@ -33,6 +38,7 @@ export class UserService {
     private readonly userModel: Model<User>,
     private logService: EventlogService,
     private roleService: RolesService,
+    @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
   ) {}
 
@@ -242,7 +248,7 @@ export class UserService {
   }
 
   //Firebase methods
-  async createFbUser(createFbUserDTO: CreateFbUserDTO): Promise<FbUser> {
+  async createFbUser(createFbUserDTO: CreateFbUserDTO): Promise<UserRecord> {
     try {
       this.logger.debug('Creating new firebase user');
       const fbUser = await getAuth().createUser(createFbUserDTO);
@@ -253,13 +259,15 @@ export class UserService {
     }
   }
 
-  async getFbUserById(id: string): Promise<FbUser> {
+  async getFbUserById(id: string): Promise<UserRecord> {
     try {
       this.logger.debug('Getting firebase user by his id');
       const fbUser = await getAuth().getUser(id);
+      if (!fbUser) throw new NotFoundException('Firebase user not found.');
       return fbUser;
     } catch (e) {
       this.logger.error(`Error looking firebase user: ${e}`);
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException('Error looking firebase user');
     }
   }
@@ -267,7 +275,7 @@ export class UserService {
   async updatefbUser(
     id: string,
     updateFbUserDTO: UpdateFbUserDTO,
-  ): Promise<FbUser> {
+  ): Promise<UserRecord> {
     try {
       this.logger.debug('Updating firebase user');
       const updatedFbUser = await getAuth().updateUser(id, updateFbUserDTO);
@@ -292,9 +300,9 @@ export class UserService {
   async createWebUser(
     createWebUserDTO: WebUserDTO,
     roleId: string,
-  ): Promise<any> {
+  ): Promise<ResponseWebUserDTO | User> {
     try {
-      let fbNewUser: FbUser;
+      let fbNewUser: UserRecord;
       let dbNewUser: User;
       this.logger.debug('Creating new web user');
       if (!createWebUserDTO.fbregistered) {
@@ -312,7 +320,12 @@ export class UserService {
         };
         dbNewUser = await this.createDbUser({ ...createdFirebaseUser }, roleId);
         this.logger.debug('User created in db');
-        return dbNewUser;
+        const responseDTO = {
+          ...dbNewUser,
+          role: dbNewUser?.role as ResponseRoleDTO,
+          ...fbNewUser,
+        };
+        return responseDTO;
       }
 
       dbNewUser = await this.createDbUser({ ...createWebUserDTO }, roleId);
@@ -327,13 +340,17 @@ export class UserService {
     }
   }
 
-  async getWebUser(params: UrlValidator): Promise<any> {
+  async getWebUser(params: UrlValidator): Promise<ResponseWebUserDTO> {
     try {
       this.logger.debug('Looking for web user');
       const user = await this.getDbUserById(params);
       if (!user) throw new NotFoundException('No user profile found.');
       const fbUser = await this.getFbUserById(user.firebaseUid);
-      return { user, fbUser };
+      return {
+        ...user,
+        role: user?.role as ResponseRoleDTO,
+        ...fbUser,
+      };
     } catch (e) {
       this.logger.error(`Something went wrong finding the user profiles: ${e}`);
       if (e instanceof NotFoundException) throw e;
@@ -347,7 +364,7 @@ export class UserService {
     params: UrlValidator,
     updateWebUserDTO: UpdateWebUserDTO,
     roleId: string,
-  ): Promise<any> {
+  ): Promise<ResponseWebUserDTO> {
     try {
       this.logger.debug('Updating web user');
       await this.updateDbUser(params, { ...updateWebUserDTO }, roleId);
@@ -358,7 +375,11 @@ export class UserService {
         ...updateWebUserDTO,
       });
       this.logger.debug('Updated in fb');
-      return { user: updatedDbUser, fbUser: updatedFbUser };
+      return {
+        ...updatedDbUser,
+        ...updatedFbUser,
+        role: updatedDbUser.role as ResponseRoleDTO,
+      };
     } catch (e) {
       this.logger.error(`Something went wrong updating the user profile: ${e}`);
       if (e instanceof NotFoundException) throw e;

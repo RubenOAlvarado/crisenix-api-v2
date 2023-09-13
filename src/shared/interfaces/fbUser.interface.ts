@@ -4,7 +4,7 @@ export interface FbUser {
   readonly emailVerified?: boolean;
   readonly phoneNumber?: string;
   readonly password?: string;
-  readonly displayName?: string;
+  readonly displayName: string;
   readonly photoUrl?: string;
   readonly disabled?: boolean;
 }

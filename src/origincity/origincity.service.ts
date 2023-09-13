@@ -79,12 +79,14 @@ export class OriginCityService {
             .find({ status })
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .populate('aboardPoints')
             .select({ __v: 0, createdAt: 0 })
             .exec()
         : await this.originCityModel
             .find()
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .populate('aboardPoints')
             .select({ __v: 0, createdAt: 0 })
             .exec();
       if (!docs.length)
@@ -198,6 +200,8 @@ export class OriginCityService {
           ],
           status,
         })
+        .populate('aboardPoints')
+        .select({ __v: 0, createdAt: 0 })
         .exec();
       if (!searchResult)
         throw new NotFoundException('Any origin city match your search.');

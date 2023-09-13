@@ -28,6 +28,8 @@ import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { Public } from '@/auth/public.decorator';
+import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -153,6 +155,7 @@ export class UserController {
     description:
       'Something went wrong finding the user profile by his firebase id.',
   })
+  @Public()
   @Get('profileFb/:id')
   async getUserProfileByFbId(@Param('id') id: string) {
     return await this.userService.getDbUserByFbUid(id);
@@ -212,7 +215,7 @@ export class UserController {
 
   @ApiOkResponse({
     description: 'The user profiles have been succesfully found.',
-    type: [WebUserDTO],
+    type: [ResponseWebUserDTO],
   })
   @ApiNotFoundResponse({
     description: 'No user profile found.',

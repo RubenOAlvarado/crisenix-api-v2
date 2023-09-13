@@ -25,6 +25,7 @@ import {
 import { UrlValidator } from '../shared/validators/urlValidator.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/updateaboardpoint.dto';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/aboardpoint/responseaboardpoint.dto';
+import { Public } from '@/auth/public.decorator';
 
 @ApiTags('Aboard Point')
 @ApiBearerAuth()
@@ -76,6 +77,7 @@ export class AboardPointController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the aboard point.',
   })
+  @Public()
   @Get(':id')
   async findOne(@Param() param: UrlValidator) {
     const aboardPoint = await this.service.findOne(param);
