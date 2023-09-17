@@ -1,8 +1,15 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { SalesController } from './sales.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Sales, SalesSchema } from '../shared/models/schemas/sales.schema';
+import { TourModule } from '@/tour/tour.module';
 
 @Module({
+  imports: [
+    MongooseModule.forFeature([{ name: Sales.name, schema: SalesSchema }]),
+    forwardRef(() => TourModule),
+  ],
   controllers: [SalesController],
   providers: [SalesService],
 })

@@ -15,84 +15,137 @@ import { SalesStatus } from '../../../enums/sales/salesstatus.enum';
 import { SaleOrigin } from '../../../enums/sales/saleorigin.enum';
 
 export class CreateSaleDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour id',
+    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
+  })
   @IsNotEmpty()
   @IsMongoId()
   tour: string;
 
-  @ApiPropertyOptional({ enum: SalesStatus })
+  @ApiPropertyOptional({
+    enum: SalesStatus,
+    example: SalesStatus.CHECKED,
+    description: 'Sale status',
+  })
   @IsOptional()
   @IsString()
   status?: SalesStatus;
 
-  @ApiProperty({ enum: SaleOrigin })
+  @ApiProperty({
+    enum: SaleOrigin,
+    example: SaleOrigin.WEB,
+    description: 'Sale origin platform',
+  })
   @IsNotEmpty()
-  @ApiProperty()
+  @IsString()
+  origin: SaleOrigin;
+
+  @ApiProperty({
+    example: 'Juan',
+    description: 'Client name',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   clientName: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Perez',
+    description: 'Client last name',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   clientLastName: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    example: 'Gonzalez',
+    description: 'Client mother last name',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(150)
   clientMotherLastName?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Client email',
+    example: 'test@testing.com',
+  })
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Client oficial id photo url',
+    example: 'https://www.test.com/test.jpg',
+  })
   @IsOptional()
   @IsUrl()
   oficialId?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Reserved seats by client',
+    example: 1,
+  })
   @IsNotEmpty()
   @IsNumber()
   @Min(1)
   reservedSeat: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Reservation date',
+    example: '2020-10-30T00:00:00.000Z',
+  })
   @IsNotEmpty()
   @IsDateString()
   reservationDate: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Pay limit date',
+    example: '2020-10-30T00:00:00.000Z',
+  })
   @IsOptional()
   @IsDateString()
   payLimitDate?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Total payed mount including all seats',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   totalPayedMount?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Pay date',
+    example: '2020-10-30T00:00:00.000Z',
+  })
   @IsNotEmpty()
   @IsDateString()
   payDate: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Saler id',
+    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
+  })
   @IsOptional()
   @IsMongoId()
   saler?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'List of passengers ids',
+    example: ['5f9d7a3b9d7a3b9d7a3b9d7a'],
+  })
   @IsOptional()
   @IsMongoId({ each: true })
   passenger?: Array<string>;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'User id if registered',
+    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
+  })
   @IsOptional()
   @IsMongoId()
   user?: string;
@@ -105,6 +158,7 @@ export class CreateSaleDTO {
     reservedSeat: number,
     reservationDate: Date,
     payDate: Date,
+    origin: SaleOrigin,
   ) {
     this.tour = tour;
     this.clientName = clientName;
@@ -113,5 +167,6 @@ export class CreateSaleDTO {
     this.reservedSeat = reservedSeat;
     this.reservationDate = reservationDate;
     this.payDate = payDate;
+    this.origin = origin;
   }
 }
