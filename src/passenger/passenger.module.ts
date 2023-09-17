@@ -3,14 +3,14 @@ import { PassengerService } from './passenger.service';
 import { PassengerController } from './passenger.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  Passenger,
+  Passengers,
   PassengerSchema,
 } from '@/shared/models/schemas/passenger.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Passenger.name, schema: PassengerSchema },
+      { name: Passengers.name, schema: PassengerSchema },
     ]),
   ],
   controllers: [PassengerController],

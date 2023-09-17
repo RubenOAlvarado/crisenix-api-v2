@@ -11,57 +11,88 @@ import {
 } from 'class-validator';
 
 export class CreatePrivatetourDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Name of the person who is requesting the private tour',
+    example: 'John Doe',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(250)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description:
+      'Phone number of the person who is requesting the private tour',
+    example: '+573002222222',
+  })
   @IsNotEmpty()
   @IsMobilePhone()
   phone: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Email of the person who is requesting the private tour',
+    example: 'test@testing.com',
+  })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Destination of the private tour',
+    example: 'Cartagena',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(300)
   destination: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Origin of the private tour',
+    example: 'Medellín',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(300)
   origin: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Initial date of the private tour',
+    example: '2021-12-31',
+  })
   @IsNotEmpty()
   @IsString()
   initDate: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Return date of the private tour',
+    example: '2021-12-31',
+  })
   @IsNotEmpty()
   @IsString()
   returnDate: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Number of adults of the private tour',
+    example: 2,
+  })
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   adults: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Number of children of the private tour',
+    example: 2,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
   children?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Description of the private tour',
+    example: 'This is a description of the private tour',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(1000)

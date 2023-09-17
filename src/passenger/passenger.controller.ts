@@ -17,7 +17,7 @@ export class PassengerController {
   constructor(private passengerService: PassengerService) {}
 
   @ApiCreatedResponse({
-    description: 'Create a new passenger',
+    description: 'Passenger created successfully.',
     type: ResponsePassengerDTO,
   })
   @ApiInternalServerErrorResponse({

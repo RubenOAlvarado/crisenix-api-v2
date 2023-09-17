@@ -1,7 +1,7 @@
 import { CreatePassengerDTO } from '@/shared/models/dtos/passenger/createpassenger.dto';
 import {
-  Passenger,
   PassengerDocument,
+  Passengers,
 } from '@/shared/models/schemas/passenger.schema';
 import {
   Injectable,
@@ -14,8 +14,8 @@ import { Model } from 'mongoose';
 @Injectable()
 export class PassengerService {
   constructor(
-    @InjectModel(Passenger.name)
-    private readonly passengerModel: Model<Passenger>,
+    @InjectModel(Passengers.name)
+    private readonly passengerModel: Model<Passengers>,
   ) {}
 
   private readonly logger = new Logger(PassengerService.name);

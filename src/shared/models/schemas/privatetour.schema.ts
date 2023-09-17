@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 @Schema()
-export class PrivateTour {
+export class PrivateTours {
   @Prop({ required: true })
   name: string;
 
@@ -59,5 +59,5 @@ export class PrivateTour {
   }
 }
 
-export type PrivateTourDocument = HydratedDocument<PrivateTour>;
-export const PrivateTourSchema = SchemaFactory.createForClass(PrivateTour);
+export type PrivateTourDocument = HydratedDocument<PrivateTours>;
+export const PrivateTourSchema = SchemaFactory.createForClass(PrivateTours);

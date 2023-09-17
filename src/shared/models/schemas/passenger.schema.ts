@@ -5,7 +5,7 @@ import { OriginCity } from './origincity.schema';
 import { Price } from './price.schema';
 
 @Schema()
-export class Passenger {
+export class Passengers {
   @Prop({ required: true, index: true })
   room: string;
 
@@ -69,5 +69,5 @@ export class Passenger {
   }
 }
 
-export type PassengerDocument = HydratedDocument<Passenger>;
-export const PassengerSchema = SchemaFactory.createForClass(Passenger);
+export type PassengerDocument = HydratedDocument<Passengers>;
+export const PassengerSchema = SchemaFactory.createForClass(Passengers);
