@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Saler } from './saler.schema';
-import { Passenger } from './passenger.schema';
+import { Passengers } from './passenger.schema';
 import { Tour } from './tour.schema';
 
 @Schema()
@@ -55,7 +55,7 @@ export class Sales {
   saler?: Saler;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }] })
-  passenger?: Array<Passenger>;
+  passenger?: Array<Passengers>;
 
   @Prop({ default: Date.now })
   createdAt?: Date;
