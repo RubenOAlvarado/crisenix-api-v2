@@ -1,20 +1,9 @@
-import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
-import { State } from '@/shared/enums/sales/state.enum';
-import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CreateSaleDTO } from '@/shared/models/dtos/sales/createsales.dto';
-import { PaypalResponse } from '@/shared/models/dtos/sales/paypal.response.dto';
-import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/sales/response-paypal.response.dto';
 import { Sales, SalesDocument } from '@/shared/models/schemas/sales.schema';
-import { TourDocument } from '@/shared/models/schemas/tour.schema';
-import { TourService } from '@/tour/tour.service';
 import {
-  BadRequestException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -23,8 +12,6 @@ import { Model } from 'mongoose';
 export class SalesService {
   constructor(
     @InjectModel(Sales.name) private readonly salesModel: Model<Sales>,
-    @Inject(forwardRef(() => TourService))
-    private tourService: TourService,
   ) {}
 
   private readonly logger = new Logger(SalesService.name);
