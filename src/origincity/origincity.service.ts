@@ -31,7 +31,6 @@ export class OriginCityService {
     private readonly aboardPointService: AboardpointService,
   ) {}
 
-  limit: any;
   private readonly logger = new Logger(OriginCityService.name);
 
   async create(
