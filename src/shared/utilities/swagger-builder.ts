@@ -15,6 +15,8 @@ import { AboardpointModule } from 'src/aboardpoint/aboardpoint.module';
 import { CaptionsModule } from '@/captions/captions.module';
 import { CategoryModule } from '@/category/category.module';
 import { TourModule } from '@/tour/tour.module';
+import { PrivatetourModule } from '@/privatetour/privatetour.module';
+import { PassengerModule } from '@/passenger/passenger.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -42,6 +44,8 @@ export const buildSwaggerModule = async (
       CaptionsModule,
       CategoryModule,
       TourModule,
+      PrivatetourModule,
+      PassengerModule,
     ],
   });
 
