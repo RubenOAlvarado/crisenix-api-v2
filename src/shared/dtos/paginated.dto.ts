@@ -17,20 +17,39 @@ export class PaginatedDTO<TData> {
     this.totalPages = totalPages;
   }
 
+  @ApiProperty({
+    description: 'Result documents',
+    type: [Object],
+  })
   docs: TData[];
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({
+    description: 'Total documents registered.',
+    type: Number,
+  })
   totalDocs: number;
 
-  @ApiProperty({ type: Boolean })
+  @ApiProperty({
+    description: 'Has previous page.',
+    type: Boolean,
+  })
   hasPrevPage: boolean;
 
-  @ApiProperty({ type: Boolean })
+  @ApiProperty({
+    description: 'Has next page.',
+    type: Boolean,
+  })
   hasNextPage: boolean;
 
-  @ApiPropertyOptional({ type: Number })
+  @ApiPropertyOptional({
+    description: 'Current page.',
+    type: Number,
+  })
   page?: number | undefined;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({
+    description: 'Total pages with sended docs per page.',
+    type: Number,
+  })
   totalPages: number;
 }
