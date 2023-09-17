@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Clasification } from './clasification.schema';
+import { Clasifications } from './clasification.schema';
 
 @Schema()
 export class Itinerary {
@@ -9,10 +9,10 @@ export class Itinerary {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Clasification',
+    ref: 'Clasifications',
     required: true,
   })
-  clasification: Clasification;
+  clasification: Clasifications;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -20,7 +20,7 @@ export class Itinerary {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(activity: string, clasification: Clasification, status: string) {
+  constructor(activity: string, clasification: Clasifications, status: string) {
     this.activity = activity;
     this.clasification = clasification;
     this.status = status;

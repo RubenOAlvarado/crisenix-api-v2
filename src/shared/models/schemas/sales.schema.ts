@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Saler } from './saler.schema';
+import { Salers } from './saler.schema';
 import { Passengers } from './passenger.schema';
 import type { TourDocument } from './tour.schema';
 
 @Schema()
 export class Sales {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tours', required: true })
   tour: TourDocument;
 
   @Prop({ required: true })
@@ -51,10 +51,10 @@ export class Sales {
   @Prop()
   payDate?: Date;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Saler' })
-  saler?: Saler;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Salers' })
+  saler?: Salers;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
   passenger?: Array<Passengers>;
 
   @Prop({ default: Date.now })

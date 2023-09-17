@@ -2,15 +2,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Destination } from './destination.schema';
 import { Transports } from './transporst.schema';
-import { AboardPoint } from './aboarpoint.schema';
+import { AboardPoints } from './aboarpoint.schema';
 import { Departure } from './departure.schema';
 import { TourType } from './tourtype.schema';
 import { Included } from './included.schema';
-import { Price } from './price.schema';
+import { Prices } from './price.schema';
 import { Itinerary } from './itinerary.schema';
 
 @Schema()
-export class Tour {
+export class Tours {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Destination',
@@ -46,7 +46,7 @@ export class Tour {
   @Prop({ type: Array })
   aboardHour?: Array<{
     hour: string;
-    aboardPoint: AboardPoint;
+    aboardPoint: AboardPoints;
   }>;
 
   @Prop({ type: Number, default: 1 })
@@ -66,7 +66,7 @@ export class Tour {
   returnDate: Date;
 
   @Prop({ type: Array })
-  returnHour?: Array<{ hour: string; aboardPoint: AboardPoint }>;
+  returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
   @Prop({ type: Array, ref: 'Departure' })
   departure?: Array<Departure>;
@@ -110,7 +110,7 @@ export class Tour {
   }>;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Price' }] })
-  price?: Array<Price>;
+  price?: Array<Prices>;
 
   @Prop({ type: Date, default: Date.now })
   createdAt?: Date;
@@ -142,5 +142,5 @@ export class Tour {
   }
 }
 
-export type TourDocument = HydratedDocument<Tour>;
-export const TourSchema = SchemaFactory.createForClass(Tour);
+export type TourDocument = HydratedDocument<Tours>;
+export const TourSchema = SchemaFactory.createForClass(Tours);

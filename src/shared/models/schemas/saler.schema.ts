@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { SalerType } from './salertype.schema';
+import { SalerTypes } from './salertype.schema';
 
 @Schema()
-export class Saler {
+export class Salers {
   @Prop({ required: true, index: true })
   code: string;
 
@@ -20,9 +20,9 @@ export class Saler {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SalerType',
+    ref: 'SalerTypes',
   })
-  salerType: SalerType;
+  salerType: SalerTypes;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -34,7 +34,7 @@ export class Saler {
     code: string,
     name: string,
     lastName: string,
-    salerType: SalerType,
+    salerType: SalerTypes,
     status: string,
   ) {
     this.code = code;
@@ -45,5 +45,5 @@ export class Saler {
   }
 }
 
-export type SalerDocument = HydratedDocument<Saler>;
-export const SalerSchema = SchemaFactory.createForClass(Saler);
+export type SalerDocument = HydratedDocument<Salers>;
+export const SalerSchema = SchemaFactory.createForClass(Salers);

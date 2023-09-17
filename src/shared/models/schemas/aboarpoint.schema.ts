@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 @Schema()
-export class AboardPoint {
+export class AboardPoints {
   @Prop({ type: String, required: true, index: true })
   name: string;
 
@@ -18,5 +18,5 @@ export class AboardPoint {
   }
 }
 
-export type AboardPointDocument = HydratedDocument<AboardPoint>;
-export const AboardPointSchema = SchemaFactory.createForClass(AboardPoint);
+export type AboardPointDocument = HydratedDocument<AboardPoints>;
+export const AboardPointSchema = SchemaFactory.createForClass(AboardPoints);

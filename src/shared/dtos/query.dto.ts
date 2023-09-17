@@ -7,17 +7,26 @@ import {
 } from 'class-validator';
 
 export class QueryDTO {
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({
+    default: 1,
+    description: 'Page number',
+  })
+  @IsNotEmpty()
   @IsNumberString()
   page: number;
 
-  @ApiProperty()
-  @IsOptional()
+  @ApiProperty({
+    default: 10,
+    description: 'Number of items per page',
+  })
+  @IsNotEmpty()
   @IsNumberString()
   limit: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    default: 'Activo',
+    description: 'Status to look for (optional)',
+  })
   @IsOptional()
   @IsNotEmpty()
   @IsString()

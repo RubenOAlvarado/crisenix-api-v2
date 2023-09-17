@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Category } from './category.schema';
 import { OriginCity } from './origincity.schema';
-import { TranslationType } from './translationtype.schema';
+import { TranslationTypes } from './translationtype.schema';
 
 @Schema()
 export class Destination {
@@ -34,9 +34,9 @@ export class Destination {
   visa: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TranslationType' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TranslationTypes' }],
   })
-  translationType?: Array<TranslationType>;
+  translationType?: Array<TranslationTypes>;
 
   @Prop({ type: String })
   translationRoute?: string;

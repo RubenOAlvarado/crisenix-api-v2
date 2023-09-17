@@ -1,10 +1,14 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { UserRoles } from '@/shared/enums/roles';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { DecodedIdToken, getAuth } from 'firebase-admin/auth';
 import { FirebaseError } from 'firebase-admin';
 
 @Injectable()
 export class AuthService {
+  constructor /*private configService: ConfigService,
+    //private jwtService: JwtService /* @Inject(forwardRef(() => UserService))
+    private userService: UserService, */() {}
   private readonly logger = new Logger(AuthService.name);
 
   //Auth method
@@ -38,6 +42,20 @@ export class AuthService {
       this.logger.error(`Error adding claims to user: ${e}`);
     }
   }
+
+  /* async signIn(username: string, password: string) {
+    const configUser = this.configService.get<string>('ADMIN_USERNAME');
+    const configPass = this.configService.get<string>('ADMIN_PASSWORD');
+    if (username === configUser && password === configPass) {
+      const payload = { username: configUser };
+      const token = await this.jwtService.signAsync(payload);
+      return {
+        access_token: token,
+      };
+    } else {
+      throw new UnauthorizedException('Invalid credentials.');
+    }
+  } */
 
   /* async getFirebaseUser(uid: string): Promise<any> {
     try {

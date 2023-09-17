@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { OriginCity } from './origincity.schema';
 
 @Schema()
-export class Price {
+export class Prices {
   // ref: 'OriginCity'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -67,5 +67,5 @@ export class Price {
   }
 }
 
-export type PriceDocument = HydratedDocument<Price>;
-export const PriceSchema = SchemaFactory.createForClass(Price);
+export type PriceDocument = HydratedDocument<Prices>;
+export const PriceSchema = SchemaFactory.createForClass(Prices);

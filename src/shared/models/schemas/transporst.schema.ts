@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { TranslationType } from './translationtype.schema';
+import { TranslationTypes } from './translationtype.schema';
 
 @Schema()
 export class Transports {
@@ -9,10 +9,10 @@ export class Transports {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'TranslationType',
+    ref: 'TranslationTypes',
     required: true,
   })
-  translationType: TranslationType;
+  translationType: TranslationTypes;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -20,7 +20,7 @@ export class Transports {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(name: string, translationType: TranslationType, status: string) {
+  constructor(name: string, translationType: TranslationTypes, status: string) {
     this.name = name;
     this.translationType = translationType;
     this.status = status;

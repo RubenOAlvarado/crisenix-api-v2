@@ -12,15 +12,15 @@ import { Model } from 'mongoose';
 import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import {
-  AboardPoint,
+  AboardPoints,
   AboardPointDocument,
 } from 'src/shared/models/schemas/aboarpoint.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 @Injectable()
 export class AboardpointService {
   constructor(
-    @InjectModel(AboardPoint.name)
-    private readonly aboardPointModel: Model<AboardPoint>,
+    @InjectModel(AboardPoints.name)
+    private readonly aboardPointModel: Model<AboardPoints>,
   ) {}
 
   private readonly logger = new Logger(AboardpointService.name);
@@ -53,7 +53,7 @@ export class AboardpointService {
     }
   }
 
-  async findAll({ status }: StatusDTO): Promise<Array<AboardPoint>> {
+  async findAll({ status }: StatusDTO): Promise<Array<AboardPoints>> {
     this.logger.debug(`getting all aboard points`);
     try {
       return status

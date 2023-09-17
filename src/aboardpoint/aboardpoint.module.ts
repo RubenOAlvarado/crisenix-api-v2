@@ -3,14 +3,14 @@ import { AboardpointService } from './aboardpoint.service';
 import { AboardPointController } from './aboardpoint.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  AboardPoint,
+  AboardPoints,
   AboardPointSchema,
 } from 'src/shared/models/schemas/aboarpoint.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: AboardPoint.name, schema: AboardPointSchema },
+      { name: AboardPoints.name, schema: AboardPointSchema },
     ]),
   ],
   controllers: [AboardPointController],

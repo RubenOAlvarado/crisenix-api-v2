@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { AboardPoint } from './aboarpoint.schema';
+import { AboardPoints } from './aboarpoint.schema';
 
 @Schema()
 export class OriginCity {
@@ -12,9 +12,9 @@ export class OriginCity {
 
   // ref: 'AboardPoint'
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AboardPoint' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AboardPoints' }],
   })
-  aboardPoints?: Array<AboardPoint>;
+  aboardPoints?: Array<AboardPoints>;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;

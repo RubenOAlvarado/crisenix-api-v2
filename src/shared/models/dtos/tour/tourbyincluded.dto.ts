@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class TourByIncluded {
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Comida',
+    description: 'Included service to look for',
+  })
   @IsNotEmpty()
-  @IsMongoId()
+  @IsString()
   included: string;
 
   constructor(included: string) {

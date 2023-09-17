@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { SalerType } from './salertype.schema';
+import { SalerTypes } from './salertype.schema';
 import { TourType } from './tourtype.schema';
 
 @Schema()
@@ -8,10 +8,10 @@ export class Commissions {
   // ref: 'SalerType',
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SalerType',
+    ref: 'SalerTypes',
     required: true,
   })
-  salerType: SalerType;
+  salerType: SalerTypes;
 
   // ref: 'TourType',
   @Prop({
@@ -31,7 +31,7 @@ export class Commissions {
   createdAt?: Date;
 
   constructor(
-    salerType: SalerType,
+    salerType: SalerTypes,
     tourType: TourType,
     amount: number,
     status: string,
