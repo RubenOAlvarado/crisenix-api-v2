@@ -1,3 +1,4 @@
+import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/updateaboardpoint.dto';
 import {
@@ -38,13 +39,13 @@ export class AboardpointService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<AboardPointDocument> {
+  async findOne({ id }: UrlValidator): Promise<AboardPointLean> {
     this.logger.debug(`getting aboard point`);
     try {
       const aboardPoint = await this.aboardPointModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!aboardPoint) throw new NotFoundException('Aboard point not found');
       return aboardPoint;
     } catch (error) {
@@ -53,18 +54,18 @@ export class AboardpointService {
     }
   }
 
-  async findAll({ status }: StatusDTO): Promise<Array<AboardPoints>> {
+  async findAll({ status }: StatusDTO): Promise<Array<AboardPointLean>> {
     this.logger.debug(`getting all aboard points`);
     try {
       return status
         ? await this.aboardPointModel
             .find({ status: status as Status })
             .select({ __v: 0, createdAt: 0 })
-            .exec()
+            .lean()
         : await this.aboardPointModel
             .find()
             .select({ __v: 0, createdAt: 0 })
-            .exec();
+            .lean();
     } catch (error) {
       this.logger.error(`Error getting all aboard points: ${error}`);
       throw new InternalServerErrorException('Error getting all aboard points');
@@ -78,9 +79,9 @@ export class AboardpointService {
     this.logger.debug(`updating aboard point`);
     try {
       if (!(await this.validateAboardPoint({ id }))) return;
-      await this.aboardPointModel
-        .findByIdAndUpdate(id, updateAboardPointDTO, { new: true })
-        .exec();
+      await this.aboardPointModel.findByIdAndUpdate(id, updateAboardPointDTO, {
+        new: true,
+      });
     } catch (error) {
       this.logger.error(`Error updating aboard point: ${error}`);
       if (
@@ -97,9 +98,11 @@ export class AboardpointService {
     this.logger.debug(`deleting aboard point ${id}`);
     try {
       if (!(await this.validateAboardPoint({ id }))) return;
-      await this.aboardPointModel
-        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
-        .exec();
+      await this.aboardPointModel.findByIdAndUpdate(
+        id,
+        { status: Status.INACTIVE },
+        { new: true },
+      );
     } catch (error) {
       this.logger.error(`Error deleting aboard point: ${error}`);
       if (
@@ -142,7 +145,7 @@ export class AboardpointService {
   private async validateAboardPoint({ id }: UrlValidator): Promise<boolean> {
     this.logger.debug(`validating aboard point`);
     try {
-      const foundAboardPoint = await this.aboardPointModel.findById(id).exec();
+      const foundAboardPoint = await this.aboardPointModel.findById(id).lean();
       if (!foundAboardPoint)
         throw new NotFoundException('Aboard point not found');
       if (foundAboardPoint.status !== Status.ACTIVE)
@@ -170,7 +173,7 @@ export class AboardpointService {
         aboardPoints.map(async (aboardPoint) => {
           const foundAboardPoint = await this.aboardPointModel
             .findOne({ name: aboardPoint })
-            .exec();
+            .lean();
           if (foundAboardPoint) {
             return foundAboardPoint._id.toString();
           } else {

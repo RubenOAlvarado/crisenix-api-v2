@@ -29,6 +29,7 @@ import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
 import { UserRecord } from 'firebase-admin/auth';
 import { ResponseRoleDTO } from '@/shared/models/dtos/role/response-role.dto';
+import { UserLean } from '@/shared/interfaces/user/user.lean.interface';
 
 @Injectable()
 export class UserService {
@@ -99,14 +100,14 @@ export class UserService {
     }
   }
 
-  async getDbUserById({ id }: UrlValidator): Promise<User> {
+  async getDbUserById({ id }: UrlValidator): Promise<UserLean> {
     try {
       this.logger.debug('Looking user profile');
       const profile = await this.userModel
         .findById(id)
         .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!profile)
         throw new NotFoundException(`Profile for user ${id} not found.`);
       return profile;
@@ -118,14 +119,14 @@ export class UserService {
     }
   }
 
-  async getDbUserByFbUid(firebaseUid: string): Promise<User> {
+  async getDbUserByFbUid(firebaseUid: string): Promise<UserLean> {
     try {
       this.logger.debug('Looking user profile by his firebaseid');
       const profile = await this.userModel
         .findOne({ firebaseUid })
         .populate('role', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!profile)
         throw new NotFoundException(
           `Profile for user ${firebaseUid} not found.`,
@@ -142,7 +143,10 @@ export class UserService {
     }
   }
 
-  async getDbUsers({ page, limit }: QueryDTO): Promise<PaginateResult<User>> {
+  async getDbUsers({
+    page,
+    limit,
+  }: QueryDTO): Promise<PaginateResult<UserLean>> {
     try {
       this.logger.debug('looking users profiles');
       const docs = await this.userModel
@@ -151,7 +155,7 @@ export class UserService {
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!docs) throw new NotFoundException('No users found.');
       const totalDocs = await this.userModel.countDocuments().exec();
       return {

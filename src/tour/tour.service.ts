@@ -4,6 +4,7 @@ import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
@@ -87,13 +88,13 @@ export class TourService {
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .select({ __v: 0, createdAt: 0 })
-            .exec()
+            .lean()
         : await this.tourModel
             .find()
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .select({ __v: 0, createdAt: 0 })
-            .exec();
+            .lean();
       if (docs.length === 0)
         throw new NotFoundException('No tours registered.');
       const totalDocs = status
@@ -119,7 +120,7 @@ export class TourService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<TourDocument> {
+  async findOne({ id }: UrlValidator): Promise<TourLean> {
     try {
       this.logger.debug(`getting tour with id: ${id}`);
       const tour = await this.tourModel
@@ -151,7 +152,7 @@ export class TourService {
           },
         })
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
 
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;
@@ -164,7 +165,7 @@ export class TourService {
     }
   }
 
-  async getLastRegisteredTour({ id }: UrlValidator): Promise<TourDocument> {
+  async getLastRegisteredTour({ id }: UrlValidator): Promise<TourLean> {
     try {
       this.logger.debug(
         `getting last registered tour for destination with id: ${id}`,
@@ -174,7 +175,7 @@ export class TourService {
         .sort({ createdAt: -1 })
         .select({ __v: 0, createdAt: 0 })
         .limit(1)
-        .exec();
+        .lean();
 
       if (!tour) throw new NotFoundException('No tour registered.');
       return tour;
@@ -287,14 +288,14 @@ export class TourService {
     return true;
   }
 
-  async getWebTourById({ id }: UrlValidator): Promise<TourDocument> {
+  async getWebTourById({ id }: UrlValidator): Promise<TourLean> {
     try {
       this.logger.debug(`getting web tour with id: ${id}`);
       const tour = await this.tourModel
         .findById(id)
         .populate('destination')
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
 
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;

@@ -3,19 +3,29 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateCatalogDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Name of the catalog item',
+    example: 'Catalog item name',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Description of the catalog item',
+    example: 'Catalog item description',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   description: string;
 
-  @ApiPropertyOptional({ enum: Status })
+  @ApiPropertyOptional({
+    enum: Status,
+    description: 'Status of the catalog item',
+    example: Status.ACTIVE,
+  })
   @IsOptional()
   @IsString()
   status?: Status;

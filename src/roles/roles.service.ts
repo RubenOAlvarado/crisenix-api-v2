@@ -7,13 +7,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Roles, RolesDocument } from 'src/shared/models/schemas/roles.schema';
+import { Roles } from 'src/shared/models/schemas/roles.schema';
 import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { CreateRoleDTO } from '@/shared/models/dtos/role/createrole.dto';
 import { UpdateRoleDTO } from '@/shared/models/dtos/role/updaterole.dto';
 import { DescriptionDTO } from '@/shared/models/dtos/role/findByDescription.dto';
+import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
 
 @Injectable()
 export class RolesService {
@@ -36,7 +37,7 @@ export class RolesService {
     }
   }
 
-  async getRoles({ status }: StatusDTO): Promise<Array<Roles>> {
+  async getRoles({ status }: StatusDTO): Promise<Array<RolesLean>> {
     try {
       this.logger.debug(
         status ? `Looking roles with status ${status}` : `Looking roles`,
@@ -45,8 +46,8 @@ export class RolesService {
         ? await this.roleModel
             .find({ status })
             .select({ __v: 0, createdAt: 0 })
-            .exec()
-        : await this.roleModel.find().select({ __v: 0, createdAt: 0 }).exec();
+            .lean()
+        : await this.roleModel.find().select({ __v: 0, createdAt: 0 }).lean();
       if (!roles) throw new NotFoundException('No roles registered.');
       return roles;
     } catch (e) {
@@ -58,13 +59,13 @@ export class RolesService {
     }
   }
 
-  async getRoleById({ id }: UrlValidator): Promise<RolesDocument> {
+  async getRoleById({ id }: UrlValidator): Promise<RolesLean> {
     try {
       this.logger.debug('Looking role by his id');
       const role = await this.roleModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!role) throw new NotFoundException(`Role not found.`);
       return role;
     } catch (e) {
@@ -165,13 +166,13 @@ export class RolesService {
 
   async getRoleByDescription({
     description,
-  }: DescriptionDTO): Promise<RolesDocument> {
+  }: DescriptionDTO): Promise<RolesLean> {
     try {
       this.logger.debug('Looking role by description.');
       const validRole = await this.roleModel
         .findOne({ description })
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!validRole)
         throw new NotFoundException(
           `Role ${description} was not registered on DB.`,

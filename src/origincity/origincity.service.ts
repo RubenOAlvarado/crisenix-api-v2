@@ -1,3 +1,4 @@
+import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
 import {
   BadRequestException,
   Injectable,
@@ -48,14 +49,14 @@ export class OriginCityService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<OriginCity> {
+  async findOne({ id }: UrlValidator): Promise<OriginCityLean> {
     try {
       this.logger.debug(`getting origin city: ${id}`);
       const city = await this.originCityModel
         .findById(id)
         .select({ _id: 0, __v: 0, createdAt: 0 })
         .populate('aboardPoints')
-        .exec();
+        .lean();
       if (!city) throw new NotFoundException('Origin city not found.');
       return city;
     } catch (error) {
@@ -70,7 +71,7 @@ export class OriginCityService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<OriginCity>> {
+  }: QueryDTO): Promise<PaginateResult<OriginCityLean>> {
     try {
       this.logger.debug(`getting all origin cities`);
       const docs = status
@@ -80,14 +81,14 @@ export class OriginCityService {
             .skip((page - 1) * limit)
             .populate('aboardPoints')
             .select({ __v: 0, createdAt: 0 })
-            .exec()
+            .lean()
         : await this.originCityModel
             .find()
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .populate('aboardPoints')
             .select({ __v: 0, createdAt: 0 })
-            .exec();
+            .lean();
       if (!docs.length)
         throw new NotFoundException('No origin cities registered.');
       const totalDocs = status
@@ -114,7 +115,7 @@ export class OriginCityService {
   private async validateOriginCity(id: string): Promise<boolean> {
     try {
       this.logger.debug('Validating OriginCity');
-      const validOrigin = await this.originCityModel.findById(id);
+      const validOrigin = await this.originCityModel.findById(id).lean();
       if (!validOrigin)
         throw new NotFoundException(`OriginCity ${id} was not found`);
       if (validOrigin.status !== Status.ACTIVE)
@@ -137,9 +138,9 @@ export class OriginCityService {
     try {
       this.logger.debug('Updating origin city');
       if (await this.validateOriginCity(id))
-        await this.originCityModel
-          .findByIdAndUpdate(id, updateOriginCity, { new: true })
-          .exec();
+        await this.originCityModel.findByIdAndUpdate(id, updateOriginCity, {
+          new: true,
+        });
     } catch (error) {
       this.logger.error(`Error updating origin city: ${error}`);
       if (
@@ -155,9 +156,11 @@ export class OriginCityService {
     try {
       this.logger.debug('Deleting origin city');
       if (await this.validateOriginCity(id))
-        await this.originCityModel
-          .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
-          .exec();
+        await this.originCityModel.findByIdAndUpdate(
+          id,
+          { status: Status.INACTIVE },
+          { new: true },
+        );
     } catch (error) {
       this.logger.error(`Error deleting origin city: ${error}`);
       if (
@@ -173,9 +176,11 @@ export class OriginCityService {
     try {
       this.logger.debug('Reactivating OriginCity');
       if (await this.validateOriginCity(id))
-        await this.originCityModel
-          .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
-          .exec();
+        await this.originCityModel.findByIdAndUpdate(
+          id,
+          { status: Status.ACTIVE },
+          { new: true },
+        );
     } catch (error) {
       this.logger.error(`Error reactivating origincity: ${error}`);
       if (
@@ -188,7 +193,10 @@ export class OriginCityService {
     }
   }
 
-  async searcher({ word, status }: SearcherDTO): Promise<Array<OriginCity>> {
+  async searcher({
+    word,
+    status,
+  }: SearcherDTO): Promise<Array<OriginCityLean>> {
     try {
       this.logger.debug(`Searching origin cities: ${word}`);
       const searchResult = this.originCityModel
@@ -201,7 +209,7 @@ export class OriginCityService {
         })
         .populate('aboardPoints')
         .select({ __v: 0, createdAt: 0 })
-        .exec();
+        .lean();
       if (!searchResult)
         throw new NotFoundException('Any origin city match your search.');
       return searchResult;
@@ -222,9 +230,11 @@ export class OriginCityService {
     try {
       this.logger.debug(`Adding aboard points to origin city: ${id}`);
       if (await this.validateOriginCity(id))
-        await this.originCityModel
-          .findByIdAndUpdate(id, { $push: { aboardPoints } }, { new: true })
-          .exec();
+        await this.originCityModel.findByIdAndUpdate(
+          id,
+          { $push: { aboardPoints } },
+          { new: true },
+        );
     } catch (error) {
       this.logger.error(`Error adding aboard points to origin city: ${error}`);
       if (

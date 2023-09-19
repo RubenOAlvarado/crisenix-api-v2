@@ -3,19 +3,30 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateCategoryDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Category label (name)',
+    example: 'Internacionales',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   label: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Category main',
+    example: '3 dias',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(150)
   main?: string;
 
-  @ApiProperty({ enum: Status })
+  @ApiProperty({
+    enum: Status,
+    default: Status.ACTIVE,
+    example: Status.ACTIVE,
+    description: 'Category status',
+  })
   @IsOptional()
   @IsString()
   status?: Status;

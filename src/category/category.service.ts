@@ -1,5 +1,6 @@
 import { FilerService } from '@/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
+import { CategoryLean } from '@/shared/interfaces/category/category.lean.interface';
 import { CreateCategoryDTO } from '@/shared/models/dtos/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
 import {
@@ -42,12 +43,12 @@ export class CategoryService {
     }
   }
 
-  async findAll(status?: string): Promise<CategoryDocument[]> {
+  async findAll(status?: string): Promise<Array<CategoryLean>> {
     try {
       this.logger.debug(`finding all categories`);
       const categories = status
-        ? await this.categoryModel.find({ status }).exec()
-        : await this.categoryModel.find().exec();
+        ? await this.categoryModel.find({ status }).lean()
+        : await this.categoryModel.find().lean();
       if (!categories) throw new NotFoundException('No categories registered.');
       return categories;
     } catch (error) {
@@ -59,7 +60,7 @@ export class CategoryService {
     }
   }
 
-  async findOne(id: string): Promise<CategoryDocument> {
+  async findOne(id: string): Promise<CategoryLean> {
     try {
       this.logger.debug(`finding category with id: ${id}`);
       const category = await this.categoryModel.findById(id).exec();
