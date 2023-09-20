@@ -18,7 +18,7 @@ export class TransportsService {
 
   private logger = new Logger(TransportsService.name);
 
-  async getTransport({ id }: UrlValidator) {
+  async getTransport({ id }: UrlValidator): Promise<Transports> {
     try {
       this.logger.debug(`Getting transport with id: ${id}`);
       const transport = await this.transportModel.findById(id).lean();

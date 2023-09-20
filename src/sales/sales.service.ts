@@ -4,9 +4,12 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { BadRequestException } from '@nestjs/common';
+import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 
 @Injectable()
 export class SalesService {
@@ -31,43 +34,34 @@ export class SalesService {
     }
   }
 
+  async findOne(id: string): Promise<Sales> {
+    try {
+      this.logger.debug(`finding sale by id`);
+      const sale = await this.salesModel.findById(id).populate('tour').lean();
+      if (!sale) {
+        this.logger.error(`Sale not found.`);
+        throw new NotFoundException(`Sale not found.`);
+      }
+      return sale;
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong finding the sale: ${JSON.stringify(error)}`,
+      );
+      throw new InternalServerErrorException(
+        `Something went wrong finding the sale.`,
+      );
+    }
+  }
+
   /* async paypalResponse(
     { state, sale, operationId, failureReason }: PaypalResponse,
     user: any,
   ): Promise<ResponseSavedPaypalResponse> {
     try {
       this.logger.debug(`Validating sale response`);
-      const currentSale = await this.salesModel.findById(sale);
-
-      //sale validation
-      // TODO: move to a validation method
-      if (!currentSale) {
-        this.logger.error(`Sale not found.`);
-        throw new NotFoundException(`Sale not found.`);
-      }
-      if (currentSale.status !== SalesStatus.RESERVED) {
-        this.logger.error(`Sale not in ${SalesStatus.RESERVED} status.`);
-        throw new BadRequestException(
-          `Sale must be in reserved status to allow pay it.`,
-        );
-      }
-
-      // TODO: create a validation method in tour service for tour status
-      const saleTour: TourDocument = await this.tourService.getWebTourById({
-        id: currentSale.tour._id.toString(),
-      });
-      if (!saleTour) {
-        this.logger.error(`Sale tour not found.`);
-        throw new NotFoundException(`Tour not found.`);
-      }
-      if (saleTour.status !== TourStatus.PUBLISH) {
-        this.logger.error(`Tour not in ${TourStatus.PUBLISH} status.`);
-        throw new BadRequestException(
-          `Tour must be in publish status to allow reservations.`,
-        );
-      }
-
-      // All validations passed, saving sale response
+      const validatedSale = await this.validateSale(sale);
+      if(validatedSale && this.tourService.validateSaledTour(validatedSale.tour._id.toString())){
+        // All validations passed, saving sale response
       this.logger.debug(`Processing paypal response `);
 
       if (state === State.APPROVED) {
@@ -106,6 +100,7 @@ export class SalesService {
         };
         return response;
       }
+      }
     } catch (error) {
       this.logger.error(
         `Something went wrong saving sale response: ${JSON.stringify(error)}`,
@@ -121,4 +116,35 @@ export class SalesService {
         );
     }
   } */
+
+  private async validateSale(saleId: string): Promise<Sales> {
+    try {
+      this.logger.debug(`Validating sale`);
+      const currentSale = await this.findOne(saleId);
+      if (!currentSale) {
+        this.logger.error(`Sale not found.`);
+        throw new NotFoundException(`Sale not found.`);
+      }
+      if (currentSale.status !== SalesStatus.RESERVED) {
+        this.logger.error(`Sale not in ${SalesStatus.RESERVED} status.`);
+        throw new BadRequestException(
+          `Sale must be in reserved status to allow pay it.`,
+        );
+      }
+      return currentSale;
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong validating sale: ${JSON.stringify(error)}`,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      else
+        throw new InternalServerErrorException(
+          `Something went wrong validating sale.`,
+        );
+    }
+  }
 }

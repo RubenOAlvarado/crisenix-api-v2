@@ -2,12 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Salers } from './saler.schema';
 import { Passengers } from './passenger.schema';
-import type { TourDocument } from './tour.schema';
+import type { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 
 @Schema()
 export class Sales {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tours', required: true })
-  tour: TourDocument;
+  tour: TourLean;
 
   @Prop({ required: true })
   user: string;
@@ -61,7 +61,7 @@ export class Sales {
   createdAt?: Date;
 
   constructor(
-    tour: TourDocument,
+    tour: TourLean,
     user: string,
     status: string,
     origin: string,

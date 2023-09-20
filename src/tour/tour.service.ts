@@ -256,7 +256,7 @@ export class TourService {
     tour: TourDocument,
   ): boolean {
     if (tour.status === newStatus)
-      throw new BadRequestException('Tour is already in wanted status.');
+      throw new BadRequestException(`Tour is already in ${newStatus} status.`);
     if (newStatus === TourStatus.INACTIVE && tour.status !== TourStatus.ACTIVE)
       throw new BadRequestException(
         'The tour must be in in active status to be inactivated.',
@@ -339,6 +339,37 @@ export class TourService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(
         `Something went wrong looking tours by included.`,
+      );
+    }
+  }
+
+  private async getPOJOTourById(id: string): Promise<TourLean> {
+    try {
+      const tourPOJO = await this.tourModel.findById(id).lean();
+      if (!tourPOJO) throw new NotFoundException('Tour not found.');
+      return tourPOJO;
+    } catch (error) {
+      this.logger.error(`Error getting POJO tour by id: ${error}`);
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        `Something went wrong looking POJO tour by id.`,
+      );
+    }
+  }
+
+  async validateSaledTour(id: string): Promise<void> {
+    try {
+      this.logger.debug(`validating saled tour with id: ${id}`);
+      const tour = await this.getPOJOTourById(id);
+      if (tour.status !== TourStatus.PUBLISH)
+        throw new BadRequestException(
+          'The tour must be in publish status to be saled.',
+        );
+    } catch (error) {
+      this.logger.error(`Error validating saled tour: ${error}`);
+      if (error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(
+        `Something went wrong validating saled tour.`,
       );
     }
   }
