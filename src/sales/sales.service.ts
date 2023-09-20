@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BadRequestException } from '@nestjs/common';
-import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
+// import { BadRequestException } from '@nestjs/common';
+// import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 
 @Injectable()
 export class SalesService {
@@ -117,7 +117,7 @@ export class SalesService {
     }
   } */
 
-  private async validateSale(saleId: string): Promise<Sales> {
+  /* private async validateSale(saleId: string): Promise<Sales> {
     try {
       this.logger.debug(`Validating sale`);
       const currentSale = await this.findOne(saleId);
@@ -146,5 +146,5 @@ export class SalesService {
           `Something went wrong validating sale.`,
         );
     }
-  }
+  } */
 }
