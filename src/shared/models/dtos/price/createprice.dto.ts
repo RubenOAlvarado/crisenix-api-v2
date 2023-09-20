@@ -1,4 +1,5 @@
 import {
+  IsIn,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -9,48 +10,77 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Currency } from 'src/shared/enums/currency.enum';
 
 export class CreatePriceDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'City id that this price belongs to.',
+    example: '60f1b2b3e6b2f1b2b3e6b2f1',
+  })
   @IsNotEmpty()
   @IsString()
   @IsMongoId()
   city: string;
 
-  @ApiProperty({ enum: Currency })
+  @ApiProperty({
+    enum: Currency,
+    description: 'Currency of the price.',
+    example: Currency.MX,
+  })
   @IsNotEmpty()
+  @IsIn([Currency.MX, Currency.USA])
   @IsString()
   currency: Currency;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'General price.',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   general?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Single base price.',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   singleBase?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Double base price.',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   doubleBase?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Triple base price.',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   tripleBase?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Quadruple base price.',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   quadrupleBase?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Minor base price (just for childrens).',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   minor?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Inapam base price (just for old people).',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   inapam?: number;

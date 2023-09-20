@@ -3,7 +3,8 @@ import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class NameValidator {
   @ApiProperty({
-    description: 'Destination name to look',
+    description: 'Destination name to look for.',
+    example: 'Hanoi',
   })
   @IsNotEmpty()
   @IsString()

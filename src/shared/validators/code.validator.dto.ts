@@ -4,6 +4,7 @@ import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 export class CodeValidator {
   @ApiProperty({
     description: 'Destination code to look',
+    example: 'HAN',
   })
   @IsNotEmpty()
   @IsString()

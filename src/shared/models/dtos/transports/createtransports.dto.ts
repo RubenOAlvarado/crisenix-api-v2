@@ -9,18 +9,27 @@ import {
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateTransportsDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Name of the transport.',
+    example: 'Bus',
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Translation type of the transport.',
+  })
   @IsNotEmpty()
   @IsMongoId()
   translationType: string;
 
-  @ApiProperty({ enum: Status })
+  @ApiProperty({
+    enum: Status,
+    description: 'Status of the transport.',
+    example: Status.ACTIVE,
+  })
   @IsOptional()
   @IsString()
   status?: Status;
