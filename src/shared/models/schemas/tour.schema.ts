@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Destination } from './destination.schema';
+import { Destinations } from './destination.schema';
 import { Transports } from './transporst.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { Departure } from './departure.schema';
@@ -13,10 +13,10 @@ import { Itinerary } from './itinerary.schema';
 export class Tours {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Destination',
+    ref: 'Destinations',
     required: true,
   })
-  destination: Destination;
+  destination: Destinations;
 
   @Prop({ type: String, required: true, index: true })
   code: string;
@@ -116,7 +116,7 @@ export class Tours {
   createdAt?: Date;
 
   constructor(
-    destination: Destination,
+    destination: Destinations,
     code: string,
     status: string,
     boxLunch: string,

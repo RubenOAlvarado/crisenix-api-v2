@@ -410,6 +410,29 @@ export class UserService {
     }
   }
 
+  async validateUser(id: string): Promise<boolean> {
+    try {
+      this.logger.debug('Validating user');
+      const user = await this.userModel.findById(id).lean();
+      if (!user) {
+        this.logger.error('User not found.');
+        throw new NotFoundException('User not found.');
+      }
+      if (user.status === Status.INACTIVE) {
+        this.logger.error('User is inactive.');
+        throw new BadRequestException('User invalid.');
+      }
+      return true;
+    } catch (e) {
+      this.logger.error(`Something went wrong validating the user: ${e}`);
+      if (e instanceof NotFoundException || e instanceof BadRequestException)
+        throw e;
+      throw new InternalServerErrorException(
+        'Something went wrong validating the user.',
+      );
+    }
+  }
+
   /* async test(uid: string) {
     try {
       const user = await this.authService.getFirebaseUser(uid);

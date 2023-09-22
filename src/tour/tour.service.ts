@@ -2,6 +2,7 @@ import { EventlogService } from '@/eventlog/eventlog.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
+import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
@@ -371,6 +372,50 @@ export class TourService {
       throw new InternalServerErrorException(
         `Something went wrong validating saled tour.`,
       );
+    }
+  }
+
+  async updateTourSeats(
+    tour: TourLean,
+    soldSeats: number,
+    //user: User,
+    saleMove: SalesMove,
+  ): Promise<void> {
+    try {
+      const { availableSeat = 0, ocuppiedSeat = 0, seating, _id } = tour;
+      let newAvailableSeat = availableSeat;
+      let newOcuppiedSeat = 0;
+      if (
+        saleMove === SalesMove.SALE &&
+        availableSeat > 0 &&
+        ocuppiedSeat > 0
+      ) {
+        newAvailableSeat = availableSeat - soldSeats;
+        newOcuppiedSeat = ocuppiedSeat + soldSeats;
+
+        if (newAvailableSeat <= 0 && newOcuppiedSeat > seating)
+          throw new BadRequestException(
+            'There are not enough seats available to sale.',
+          );
+      } else {
+        newAvailableSeat = availableSeat + soldSeats;
+        newOcuppiedSeat = ocuppiedSeat - soldSeats;
+
+        if (newAvailableSeat > seating)
+          throw new BadRequestException('There are not enough seats.');
+      }
+
+      await this.tourModel.findByIdAndUpdate(
+        _id,
+        { availableSeat: newAvailableSeat, ocuppiedSeat: newOcuppiedSeat },
+        { new: true },
+      );
+
+      // TODO: save log
+    } catch (error) {
+      this.logger.error(`Error updating seats: ${error}`);
+      if (error instanceof BadRequestException) throw error;
+      else throw new InternalServerErrorException('Error updating seats');
     }
   }
 }

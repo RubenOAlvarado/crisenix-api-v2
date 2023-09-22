@@ -63,6 +63,7 @@ export class UserController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the users profiles.',
   })
+  @Public()
   @Get('all')
   async getUsers(@Query() query: PaginationDTO) {
     return await this.userService.getDbUsers(query);

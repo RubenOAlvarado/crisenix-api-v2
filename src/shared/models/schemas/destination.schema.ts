@@ -5,7 +5,7 @@ import { OriginCity } from './origincity.schema';
 import { TranslationTypes } from './translationtype.schema';
 
 @Schema()
-export class Destination {
+export class Destinations {
   @Prop({ type: String, required: true, index: true })
   code: string;
 
@@ -55,5 +55,5 @@ export class Destination {
   }
 }
 
-export type DestinationDocument = HydratedDocument<Destination>;
-export const DestinationSchema = SchemaFactory.createForClass(Destination);
+export type DestinationDocument = HydratedDocument<Destinations>;
+export const DestinationSchema = SchemaFactory.createForClass(Destinations);

@@ -3,14 +3,15 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Salers } from './saler.schema';
 import { Passengers } from './passenger.schema';
 import type { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
+import { User } from './user.schema';
 
 @Schema()
 export class Sales {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tours', required: true })
   tour: TourLean;
 
-  @Prop({ required: true })
-  user: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true })
+  user: User;
 
   @Prop({
     enum: ['RESERVADA', 'PAGADA', 'COMPROBADA', 'CANCELADA', 'RECHAZADA'],
@@ -62,7 +63,7 @@ export class Sales {
 
   constructor(
     tour: TourLean,
-    user: string,
+    user: User,
     status: string,
     origin: string,
     clientName: string,
