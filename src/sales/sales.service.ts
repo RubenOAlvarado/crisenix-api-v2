@@ -71,9 +71,9 @@ export class SalesService {
         })
         .sort({ reservationDate: -1 })
         .lean();
-      if (!sales) {
-        this.logger.error(`Sales not found.`);
-        throw new NotFoundException(`Sales not found.`);
+      if (!sales.length) {
+        this.logger.error(`User does not have sales registered.`);
+        throw new NotFoundException(`User does not have sales registered.`);
       }
       this.logger.debug(`Sales found.`);
       return sales;
