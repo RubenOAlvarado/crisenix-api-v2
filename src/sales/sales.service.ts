@@ -73,7 +73,7 @@ export class SalesService {
         .lean();
       if (!sales.length) {
         this.logger.error(`User does not have sales registered.`);
-        throw new NotFoundException(`User does not have sales registered.`);
+        throw new BadRequestException(`User does not have sales registered.`);
       }
       this.logger.debug(`Sales found.`);
       return sales;
