@@ -11,6 +11,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 // import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 import { UserService } from '../user/user.service';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 
 @Injectable()
 export class SalesService {
@@ -55,12 +57,15 @@ export class SalesService {
     }
   }
 
-  async salesByUser(id: string): Promise<Sales[]> {
+  async salesByUser(
+    id: string,
+    { page, limit }: PaginationDTO,
+  ): Promise<PaginateResult<Sales>> {
     try {
       this.logger.debug(`finding sales by user`);
       await this.userService.validateUser(id);
       this.logger.debug(`User found, finding sales`);
-      const sales = await this.salesModel
+      const docs = await this.salesModel
         .find({ user: id })
         .populate({
           path: 'tour',
@@ -70,13 +75,22 @@ export class SalesService {
           },
         })
         .sort({ reservationDate: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
         .lean();
-      if (!sales.length) {
+      if (!docs.length) {
         this.logger.error(`User does not have sales registered.`);
         throw new BadRequestException(`User does not have sales registered.`);
       }
-      this.logger.debug(`Sales found.`);
-      return sales;
+      const totalDocs = await this.salesModel.countDocuments({ user: id });
+      return {
+        docs,
+        totalDocs,
+        page,
+        totalPages: Math.ceil(totalDocs / limit),
+        hasPrevPage: page > 1,
+        hasNextPage: page < Math.ceil(totalDocs / limit),
+      };
     } catch (error) {
       this.logger.error(`Something went wrong finding the sales: ${error}`);
       if (

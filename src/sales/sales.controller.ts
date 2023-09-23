@@ -1,22 +1,27 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
 import { CreateSaleDTO } from '@/shared/models/dtos/sales/createsales.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { Public } from '@/auth/public.decorator';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { Sales } from '@/shared/models/schemas/sales.schema';
+import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
+import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 
 @ApiBearerAuth()
 @ApiTags('Sales')
 @Controller('sales')
+@ApiExtraModels(PaginatedDTO)
 export class SalesController {
   constructor(private salesService: SalesService) {}
 
@@ -35,10 +40,7 @@ export class SalesController {
     return await this.salesService.create(createSaleDTO);
   }
 
-  @ApiOkResponse({
-    description: 'Sales found successfully.',
-    // TODO: Add type and create response object
-  })
+  @ApiPaginatedResponse(Sales)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding user sales.',
   })
@@ -50,8 +52,11 @@ export class SalesController {
   })
   @Public()
   @Get('salesByUser/:id')
-  async salesByUser(@Param() param: UrlValidator) {
-    return await this.salesService.salesByUser(param.id);
+  async salesByUser(
+    @Param() param: UrlValidator,
+    @Query() query: PaginationDTO,
+  ) {
+    return await this.salesService.salesByUser(param.id, query);
   }
 
   /* @ApiOkResponse({
