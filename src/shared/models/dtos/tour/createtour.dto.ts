@@ -20,69 +20,104 @@ import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
 
 export class CreateTourDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Destination id',
+    example: '5f9d5c2b9d6b280b685d3e4e',
+  })
   @IsNotEmpty()
   @IsString()
   @IsMongoId()
   destination: string;
 
-  @ApiPropertyOptional({ enum: BoxLunch })
+  @ApiPropertyOptional({
+    enum: BoxLunch,
+    description: 'Box lunch indicator',
+    example: BoxLunch.NO,
+  })
   @IsOptional()
   @IsString()
   boxLunch?: BoxLunch;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour code',
+    example: 'T-0001',
+  })
   @IsNotEmpty()
   @IsString()
   code: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour seats number',
+    example: 20,
+  })
   @IsNotEmpty()
   @IsNumber()
   seating: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Available seats',
+    example: 10,
+  })
   @IsOptional()
   @IsNumber()
   availableSeat?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Ocuppied seats',
+    example: 10,
+  })
   @IsOptional()
   @IsNumber()
   ocuppiedSeat?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour initial date',
+    example: '2020-10-30T05:00:00.000Z',
+  })
   @IsNotEmpty()
   @IsDateString()
   initDate: Date;
 
   @ApiPropertyOptional({
     description: 'hour and place of aboard',
-    type: [AboardHourDTO],
+    type: AboardHourDTO,
+    isArray: true,
   })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => AboardHourDTO)
   aboardHour?: AboardHourDTO[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour days long',
+    example: 5,
+  })
   @IsOptional()
   @IsInt()
   @IsPositive()
   @Min(1)
   days?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour nights long',
+    example: 4,
+  })
   @IsOptional()
   @IsInt()
   nights?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour transport',
+    example: '5f9d5c2b9d6b280b685d3e4e',
+  })
   @IsNotEmpty()
   @IsMongoId()
   transport: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour return date',
+    example: '2020-10-30T05:00:00.000Z',
+  })
   @IsNotEmpty()
   @IsDateString()
   returnDate: Date;
@@ -96,7 +131,11 @@ export class CreateTourDTO {
   @Type(() => AboardHourDTO)
   returnHour?: AboardHourDTO[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour departure',
+    type: String,
+    isArray: true,
+  })
   @IsOptional()
   @IsMongoId({ each: true })
   departure?: Array<string>;
@@ -110,23 +149,36 @@ export class CreateTourDTO {
   @Type(() => CoordinatorDTO)
   coordinator?: CoordinatorDTO[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour front image',
+    example: 'https://www.example.com/image.jpg',
+  })
   @IsOptional()
   @IsUrl()
   front?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour recommendations',
+    example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(500)
   recommendations?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Tour type',
+    example: '5f9d5c2b9d6b280b685d3e4e',
+  })
   @IsNotEmpty()
   @IsMongoId()
   tourType: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour included',
+    type: String,
+    isArray: true,
+  })
   @IsOptional()
   @IsMongoId({ each: true })
   included?: Array<string>;

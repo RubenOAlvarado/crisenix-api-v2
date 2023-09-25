@@ -118,13 +118,13 @@ export class CreateSaleDTO {
   @IsNumber()
   totalPayedMount?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Pay date',
     example: '2020-10-30T00:00:00.000Z',
   })
   @IsNotEmpty()
   @IsDateString()
-  payDate: Date;
+  payDate?: Date;
 
   @ApiPropertyOptional({
     description: 'Saler id',

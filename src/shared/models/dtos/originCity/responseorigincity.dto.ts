@@ -7,16 +7,12 @@ export class ResponseOriginCityDTO {
     state: string,
     name: string,
     status: string,
-    createdAt?: Date,
-    _id?: string,
     aboardPoints?: ResponseAboardPointDTO[],
   ) {
     this.state = state;
     this.name = name;
     this.aboardPoints = aboardPoints;
     this.status = status;
-    this.createdAt = createdAt;
-    this._id = _id;
   }
 
   @ApiProperty({ type: String })
@@ -31,10 +27,4 @@ export class ResponseOriginCityDTO {
 
   @ApiProperty({ type: String })
   status: string;
-
-  @ApiPropertyOptional({ type: Date, default: Date.now() })
-  createdAt?: Date;
-
-  @ApiPropertyOptional({ type: String })
-  _id?: string;
 }

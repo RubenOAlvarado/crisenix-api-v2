@@ -12,61 +12,94 @@ import {
 } from 'class-validator';
 
 export class ItineraryDTO {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Day number',
+    example: 1,
+  })
   @IsNotEmpty()
   @IsInt()
   @Min(1)
   @MaxLength(2)
   dayNumber: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Activity listed this day',
+    example: 'camping',
+  })
   @IsNotEmpty()
   @IsMongoId()
   activity: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity additional cost (optional)',
+    example: 100,
+  })
   @IsOptional()
   @IsNumber()
   @MaxLength(6)
   additionalCost?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity initial date (optional)',
+    example: '2020-10-30T05:00:00.000Z',
+  })
   @IsOptional()
   @IsNotEmpty()
   @IsDateString()
   initDate?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity initial hour (optional)',
+    example: '10:00',
+  })
   @IsOptional()
   @IsString()
   initHour?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity finish date (optional)',
+    example: '2020-10-30T05:00:00.000Z',
+  })
   @IsOptional()
   @IsDateString()
   finishDate?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity finish hour (optional)',
+    example: '10:00',
+  })
   @IsOptional()
   @IsString()
   finishHour?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity aeroline (optional)',
+    example: 'Aeromexico',
+  })
   @IsOptional()
   @IsString()
   aeroline?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Flight number (optional)',
+    example: 'AM-123',
+  })
   @IsOptional()
   @IsString()
   flight?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Activity route (optional)',
+    example: 'CDMX - Cancun',
+  })
   @IsOptional()
   @IsString()
   route?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Activity order to be displayed',
+    example: 1,
+  })
   @IsNotEmpty()
   @IsNumber()
   order: number;

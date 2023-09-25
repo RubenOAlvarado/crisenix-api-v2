@@ -40,6 +40,7 @@ export class SalesController {
     return await this.salesService.create(createSaleDTO);
   }
 
+  // TODO: use proper response object
   @ApiPaginatedResponse(Sales)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding user sales.',

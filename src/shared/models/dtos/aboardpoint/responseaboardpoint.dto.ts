@@ -1,11 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseAboardPointDTO {
-  constructor(name: string, status: string, createdAt?: Date, _id?: string) {
+  constructor(name: string, status: string) {
     this.name = name;
     this.status = status;
-    this.createdAt = createdAt;
-    this._id = _id;
   }
 
   @ApiProperty({ type: String })
@@ -13,10 +11,4 @@ export class ResponseAboardPointDTO {
 
   @ApiProperty({ type: String })
   status: string;
-
-  @ApiPropertyOptional({ type: Date, default: Date.now() })
-  createdAt?: Date;
-
-  @ApiPropertyOptional({ type: String })
-  _id?: string;
 }
