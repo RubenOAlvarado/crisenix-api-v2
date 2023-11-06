@@ -14,9 +14,9 @@ import { CreateSaleDTO } from '@/shared/models/dtos/sales/createsales.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { Public } from '@/auth/public.decorator';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { Sales } from '@/shared/models/schemas/sales.schema';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
+import { ResponseSalesDTO } from '@/shared/models/dtos/sales/responsesales.dto';
 
 @ApiBearerAuth()
 @ApiTags('Sales')
@@ -40,8 +40,7 @@ export class SalesController {
     return await this.salesService.create(createSaleDTO);
   }
 
-  // TODO: use proper response object
-  @ApiPaginatedResponse(Sales)
+  @ApiPaginatedResponse(ResponseSalesDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding user sales.',
   })

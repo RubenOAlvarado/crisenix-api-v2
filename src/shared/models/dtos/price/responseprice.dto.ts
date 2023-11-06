@@ -48,25 +48,8 @@ export class ResponsePriceDTO {
   })
   inapam?: number;
 
-  constructor(
-    city: ResponseOriginCityDTO,
-    currency: string,
-    general?: number,
-    singleBase?: number,
-    doubleBase?: number,
-    tripleBase?: number,
-    quadrupleBase?: number,
-    minor?: number,
-    inapam?: number,
-  ) {
+  constructor(city: ResponseOriginCityDTO, currency: string) {
     this.city = city;
     this.currency = currency;
-    this.general = general;
-    this.singleBase = singleBase;
-    this.doubleBase = doubleBase;
-    this.tripleBase = tripleBase;
-    this.quadrupleBase = quadrupleBase;
-    this.minor = minor;
-    this.inapam = inapam;
   }
 }

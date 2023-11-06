@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 
 export class ResponseAboardHourDTO {
   @ApiProperty({
@@ -9,11 +10,11 @@ export class ResponseAboardHourDTO {
 
   @ApiProperty({
     description: 'Aboard point',
-    type: ResponseAboardHourDTO,
+    type: ResponseAboardPointDTO,
   })
-  aboardPoint: ResponseAboardHourDTO;
+  aboardPoint: ResponseAboardPointDTO;
 
-  constructor(hour: string, aboardPoint: ResponseAboardHourDTO) {
+  constructor(hour: string, aboardPoint: ResponseAboardPointDTO) {
     this.hour = hour;
     this.aboardPoint = aboardPoint;
   }

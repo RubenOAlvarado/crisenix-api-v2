@@ -142,7 +142,8 @@ export class CreateTourDTO {
 
   @ApiPropertyOptional({
     description: 'Coordinator/s assigned to the tour',
-    type: [CoordinatorDTO],
+    type: CoordinatorDTO,
+    isArray: true,
   })
   @IsOptional()
   @ValidateNested({ each: true })
@@ -185,14 +186,19 @@ export class CreateTourDTO {
 
   @ApiPropertyOptional({
     description: 'Tour itinerary, array of activities',
-    type: [ItineraryDTO],
+    type: ItineraryDTO,
+    isArray: true,
   })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => ItineraryDTO)
   itinerary?: ItineraryDTO[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Tour price',
+    type: String,
+    isArray: true,
+  })
   @IsOptional()
   @IsMongoId({ each: true })
   price?: Array<string>;

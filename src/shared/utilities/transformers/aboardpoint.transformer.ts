@@ -9,8 +9,8 @@ export const aboardPointsTransformer: TransformerInterface<AboardPoints[]> = ({
 }: {
   value: AboardPoints[];
 }) => {
-  return value.map(({ name, status, createdAt }) => {
-    return new ResponseAboardPointDTO(name, status, createdAt);
+  return value.map(({ name, status }) => {
+    return new ResponseAboardPointDTO(name, status);
   });
 };
 export const AboardPointsTransformer = () =>
