@@ -413,7 +413,10 @@ export class UserService {
   async validateUser(id: string): Promise<boolean> {
     try {
       this.logger.debug('Validating user');
-      const user = await this.userModel.findById(id).lean();
+      const user = await this.userModel
+        .findById(id)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!user) {
         this.logger.error('User not found.');
         throw new NotFoundException('User not found.');

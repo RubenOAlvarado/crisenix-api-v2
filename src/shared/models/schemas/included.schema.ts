@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 @Schema()
-export class Included {
+export class Includeds {
   @Prop({ required: true, index: true })
   concept: string;
 
@@ -97,5 +97,5 @@ export class Included {
   }
 }
 
-export type IncludedDocument = HydratedDocument<Included>;
-export const IncludedSchema = SchemaFactory.createForClass(Included);
+export type IncludedDocument = HydratedDocument<Includeds>;
+export const IncludedSchema = SchemaFactory.createForClass(Includeds);

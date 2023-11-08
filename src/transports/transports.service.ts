@@ -21,7 +21,10 @@ export class TransportsService {
   async getTransport({ id }: UrlValidator): Promise<Transports> {
     try {
       this.logger.debug(`Getting transport with id: ${id}`);
-      const transport = await this.transportModel.findById(id).lean();
+      const transport = await this.transportModel
+        .findById(id)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!transport) {
         this.logger.error(`Transport with id: ${id} not found.`);
         throw new NotFoundException('Transport not found.');

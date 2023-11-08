@@ -45,8 +45,14 @@ export class CaptionsService {
     try {
       this.logger.debug('Finding all captions');
       const captions = status
-        ? await this.captionModel.find({ status }).lean()
-        : await this.captionModel.find().lean();
+        ? await this.captionModel
+            .find({ status })
+            .select({ __v: 0, createdAt: 0 })
+            .lean()
+        : await this.captionModel
+            .find()
+            .select({ __v: 0, createdAt: 0 })
+            .lean();
       if (!captions) throw new NotFoundException('No captions registered');
       return captions;
     } catch (error) {

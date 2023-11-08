@@ -27,6 +27,7 @@ export class DestinationService {
         .populate('originCity')
         .populate('category')
         .populate('translationType')
+        .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!destination) throw new NotFoundException('Destination not found.');
       return destination;
@@ -36,7 +37,7 @@ export class DestinationService {
       );
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(
-        'Something went wrong while finding category',
+        'Something went wrong while finding destination.',
       );
     }
   }

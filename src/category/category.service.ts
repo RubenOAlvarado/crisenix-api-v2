@@ -47,8 +47,14 @@ export class CategoryService {
     try {
       this.logger.debug(`finding all categories`);
       const categories = status
-        ? await this.categoryModel.find({ status }).lean()
-        : await this.categoryModel.find().lean();
+        ? await this.categoryModel
+            .find({ status })
+            .select({ __v: 0, createdAt: 0 })
+            .lean()
+        : await this.categoryModel
+            .find()
+            .select({ __v: 0, createdAt: 0 })
+            .lean();
       if (!categories) throw new NotFoundException('No categories registered.');
       return categories;
     } catch (error) {

@@ -41,7 +41,11 @@ export class SalesService {
   async findOne(id: string): Promise<Sales> {
     try {
       this.logger.debug(`finding sale by id`);
-      const sale = await this.salesModel.findById(id).populate('tour').lean();
+      const sale = await this.salesModel
+        .findById(id)
+        .populate('tour')
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!sale) {
         this.logger.error(`Sale not found.`);
         throw new NotFoundException(`Sale not found.`);
@@ -77,6 +81,7 @@ export class SalesService {
         .sort({ reservationDate: -1 })
         .limit(limit * 1)
         .skip((page - 1) * limit)
+        .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!docs.length) {
         this.logger.error(`User does not have sales registered.`);

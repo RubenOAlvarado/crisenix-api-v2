@@ -1,14 +1,14 @@
-import { Included } from '@/shared/models/schemas/included.schema';
+import { Includeds } from '@/shared/models/schemas/included.schema';
 import { TransformerInterface } from './transformer.interface';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { Entry } from '@/shared/enums/entry.enum';
 import { Transform } from 'class-transformer';
 import { applyDecorators } from '@nestjs/common';
 
-export const includedTransformer: TransformerInterface<Included[]> = ({
+export const includedTransformer: TransformerInterface<Includeds[]> = ({
   value,
 }: {
-  value: Included[];
+  value: Includeds[];
 }) => {
   return value.map(({ concept, included, publish, entry, status }) => {
     return new ResponseIncludedDTO(
