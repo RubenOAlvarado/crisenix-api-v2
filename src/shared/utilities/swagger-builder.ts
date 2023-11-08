@@ -20,6 +20,7 @@ import { PassengerModule } from '@/passenger/passenger.module';
 import { SalerModule } from '@/saler/saler.module';
 import { SalesModule } from '@/sales/sales.module';
 import { PriceModule } from '@/price/price.module';
+import { DestinationModule } from '@/destination/destination.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -52,6 +53,7 @@ export const buildSwaggerModule = async (
       SalerModule,
       SalesModule,
       PriceModule,
+      DestinationModule,
     ],
   });
 

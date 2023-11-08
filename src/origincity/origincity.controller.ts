@@ -73,7 +73,9 @@ export class OriginCityController {
     description: 'Something went wrong finding the origin city.',
   })
   @Get(':id')
-  async findOne(@Param() urlValidator: UrlValidator): Promise<OriginCity> {
+  async findOne(
+    @Param() urlValidator: UrlValidator,
+  ): Promise<ResponseOriginCityDTO> {
     return await this.originCityService.findOne(urlValidator);
   }
 

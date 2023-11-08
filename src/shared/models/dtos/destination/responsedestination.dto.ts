@@ -19,19 +19,19 @@ export class ResponseDestinationDTO {
   })
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     description: 'Destination description',
   })
-  description: string;
+  description?: string;
 
   @ApiPropertyOptional({ type: ResponseCategoryDTO, isArray: true })
   @CategoryTransformers()
-  category: ResponseCategoryDTO[];
+  category?: ResponseCategoryDTO[];
 
   @ApiPropertyOptional({ type: ResponseOriginCityDTO, isArray: true })
   @OriginCityTransformers()
-  originCity: ResponseOriginCityDTO[];
+  originCity?: ResponseOriginCityDTO[];
 
   @ApiPropertyOptional({
     description: 'Destination tentative dates',
@@ -39,11 +39,11 @@ export class ResponseDestinationDTO {
   })
   tentativeDates?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Destination passport indicator',
     type: Boolean,
   })
-  passport: boolean;
+  passport?: boolean;
 
   @ApiProperty({
     description: 'Destination visa indicator',
@@ -75,24 +75,16 @@ export class ResponseDestinationDTO {
     code: string,
     name: string,
     description: string,
-    category: ResponseCategoryDTO[],
-    originCity: ResponseOriginCityDTO[],
     tentativeDates: string,
-    passport: boolean,
     visa: string,
-    translationType: ResponseTranslationTypeDTO[],
     translationRoute: string,
     photos: string[],
   ) {
     this.code = code;
     this.name = name;
     this.description = description;
-    this.category = category;
-    this.originCity = originCity;
     this.tentativeDates = tentativeDates;
-    this.passport = passport;
     this.visa = visa;
-    this.translationType = translationType;
     this.translationRoute = translationRoute;
     this.photos = photos;
   }

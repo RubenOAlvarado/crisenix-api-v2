@@ -63,7 +63,7 @@ export class CategoryService {
   async findOne(id: string): Promise<CategoryLean> {
     try {
       this.logger.debug(`finding category with id: ${id}`);
-      const category = await this.categoryModel.findById(id).exec();
+      const category = await this.categoryModel.findById(id).lean();
       if (!category) throw new NotFoundException('Category not found.');
       return category;
     } catch (error) {
