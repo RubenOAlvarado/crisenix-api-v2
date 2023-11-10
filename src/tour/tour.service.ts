@@ -6,6 +6,7 @@ import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
+import { User } from '@/shared/interfaces/user/user.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
@@ -358,7 +359,7 @@ export class TourService {
     }
   }
 
-  async validateSaledTour(id: string): Promise<void> {
+  async validateSaledTour(id: string): Promise<TourLean> {
     try {
       this.logger.debug(`validating saled tour with id: ${id}`);
       const tour = await this.getPOJOTourById(id);
@@ -366,6 +367,9 @@ export class TourService {
         throw new BadRequestException(
           'The tour must be in publish status to be saled.',
         );
+      if (tour.availableSeat === 0)
+        throw new BadRequestException('There are not enough seats available.');
+      return tour;
     } catch (error) {
       this.logger.error(`Error validating saled tour: ${error}`);
       if (error instanceof BadRequestException) throw error;
@@ -378,7 +382,7 @@ export class TourService {
   async updateTourSeats(
     tour: TourLean,
     soldSeats: number,
-    //user: User,
+    user: User,
     saleMove: SalesMove,
   ): Promise<void> {
     try {
@@ -405,13 +409,18 @@ export class TourService {
           throw new BadRequestException('There are not enough seats.');
       }
 
-      await this.tourModel.findByIdAndUpdate(
+      const updatedTour = await this.tourModel.findByIdAndUpdate(
         _id,
         { availableSeat: newAvailableSeat, ocuppiedSeat: newOcuppiedSeat },
         { new: true },
       );
 
-      // TODO: save log
+      await this.saveLogInDataBase({
+        serviceId: tour._id.toString(),
+        move: MOVES.UPDATE,
+        user: user.email,
+        registry: updatedTour,
+      });
     } catch (error) {
       this.logger.error(`Error updating seats: ${error}`);
       if (error instanceof BadRequestException) throw error;

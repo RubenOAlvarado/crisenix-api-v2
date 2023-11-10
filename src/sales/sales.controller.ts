@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Query, Req } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -7,6 +7,7 @@ import {
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
@@ -17,6 +18,9 @@ import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 import { ResponseSalesDTO } from '@/shared/models/dtos/sales/responsesales.dto';
+import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/sales/response-paypal.response.dto';
+import { PaypalResponse } from '@/shared/models/dtos/sales/paypal.response.dto';
+import type { UserRequest } from '@/shared/interfaces/userRequest.interface';
 
 @ApiBearerAuth()
 @ApiTags('Sales')
@@ -59,7 +63,7 @@ export class SalesController {
     return await this.salesService.salesByUser(param.id, query);
   }
 
-  /* @ApiOkResponse({
+  @ApiOkResponse({
     description: 'Paypal sale result.',
     type: ResponseSavedPaypalResponse,
   })
@@ -78,5 +82,5 @@ export class SalesController {
     @Req() req: UserRequest,
   ) {
     return await this.salesService.paypalResponse(paypalResponse, req.user);
-  } */
+  }
 }

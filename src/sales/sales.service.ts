@@ -6,19 +6,28 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-// import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 import { UserService } from '../user/user.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/sales/response-paypal.response.dto';
+import { PaypalResponse } from '@/shared/models/dtos/sales/paypal.response.dto';
+import { State } from '@/shared/enums/sales/state.enum';
+import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
+import { SalesMove } from '@/shared/enums/sales/salemove.enum';
+import { TourService } from '@/tour/tour.service';
 
 @Injectable()
 export class SalesService {
   constructor(
     @InjectModel(Sales.name) private readonly salesModel: Model<Sales>,
     private readonly userService: UserService,
+    @Inject(forwardRef(() => TourService))
+    private tourService: TourService,
   ) {}
 
   private readonly logger = new Logger(SalesService.name);
@@ -109,53 +118,60 @@ export class SalesService {
     }
   }
 
-  /* async paypalResponse(
+  async paypalResponse(
     { state, sale, operationId, failureReason }: PaypalResponse,
     user: any,
   ): Promise<ResponseSavedPaypalResponse> {
     try {
       this.logger.debug(`Validating sale response`);
       const validatedSale = await this.validateSale(sale);
-      if(validatedSale && this.tourService.validateSaledTour(validatedSale.tour._id.toString())){
+      const tour = await this.tourService.validateSaledTour(
+        validatedSale.tour._id.toString(),
+      );
+      let response: ResponseSavedPaypalResponse =
+        {} as ResponseSavedPaypalResponse;
+      if (validatedSale && tour) {
         // All validations passed, saving sale response
-      this.logger.debug(`Processing paypal response `);
+        this.logger.debug(`Processing paypal response `);
 
-      if (state === State.APPROVED) {
-        // TODO: create email service
+        if (state === State.APPROVED) {
+          // TODO: create email service
 
-        this.logger.debug(`Sale approved, sending email to client`);
-        this.logger.debug(`Sale approved, updating status`);
+          this.logger.debug(`Sale approved, sending email to client`);
+          this.logger.debug(`Sale approved, updating status`);
 
-        const updateSale = await this.salesModel.findByIdAndUpdate(
-          sale,
-          { status: SalesStatus.CHECKED },
-          { new: true },
-        );
-        const response: ResponseSavedPaypalResponse = {
-          sale: updateSale,
-          message: 'Sale approved.',
-        };
-        return response;
-      } else {
-        this.logger.debug('Sale declined by paypal; updating status and seats');
-        await this.tourService.updateSeats({
-          id: saleTour._id.toString(),
-          seats: currentSale.reservedSeat,
-          user,
-          move: SalesMove.DELETE,
-        }); 
-        const updatedSale = await this.salesModel.findByIdAndUpdate(
-          sale,
-          { status: SalesStatus.DECLINED, failureReason, state },
-          { new: true },
-        );
-        const response: ResponseSavedPaypalResponse = {
-          sale: updatedSale,
-          message: 'Sale declined.',
-        };
-        return response;
+          const updateSale = await this.salesModel.findByIdAndUpdate(
+            sale,
+            { status: SalesStatus.CHECKED },
+            { new: true },
+          );
+          response = {
+            sale: updateSale,
+            message: 'Sale approved.',
+          };
+        } else {
+          this.logger.debug(
+            'Sale declined by paypal; updating status and seats',
+          );
+          await this.tourService.updateTourSeats(
+            validatedSale.tour,
+            validatedSale.reservedSeat,
+            user,
+            SalesMove.DELETE,
+          );
+          const updatedSale = await this.salesModel.findByIdAndUpdate(
+            sale,
+            { status: SalesStatus.DECLINED, failureReason, state },
+            { new: true },
+          );
+          response = {
+            sale: updatedSale,
+            message: 'Sale declined.',
+          };
+        }
       }
-      }
+
+      return response;
     } catch (error) {
       this.logger.error(
         `Something went wrong saving sale response: ${JSON.stringify(error)}`,
@@ -170,9 +186,9 @@ export class SalesService {
           'Something went wrong saving sale response.',
         );
     }
-  } */
+  }
 
-  /* private async validateSale(saleId: string): Promise<Sales> {
+  private async validateSale(saleId: string): Promise<Sales> {
     try {
       this.logger.debug(`Validating sale`);
       const currentSale = await this.findOne(saleId);
@@ -201,5 +217,5 @@ export class SalesService {
           `Something went wrong validating sale.`,
         );
     }
-  } */
+  }
 }
