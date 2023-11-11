@@ -16,5 +16,6 @@ import { EventlogModule } from '@/eventlog/eventlog.module';
   ],
   controllers: [TourController],
   providers: [TourService],
+  exports: [TourService],
 })
 export class TourModule {}
