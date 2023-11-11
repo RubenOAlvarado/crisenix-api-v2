@@ -119,7 +119,7 @@ export class SalesService {
   }
 
   async paypalResponse(
-    { state, sale, operationId, failureReason }: PaypalResponse,
+    { state, sale, failureReason }: PaypalResponse,
     user: any,
   ): Promise<ResponseSavedPaypalResponse> {
     try {
