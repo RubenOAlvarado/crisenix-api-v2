@@ -9,6 +9,7 @@ import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { User } from '@/shared/interfaces/user/user.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
+import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
@@ -27,7 +28,7 @@ import { Model } from 'mongoose';
 export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
-    private eventLogService: EventlogService, //@Inject(forwardRef(() => SalesService)) // private salesService: SalesService, // private filerService: FilerService,
+    private eventLogService: EventlogService, // @Inject(forwardRef(() => SalesService)) // private salesService: SalesService, // private filerService: FilerService,
   ) {}
 
   private readonly logger = new Logger(TourService.name);
@@ -82,7 +83,7 @@ export class TourService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<Tours>> {
+  }: PaginatedTourDTO): Promise<PaginateResult<Tours>> {
     try {
       const docs = status
         ? await this.tourModel

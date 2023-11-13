@@ -3,6 +3,6 @@ export interface PaginateResult<T> {
   totalDocs: number;
   hasPrevPage: boolean;
   hasNextPage: boolean;
-  page?: number | undefined;
+  page: number;
   totalPages: number;
 }
