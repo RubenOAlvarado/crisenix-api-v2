@@ -428,4 +428,28 @@ export class TourService {
       else throw new InternalServerErrorException('Error updating seats');
     }
   }
+
+  async getTourItineraries({ id }: UrlValidator): Promise<any> {
+    try {
+      const tour = await this.tourModel
+        .findById(id)
+        .populate('itinerary')
+        .exec();
+      if (!tour) {
+        throw new BadRequestException('Tour not found.');
+      }
+      if (!tour.itinerary) {
+        throw new NotFoundException('Tour has not itineraries registered yet.');
+      }
+      return tour.itinerary;
+    } catch (error) {
+      this.logger.error(`Error finding tour itineraries: ${error}`);
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      )
+        throw error;
+      else throw new InternalServerErrorException('Error updating seats');
+    }
+  }
 }

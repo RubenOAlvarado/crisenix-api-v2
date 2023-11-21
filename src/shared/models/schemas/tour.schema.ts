@@ -7,7 +7,7 @@ import { Departure } from './departure.schema';
 import { TourType } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
-import { Itinerary } from './itinerary.schema';
+import { Itineraries } from './itinerary.schema';
 
 @Schema()
 export class Tours {
@@ -97,7 +97,7 @@ export class Tours {
   @Prop({ type: Array })
   itinerary?: Array<{
     dayNumber: number;
-    activity: Itinerary;
+    activity: Itineraries;
     additionalCost: number;
     initDate: Date;
     initHour: string;
@@ -109,7 +109,7 @@ export class Tours {
     order: number;
   }>;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Price' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prices' }] })
   price?: Array<Prices>;
 
   @Prop({ type: Date, default: Date.now })

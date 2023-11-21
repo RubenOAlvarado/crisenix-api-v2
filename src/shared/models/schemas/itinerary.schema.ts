@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Clasifications } from './clasification.schema';
 
 @Schema()
-export class Itinerary {
+export class Itineraries {
   @Prop({ required: true })
   activity: string;
 
@@ -27,5 +27,5 @@ export class Itinerary {
   }
 }
 
-export type ItineraryDocument = HydratedDocument<Itinerary>;
-export const ItinerarySchema = SchemaFactory.createForClass(Itinerary);
+export type ItineraryDocument = HydratedDocument<Itineraries>;
+export const ItinerarySchema = SchemaFactory.createForClass(Itineraries);
