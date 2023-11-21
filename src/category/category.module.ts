@@ -3,7 +3,7 @@ import { CategoryService } from './category.service';
 import { CategoryController } from './category.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  Category,
+  Categories,
   CategorySchema,
 } from '@/shared/models/schemas/category.schema';
 import { FilerModule } from '@/filer/filer.module';
@@ -11,7 +11,7 @@ import { FilerModule } from '@/filer/filer.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Category.name, schema: CategorySchema },
+      { name: Categories.name, schema: CategorySchema },
     ]),
     FilerModule,
   ],

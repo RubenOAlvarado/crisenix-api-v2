@@ -4,7 +4,7 @@ import { CategoryLean } from '@/shared/interfaces/category/category.lean.interfa
 import { CreateCategoryDTO } from '@/shared/models/dtos/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
 import {
-  Category,
+  Categories,
   CategoryDocument,
 } from '@/shared/models/schemas/category.schema';
 import {
@@ -20,7 +20,8 @@ import { Model } from 'mongoose';
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Categories.name)
+    private readonly categoryModel: Model<Categories>,
     private filerService: FilerService,
   ) {}
 
@@ -171,7 +172,7 @@ export class CategoryService {
   }
 
   private mapJsonToCategory(json: any): CreateCategoryDTO[] {
-    return json.map((category: Category) => {
+    return json.map((category: Categories) => {
       return {
         label: category.label,
         main: category.main,

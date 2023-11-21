@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Category } from './category.schema';
+import { Categories } from './category.schema';
 import { OriginCity } from './origincity.schema';
 import { TranslationTypes } from './translationtype.schema';
 
@@ -15,8 +15,8 @@ export class Destinations {
   @Prop({ type: String })
   description?: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] })
-  category?: Array<Category>;
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Categories' }] })
+  category?: Array<Categories>;
 
   @Prop({ type: String, enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;

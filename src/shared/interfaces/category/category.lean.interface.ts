@@ -1,4 +1,4 @@
 import { Types } from 'mongoose';
-import { Category } from '../../models/schemas/category.schema';
+import { Categories } from '../../models/schemas/category.schema';
 
-export type CategoryLean = Category & { _id: Types.ObjectId };
+export type CategoryLean = Categories & { _id: Types.ObjectId };

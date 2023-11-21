@@ -77,6 +77,7 @@ export class CategoryController {
   @ApiNotFoundResponse({
     description: 'Category not found.',
   })
+  @Public()
   @Get(':id')
   async findOne(@Param() { id }: UrlValidator) {
     return await this.categoryService.findOne(id);
