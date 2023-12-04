@@ -7,8 +7,10 @@ import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdes
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
 import { generateDestinationsSearcherQuery } from '@/shared/utilities/query-maker.helper';
+import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -221,6 +223,51 @@ export class DestinationService {
       if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
         `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}`,
+      );
+    }
+  }
+
+  async deletePhotos({
+    photo: photoToDelete,
+    destination,
+  }: PhotoValidator): Promise<void> {
+    try {
+      this.logger.debug(
+        `deleting photo from destination with id: ${destination}`,
+      );
+      const destinationToUpdate = await this.destinationModel.findById(
+        destination,
+      );
+      if (!destinationToUpdate)
+        throw new NotFoundException('Destination not found.');
+      if (destinationToUpdate.status !== Status.ACTIVE)
+        throw new BadRequestException('Destination must be in Active status.');
+      const { photos } = destinationToUpdate;
+      if (photos?.some((current) => current === photoToDelete)) {
+        delete photos[photos.indexOf(photoToDelete)];
+        await this.destinationModel.findByIdAndUpdate(destination, {
+          photos,
+        });
+        this.logger.debug('Photo successfully deleted.');
+      } else {
+        throw new BadRequestException(
+          'Photo does not belong to the requested destination.',
+        );
+      }
+      await this.destinationModel.findByIdAndUpdate(destination, {
+        photos,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while deleting destination photos: ${error}`,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        'Something went wrong while deleting destination photos.',
       );
     }
   }

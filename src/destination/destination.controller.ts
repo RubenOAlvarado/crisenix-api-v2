@@ -13,6 +13,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
   ApiExtraModels,
@@ -29,6 +30,7 @@ import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
+import { PhotoValidator } from '@/shared/validators/photo.validator';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -164,5 +166,28 @@ export class DestinationController {
   })
   async search(@Body() searcherDTO: SearcherDTO) {
     return await this.destinationService.search(searcherDTO);
+  }
+
+  @ApiOkResponse({
+    description: 'Destination photos successfully deleted.',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong deleting the destination photos.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destination not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Destination must be in Active status.',
+  })
+  @Patch('deletephoto')
+  @ApiBody({
+    description: 'Destination and photo to delete',
+    type: PhotoValidator,
+  })
+  async deletePhoto(@Body() photoValidator: PhotoValidator): Promise<string> {
+    await this.destinationService.deletePhotos(photoValidator);
+    return 'Destination photos successfully deleted.';
   }
 }

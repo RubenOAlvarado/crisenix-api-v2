@@ -4,7 +4,6 @@ import { PipelineStage } from 'mongoose';
 
 // TODO: improve this function to make it more generic and add population
 // TODO 2: add pagination
-// TODO 3: research about population in aggregation
 export function generateDestinationsSearcherQuery({
   field,
   word,
