@@ -2,6 +2,7 @@ import { QueryDTO } from '@/shared/dtos/query.dto';
 import { SearcherDTO } from '@/shared/dtos/searcher.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
+import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
@@ -268,6 +269,36 @@ export class DestinationService {
         throw error;
       throw new InternalServerErrorException(
         'Something went wrong while deleting destination photos.',
+      );
+    }
+  }
+
+  async findCities({ id }: UrlValidator): Promise<OriginCityLean> {
+    try {
+      this.logger.debug(`finding cities from destination with id: ${id}`);
+      const destination = await this.destinationModel
+        .findById(id)
+        .populate('originCity')
+        .populate({
+          path: 'originCity',
+          populate: {
+            path: 'aboardPoints',
+          },
+        })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!destination) throw new NotFoundException('Destination not found.');
+      const originCity = destination.originCity;
+      if (!originCity?.length)
+        throw new NotFoundException('Destination cities not found.');
+      return originCity as unknown as OriginCityLean;
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while finding destination cities: ${error}`,
+      );
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        'Something went wrong while finding destination cities.',
       );
     }
   }

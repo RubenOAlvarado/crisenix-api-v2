@@ -31,6 +31,7 @@ import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
+import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -189,5 +190,23 @@ export class DestinationController {
   async deletePhoto(@Body() photoValidator: PhotoValidator): Promise<string> {
     await this.destinationService.deletePhotos(photoValidator);
     return 'Destination photos successfully deleted.';
+  }
+
+  @ApiOkResponse({
+    description: 'Destination cities found.',
+    type: ResponseOriginCityDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the destination cities.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destination not found.',
+  })
+  @Public()
+  @Get('cities/:id')
+  async findCities(
+    @Param() urlValidator: UrlValidator,
+  ): Promise<ResponseOriginCityDTO> {
+    return await this.destinationService.findCities(urlValidator);
   }
 }
