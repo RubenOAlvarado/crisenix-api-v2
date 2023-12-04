@@ -19,7 +19,6 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { DestinationService } from './destination.service';
@@ -76,7 +75,6 @@ export class DestinationController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the destination.',
   })
-  @Public()
   @Get(':id')
   async findOne(
     @Param() urlValidator: UrlValidator,
@@ -153,11 +151,16 @@ export class DestinationController {
     return 'Destination successfully reactivated.';
   }
 
-  // TODO: improve this endpoint docs
-  @ApiResponse({ status: 200 })
+  @ApiOkResponse({
+    description: 'Destination successfully searched.',
+    type: ResponseDestinationDTO,
+    isArray: true,
+  })
   @Post('/search')
-  @ApiBody({ type: SearcherDTO })
-  @Public()
+  @ApiBody({
+    description: 'Field and word to look for in destinations catalog',
+    type: SearcherDTO,
+  })
   async search(@Body() searcherDTO: SearcherDTO) {
     return await this.destinationService.search(searcherDTO);
   }

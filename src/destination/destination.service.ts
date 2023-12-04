@@ -6,6 +6,7 @@ import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
+import { generateDestinationsSearcherQuery } from '@/shared/utilities/query-maker.helper';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   Injectable,
@@ -59,7 +60,6 @@ export class DestinationService {
             .populate('originCity')
             .populate('category')
             .populate('translationType')
-            .populate('aboardPoint')
             .select({ __v: 0, createdAt: 0 })
             .lean()
         : await this.destinationModel
@@ -69,7 +69,6 @@ export class DestinationService {
             .populate('originCity')
             .populate('category')
             .populate('translationType')
-            .populate('aboardPoint')
             .select({ __v: 0, createdAt: 0 })
             .lean();
       if (!docs.length) throw new NotFoundException('Destinations not found.');
@@ -203,36 +202,25 @@ export class DestinationService {
     }
   }
 
-  async search({ word, status }: SearcherDTO): Promise<Array<DestinationLean>> {
+  async search(searchParams: SearcherDTO): Promise<Array<DestinationLean>> {
     try {
       this.logger.debug(
-        `Looking destinations that contains: ${word} with status: ${status}`,
+        `Looking destinations that contains: ${searchParams.word} on field: ${searchParams.field}`,
       );
-      return this.destinationModel
-        .aggregate()
-        .lookup({
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category',
-        })
-        .unwind({
-          path: '$category',
-          preserveNullAndEmptyArrays: true,
-        })
-        .match({
-          status,
-          $or: [
-            { description: new RegExp(word, 'i') },
-            { code: new RegExp(word, 'i') },
-            { name: new RegExp(word, 'i') },
-            { 'category.label': new RegExp(word, 'i') },
-          ],
-        });
+      const queryObject = generateDestinationsSearcherQuery(searchParams);
+      const searchResult = await this.destinationModel.aggregate(queryObject);
+      if (!searchResult.length)
+        throw new NotFoundException(
+          `Destinations not found with: ${searchParams.word} on field: ${searchParams.field} .`,
+        );
+      return searchResult;
     } catch (e) {
-      this.logger.error(`Error looking destination with value ${word}: ${e}`);
+      this.logger.error(
+        `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}: ${e}`,
+      );
+      if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
-        `Error looking destination with value ${word}`,
+        `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}`,
       );
     }
   }

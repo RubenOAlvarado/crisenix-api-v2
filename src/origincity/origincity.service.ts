@@ -193,10 +193,7 @@ export class OriginCityService {
     }
   }
 
-  async searcher({
-    word,
-    status,
-  }: SearcherDTO): Promise<Array<OriginCityLean>> {
+  async searcher({ word }: SearcherDTO): Promise<Array<OriginCityLean>> {
     try {
       this.logger.debug(`Searching origin cities: ${word}`);
       const searchResult = this.originCityModel
@@ -205,7 +202,6 @@ export class OriginCityService {
             { name: { $regex: word, $options: 'i' } },
             { country: { $regex: word, $options: 'i' } },
           ],
-          status,
         })
         .populate('aboardPoints')
         .select({ __v: 0, createdAt: 0 })
