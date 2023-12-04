@@ -1,17 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Status } from '../enums/status.enum';
+import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 
 export class SearcherDTO {
   @ApiProperty({
     description: 'field to search',
-    example: 'name',
+    example: SearchableFields.NAME,
     type: String,
+    enum: SearchableFields,
   })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  field: string;
+  field: SearchableFields;
 
   @ApiProperty({
     description:
@@ -32,7 +34,7 @@ export class SearcherDTO {
   @IsString()
   status?: Status;
 
-  constructor(field: string, word: string) {
+  constructor(field: SearchableFields, word: string) {
     this.field = field;
     this.word = word;
   }

@@ -1,7 +1,10 @@
-import { DestinationFields } from '../enums/searcher/destination/fields.enum';
+import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 import { SearcherDTO } from '../dtos/searcher.dto';
 import { PipelineStage } from 'mongoose';
 
+// TODO: improve this function to make it more generic and add population
+// TODO 2: add pagination
+// TODO 3: research about population in aggregation
 export function generateDestinationsSearcherQuery({
   field,
   word,
@@ -24,7 +27,7 @@ export function generateDestinationsSearcherQuery({
         },
       },
     });
-  } else if (field === DestinationFields.CATEGORY) {
+  } else if (field === SearchableFields.CATEGORY) {
     query.push({
       $lookup: {
         from: 'categories',

@@ -156,6 +156,7 @@ export class DestinationController {
     type: ResponseDestinationDTO,
     isArray: true,
   })
+  @Public()
   @Post('/search')
   @ApiBody({
     description: 'Field and word to look for in destinations catalog',
