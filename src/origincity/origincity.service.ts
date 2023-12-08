@@ -1,4 +1,5 @@
 import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
+import { mapCitiesFromDestinationExcel } from '@/shared/utilities/originCity.helpers';
 import {
   BadRequestException,
   Injectable,
@@ -134,13 +135,20 @@ export class OriginCityService {
   async update(
     { id }: UrlValidator,
     updateOriginCity: UpdateOriginCityDTO,
-  ): Promise<void> {
+  ): Promise<OriginCityLean> {
     try {
       this.logger.debug('Updating origin city');
-      if (await this.validateOriginCity(id))
-        await this.originCityModel.findByIdAndUpdate(id, updateOriginCity, {
+      await this.validateOriginCity(id);
+      const updatedOriginCity = await this.originCityModel.findByIdAndUpdate(
+        id,
+        updateOriginCity,
+        {
           new: true,
-        });
+        },
+      );
+      if (!updatedOriginCity)
+        throw new NotFoundException(`OriginCity ${id} was not found`);
+      return updatedOriginCity;
     } catch (error) {
       this.logger.error(`Error updating origin city: ${error}`);
       if (
@@ -253,16 +261,15 @@ export class OriginCityService {
       const aboardPoints = await this.aboardPointService.mapFromNameToObjectId(
         puntosDeAbordaje?.split(','),
       );
-      const originCityDTO: CreateOriginCityDTO = {
+      return {
         state: originCity.estado,
         name: originCity.nombre,
         status: originCity.status as Status,
         aboardPoints,
-      };
-      return originCityDTO;
+      } as unknown as CreateOriginCityDTO;
     });
 
-    return Promise.all(mappedOriginCities);
+    return await Promise.all(mappedOriginCities);
   }
 
   async loadFromExcel(filePath: string): Promise<void> {
@@ -276,6 +283,38 @@ export class OriginCityService {
       this.logger.error(`Error loading origin cities from excel: ${error}`);
       throw new InternalServerErrorException(
         `Error loading origin cities from excel: ${error}`,
+      );
+    }
+  }
+
+  async mapFromDestinationExcel(originCities: string): Promise<string[]> {
+    try {
+      this.logger.debug(`Mapping origin cities from destination excel`);
+      const mappedCitiesFromExcel = mapCitiesFromDestinationExcel(originCities);
+      const mappedCities = mappedCitiesFromExcel.map(async (city) => {
+        const existingCity = await this.originCityModel
+          .findOne({ name: city.name })
+          .lean();
+        if (!existingCity) {
+          const { aboardPoints } = city;
+          const mappedAboardPoints =
+            await this.aboardPointService.mapFromNameToObjectId(aboardPoints);
+          const createdOriginCity = await this.create({
+            name: city.name,
+            state: city.state,
+            aboardPoints: mappedAboardPoints,
+          } as CreateOriginCityDTO);
+          return createdOriginCity._id.toString();
+        }
+        return existingCity._id.toString();
+      });
+      return await Promise.all(mappedCities);
+    } catch (error) {
+      this.logger.error(
+        `Error mapping origin cities from destination excel: ${error}`,
+      );
+      throw new InternalServerErrorException(
+        `Error mapping origin cities from destination excel: ${error}`,
       );
     }
   }

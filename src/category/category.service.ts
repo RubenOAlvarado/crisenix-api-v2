@@ -180,4 +180,32 @@ export class CategoryService {
       };
     });
   }
+
+  async mapFromNameToObjectId(names: string[]): Promise<string[] | undefined> {
+    this.logger.debug(`mapping from name to object id`);
+    try {
+      if (!names.length) {
+        return;
+      }
+      const mappedCategories = names.map(async (name) => {
+        const category = await this.categoryModel
+          .findOne({ label: name })
+          .lean();
+        if (!category) {
+          const createdCategory = await this.create({
+            label: name,
+            status: Status.ACTIVE,
+          });
+          return createdCategory._id.toString();
+        }
+        return category._id.toString();
+      });
+      return await Promise.all(mappedCategories);
+    } catch (error) {
+      this.logger.error(`Error mapping from name to object id: ${error}`);
+      throw new InternalServerErrorException(
+        'Error mapping from name to object id',
+      );
+    }
+  }
 }

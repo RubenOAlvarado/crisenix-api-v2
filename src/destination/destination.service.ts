@@ -1,7 +1,12 @@
+import { CategoryService } from '@/category/category.service';
+import { FilerService } from '@/filer/filer.service';
+import { OriginCityService } from '@/origincity/origincity.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { SearcherDTO } from '@/shared/dtos/searcher.dto';
 import { Status } from '@/shared/enums/status.enum';
+import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
+import { DestinationsExcel } from '@/shared/interfaces/excel/destinations.excel.interface';
 import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
@@ -10,6 +15,7 @@ import { Destinations } from '@/shared/models/schemas/destination.schema';
 import { generateDestinationsSearcherQuery } from '@/shared/utilities/query-maker.helper';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { TranslationtypeService } from '@/translationtype/translationtype.service';
 import {
   BadRequestException,
   Injectable,
@@ -25,6 +31,10 @@ export class DestinationService {
   constructor(
     @InjectModel(Destinations.name)
     private readonly destinationModel: Model<Destinations>,
+    private readonly filerService: FilerService,
+    private readonly categoryService: CategoryService,
+    private readonly translationTypeService: TranslationtypeService,
+    private readonly originCityService: OriginCityService,
   ) {}
 
   private readonly logger = new Logger(DestinationService.name);
@@ -301,5 +311,62 @@ export class DestinationService {
         'Something went wrong while finding destination cities.',
       );
     }
+  }
+
+  async loadCatalog(filePath: string): Promise<void> {
+    try {
+      this.logger.debug('loading destinations from excel file.');
+      const jsonObject: DestinationsExcel[] =
+        this.filerService.excelToJson(filePath);
+      if (!jsonObject.length) throw new BadRequestException('Empty file.');
+      const destinations = this.mapToDTO(jsonObject);
+      await this.destinationModel.insertMany(destinations);
+    } catch (error) {
+      this.logger.error(`Something went wrong loading destinations: ${error}`);
+      throw new InternalServerErrorException(
+        'Something went wrong loading destinations.',
+      );
+    }
+  }
+
+  private async mapToDTO(
+    jsonObject: DestinationsExcel[],
+  ): Promise<CreateDestinationDTO[]> {
+    const mappedDTO = jsonObject.map(async (destination) => {
+      const {
+        codigo,
+        nombre,
+        descripcion,
+        categorias,
+        estatus,
+        ciudadDeOrigen,
+        fechasProgramadas,
+        pasaporte,
+        visa,
+        tipoDeTraslado,
+        traslado,
+      } = destination;
+      return {
+        code: codigo,
+        name: nombre,
+        description: descripcion,
+        category: await this.categoryService.mapFromNameToObjectId(
+          categorias?.split(','),
+        ),
+        status: estatus as Status,
+        originCity: await this.originCityService.mapFromDestinationExcel(
+          ciudadDeOrigen,
+        ),
+        scheduledDates: fechasProgramadas,
+        passport: pasaporte === 'Si' ? true : false,
+        visa: visa as Visa,
+        translationType:
+          await this.translationTypeService.mapTranslationTypeNames(
+            tipoDeTraslado?.split(','),
+          ),
+        translation: traslado,
+      } as unknown as CreateDestinationDTO;
+    });
+    return await Promise.all(mappedDTO);
   }
 }

@@ -19,5 +19,6 @@ import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
   ],
   controllers: [OriginCityController],
   providers: [OriginCityService],
+  exports: [OriginCityService],
 })
 export class OrigincityModule {}

@@ -17,5 +17,6 @@ import { FilerModule } from '@/filer/filer.module';
   ],
   controllers: [CategoryController],
   providers: [CategoryService],
+  exports: [CategoryService],
 })
 export class CategoryModule {}

@@ -197,7 +197,10 @@ export class OriginCityController {
       fileFilter: excelFileFilter,
     }),
   )
-  async loadCatalog(@UploadedFile() file: Express.Multer.File): Promise<void> {
+  async loadCatalog(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<string> {
     await this.originCityService.loadFromExcel(file.path);
+    return 'The origin cities has been successfully loaded.';
   }
 }
