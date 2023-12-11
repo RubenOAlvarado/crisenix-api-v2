@@ -1,5 +1,4 @@
 import { EventlogService } from '@/eventlog/eventlog.service';
-import { QueryDTO } from '@/shared/dtos/query.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
@@ -13,6 +12,7 @@ import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
+import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   BadRequestException,
@@ -61,7 +61,7 @@ export class TourService {
     user = UserRoles.ADMIN,
   ): Promise<Tours> {
     try {
-      this.logger.debug('Creating tour');
+      this.logger.debug(`creating tour by user: ${user}`);
       const newTour = new this.tourModel(tour);
       await newTour.save();
       await this.saveLogInDataBase({
@@ -168,14 +168,43 @@ export class TourService {
     }
   }
 
-  async getLastRegisteredTour({ id }: UrlValidator): Promise<TourLean> {
+  async getLastRegisteredTour({
+    destination,
+  }: DestinationValidator): Promise<TourLean> {
     try {
       this.logger.debug(
-        `getting last registered tour for destination with id: ${id}`,
+        `getting last registered tour for destination with id: ${destination}`,
       );
+      // TODO: check if destination is active and exists
       const tour = await this.tourModel
-        .findOne({ destination: id })
+        .findOne({ destination })
         .sort({ createdAt: -1 })
+        .populate([
+          'destination',
+          'transport',
+          'tourType',
+          'included',
+          'itinerary',
+          'price',
+          'departure',
+        ])
+        .populate({
+          path: 'aboardHour.aboardPoint',
+          model: 'AboardPoint',
+        })
+        .populate({
+          path: 'returnHour.aboardPoint',
+          model: 'AboardPoint',
+        })
+        .populate({
+          path: 'departure',
+          options: {
+            sort: {
+              date: 1,
+              hour: 1,
+            },
+          },
+        })
         .select({ __v: 0, createdAt: 0 })
         .limit(1)
         .lean();
@@ -312,36 +341,39 @@ export class TourService {
   }
 
   async getToursByIncluded(
-    { page, limit }: QueryDTO,
+    // { page, limit }: QueryDTO,
     { included }: TourByIncluded,
   ): Promise<void> {
     try {
       this.logger.debug(`getting tours by included: ${included}`);
-      const skip = (page - 1) * limit;
-      const aggregateLimit = limit * 1;
-      const aggregate = this.tourModel.aggregate([
-        {
-          $unwind: {
-            path: '$included',
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        { $match: { 'included.concept': included } },
-        { $skip: skip },
-        { $limit: aggregateLimit },
-        { $count: 'totalDocs' },
-        { $sort: { initDate: 1 } },
-      ]);
-      const docs = await aggregate.exec();
+      // const skip = (page - 1) * limit;
+      // const aggregateLimit = limit * 1;
+      const docs = await this.tourModel
+        .aggregate()
+        .lookup({
+          from: 'includeds',
+          localField: 'included',
+          foreignField: '_id',
+          as: 'included',
+        })
+        .unwind({
+          path: '$included',
+          preserveNullAndEmptyArrays: true,
+        })
+        .match({
+          'included.concept': included,
+        })
+        .exec();
       this.logger.debug(`result: ${docs}`);
-      this.logger.debug(`aggregate object: ${JSON.stringify(aggregate)}`);
       if (docs.length === 0)
-        throw new NotFoundException('No tours found for this included.');
+        throw new NotFoundException(
+          'No tours registered for this included service.',
+        );
     } catch (error) {
       this.logger.error(`Error getting tours by included: ${error}`);
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(
-        `Something went wrong looking tours by included.`,
+        `Something went wrong looking tours by included service.`,
       );
     }
   }
