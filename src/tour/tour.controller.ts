@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  Request,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -25,7 +17,6 @@ import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
-import { get } from 'http';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 
 @ApiTags('Tour')
