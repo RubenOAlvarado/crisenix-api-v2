@@ -23,5 +23,6 @@ import { OrigincityModule } from '@/origincity/origincity.module';
   ],
   controllers: [DestinationController],
   providers: [DestinationService],
+  exports: [DestinationService],
 })
 export class DestinationModule {}

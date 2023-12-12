@@ -80,6 +80,7 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'Destination state must be active.',
   })
+  @Public()
   @Get('last/:destination')
   async getLastTour(@Param() param: DestinationValidator) {
     return await this.tourService.getLastRegisteredTour(param);

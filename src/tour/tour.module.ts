@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { SalesModule } from '@/sales/sales.module';
 import { FilerModule } from '@/filer/filer.module';
 import { EventlogModule } from '@/eventlog/eventlog.module';
+import { DestinationModule } from '@/destination/destination.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { EventlogModule } from '@/eventlog/eventlog.module';
     forwardRef(() => SalesModule),
     FilerModule,
     EventlogModule,
+    DestinationModule,
   ],
   controllers: [TourController],
   providers: [TourService],

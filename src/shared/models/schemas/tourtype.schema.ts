@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 @Schema()
-export class TourType {
+export class TourTypes {
   @Prop({ required: true, index: true })
   name: string;
 
@@ -22,5 +22,5 @@ export class TourType {
   }
 }
 
-export type TourTypeDocument = HydratedDocument<TourType>;
-export const TourTypeSchema = SchemaFactory.createForClass(TourType);
+export type TourTypeDocument = HydratedDocument<TourTypes>;
+export const TourTypeSchema = SchemaFactory.createForClass(TourTypes);

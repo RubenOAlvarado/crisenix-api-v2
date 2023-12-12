@@ -4,7 +4,7 @@ import { Destinations } from './destination.schema';
 import { Transports } from './transporst.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { Departure } from './departure.schema';
-import { TourType } from './tourtype.schema';
+import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
 import { Itineraries } from './itinerary.schema';
@@ -86,10 +86,10 @@ export class Tours {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'TourType',
+    ref: 'TourTypes',
     required: true,
   })
-  tourType: TourType;
+  tourType: TourTypes;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Includeds' }] })
   included?: Array<Includeds>;
@@ -126,7 +126,7 @@ export class Tours {
     nights: number,
     transport: Transports,
     returnDate: Date,
-    tourType: TourType,
+    tourType: TourTypes,
   ) {
     this.destination = destination;
     this.code = code;

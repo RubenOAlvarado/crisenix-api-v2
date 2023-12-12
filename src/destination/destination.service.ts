@@ -13,6 +13,7 @@ import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdes
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
 import { generateDestinationsSearcherQuery } from '@/shared/utilities/query-maker.helper';
+import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { TranslationtypeService } from '@/translationtype/translationtype.service';
@@ -368,5 +369,33 @@ export class DestinationService {
       } as unknown as CreateDestinationDTO;
     });
     return await Promise.all(mappedDTO);
+  }
+
+  async validateFromTour({
+    destination,
+  }: DestinationValidator): Promise<boolean> {
+    try {
+      this.logger.debug(`Validating destination with id: ${destination}`);
+      const destinationToValidate = await this.destinationModel.findById(
+        destination,
+      );
+      if (!destinationToValidate)
+        throw new NotFoundException('Destination not found.');
+      if (destinationToValidate.status !== Status.ACTIVE)
+        throw new BadRequestException('Destination must be in Active status.');
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong validating destination: ${error}`,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        'Something went wrong validating destination.',
+      );
+    }
   }
 }

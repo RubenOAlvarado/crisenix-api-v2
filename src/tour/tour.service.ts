@@ -1,3 +1,4 @@
+import { DestinationService } from '@/destination/destination.service';
 import { EventlogService } from '@/eventlog/eventlog.service';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
@@ -28,7 +29,8 @@ import { Model } from 'mongoose';
 export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
-    private eventLogService: EventlogService, // @Inject(forwardRef(() => SalesService)) // private salesService: SalesService, // private filerService: FilerService,
+    private eventLogService: EventlogService,
+    private destinationService: DestinationService, // @Inject(forwardRef(() => SalesService)) // private salesService: SalesService, // private filerService: FilerService,
   ) {}
 
   private readonly logger = new Logger(TourService.name);
@@ -175,7 +177,10 @@ export class TourService {
       this.logger.debug(
         `getting last registered tour for destination with id: ${destination}`,
       );
-      // TODO: check if destination is active and exists
+      await this.destinationService.validateFromTour({
+        destination,
+      });
+      this.logger.debug(`Destination is valid`);
       const tour = await this.tourModel
         .findOne({ destination })
         .sort({ createdAt: -1 })
@@ -212,8 +217,12 @@ export class TourService {
       if (!tour) throw new NotFoundException('No tour registered.');
       return tour;
     } catch (error) {
-      this.logger.error(`error getting last registered tour: ${error}`);
-      if (error instanceof NotFoundException) throw error;
+      this.logger.error(`Error getting last registered tour: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
       throw new InternalServerErrorException(
         `Error getting last registered tour: ${error}`,
       );
