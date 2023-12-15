@@ -27,7 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { DestinationService } from './destination.service';
 import { Public } from '@/auth/public.decorator';
-import { SearcherDTO } from '@/shared/dtos/searcher.dto';
+import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
@@ -38,6 +38,7 @@ import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseo
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -67,6 +68,7 @@ export class DestinationController {
   @ApiNotFoundResponse({
     description: 'Destinations not found.',
   })
+  @Public()
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
@@ -160,19 +162,24 @@ export class DestinationController {
     return 'Destination successfully reactivated.';
   }
 
-  @ApiOkResponse({
-    description: 'Destination successfully searched.',
-    type: ResponseDestinationDTO,
-    isArray: true,
+  @ApiPaginatedResponse(ResponseDestinationDTO)
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong searching the destinations.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destinations not found.',
   })
   @Public()
   @Post('/search')
   @ApiBody({
-    description: 'Field and word to look for in destinations catalog',
+    description: 'Search params in destinations catalog',
     type: SearcherDTO,
   })
-  async search(@Body() searcherDTO: SearcherDTO) {
-    return await this.destinationService.search(searcherDTO);
+  async search(
+    @Body() searcherDTO: SearcherDTO,
+    @Query() queryDTO: PaginationDTO,
+  ) {
+    return await this.destinationService.search(searcherDTO, queryDTO);
   }
 
   @ApiOkResponse({

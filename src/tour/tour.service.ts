@@ -10,7 +10,6 @@ import { User } from '@/shared/interfaces/user/user.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
-import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
@@ -345,44 +344,6 @@ export class TourService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(
         `Something went wrong looking web tour by id.`,
-      );
-    }
-  }
-
-  async getToursByIncluded(
-    // { page, limit }: QueryDTO,
-    { included }: TourByIncluded,
-  ): Promise<void> {
-    try {
-      this.logger.debug(`getting tours by included: ${included}`);
-      // const skip = (page - 1) * limit;
-      // const aggregateLimit = limit * 1;
-      const docs = await this.tourModel
-        .aggregate()
-        .lookup({
-          from: 'includeds',
-          localField: 'included',
-          foreignField: '_id',
-          as: 'included',
-        })
-        .unwind({
-          path: '$included',
-          preserveNullAndEmptyArrays: true,
-        })
-        .match({
-          'included.concept': included,
-        })
-        .exec();
-      this.logger.debug(`result: ${docs}`);
-      if (docs.length === 0)
-        throw new NotFoundException(
-          'No tours registered for this included service.',
-        );
-    } catch (error) {
-      this.logger.error(`Error getting tours by included: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong looking tours by included service.`,
       );
     }
   }

@@ -12,7 +12,7 @@ import { Model } from 'mongoose';
 import { AboardpointService } from 'src/aboardpoint/aboardpoint.service';
 import { FilerService } from 'src/filer/filer.service';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
-import { SearcherDTO } from 'src/shared/dtos/searcher.dto';
+import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { OriginCityExcel } from 'src/shared/interfaces/excel/originCity.excel.interface';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';

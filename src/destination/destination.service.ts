@@ -1,8 +1,9 @@
 import { CategoryService } from '@/category/category.service';
 import { FilerService } from '@/filer/filer.service';
 import { OriginCityService } from '@/origincity/origincity.service';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { SearcherDTO } from '@/shared/dtos/searcher.dto';
+import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
@@ -216,18 +217,33 @@ export class DestinationService {
     }
   }
 
-  async search(searchParams: SearcherDTO): Promise<Array<DestinationLean>> {
+  async search(
+    searchParams: SearcherDTO,
+    queryParams: PaginationDTO,
+  ): Promise<PaginateResult<DestinationLean> | undefined> {
     try {
       this.logger.debug(
         `Looking destinations that contains: ${searchParams.word} on field: ${searchParams.field}`,
       );
-      const queryObject = generateDestinationsSearcherQuery(searchParams);
-      const searchResult = await this.destinationModel.aggregate(queryObject);
-      if (!searchResult.length)
+      const query = generateDestinationsSearcherQuery(
+        searchParams,
+        queryParams,
+      );
+      const result = await this.destinationModel.aggregate(query);
+      const { docs, totalDocs } = result[0];
+      if (!docs.length)
         throw new NotFoundException(
           `Destinations not found with: ${searchParams.word} on field: ${searchParams.field} .`,
         );
-      return searchResult;
+      return {
+        docs,
+        totalDocs,
+        hasPrevPage: queryParams.page > 1,
+        hasNextPage:
+          queryParams.page < Math.ceil(totalDocs / queryParams.limit),
+        page: queryParams.page,
+        totalPages: Math.ceil(totalDocs / queryParams.limit),
+      };
     } catch (e) {
       this.logger.error(
         `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}: ${e}`,

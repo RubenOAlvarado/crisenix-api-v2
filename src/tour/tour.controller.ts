@@ -9,13 +9,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TourService } from './tour.service';
-import { TourByIncluded } from '@/shared/models/dtos/tour/tourbyincluded.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { ResponseTourDTO } from '@/shared/models/dtos/tour/responsetour.dto';
 import { Public } from '@/auth/public.decorator';
 import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 
@@ -84,22 +82,6 @@ export class TourController {
   @Get('last/:destination')
   async getLastTour(@Param() param: DestinationValidator) {
     return await this.tourService.getLastRegisteredTour(param);
-  }
-
-  @ApiPaginatedResponse(ResponseIncludedDTO)
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong looking tours by included service.',
-  })
-  @ApiNotFoundResponse({
-    description: 'No tours registered for this included service.',
-  })
-  @Public()
-  @Get('getByIncluded/:included')
-  async getByIncluded(
-    @Param() included: TourByIncluded,
-    // @Query() query: QueryDTO,
-  ) {
-    return await this.tourService.getToursByIncluded(included);
   }
 
   @ApiPaginatedResponse(ResponseTourDTO)

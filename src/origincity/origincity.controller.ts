@@ -29,7 +29,7 @@ import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
 import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateorigincity.dto';
-import { SearcherDTO } from 'src/shared/dtos/searcher.dto';
+import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
