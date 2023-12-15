@@ -11,6 +11,7 @@ import { TourStatus } from '../../tour/status.enum';
 import { Transform } from 'class-transformer';
 import { BooleanString } from '../../boolean-string.type';
 import { SortTourFields } from './sortFields.enum';
+import { SearchType } from '../search-type.enum';
 
 export class SearcherTourDTO {
   @ApiProperty({
@@ -62,6 +63,16 @@ export class SearcherTourDTO {
   @IsNotEmpty()
   @IsEnum(SortTourFields)
   sort?: SortTourFields;
+
+  @ApiPropertyOptional({
+    description: 'Kind of search indicator.',
+    enum: SearchType,
+    default: SearchType.EXACTMATCH,
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(SearchType)
+  searchType?: SearchType;
 
   constructor(field: SearchableTourFields, word: string) {
     this.field = field;

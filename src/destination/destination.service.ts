@@ -4,6 +4,8 @@ import { OriginCityService } from '@/origincity/origincity.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
+import { SortFields } from '@/shared/enums/searcher/destination/sortFields.enum';
+import { SearchType } from '@/shared/enums/searcher/search-type.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
@@ -13,7 +15,10 @@ import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
-import { generateDestinationsSearcherQuery } from '@/shared/utilities/query-maker.helper';
+import {
+  alikeQueryBuilder,
+  generateDestinationsSearcherQuery,
+} from '@/shared/utilities/query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -218,39 +223,57 @@ export class DestinationService {
   }
 
   async search(
-    searchParams: SearcherDTO,
+    {
+      field,
+      word,
+      status,
+      populate = false,
+      sort = 'createdAt' as SortFields,
+      searchType = SearchType.EXACTMATCH,
+    }: SearcherDTO,
     queryParams: PaginationDTO,
-  ): Promise<PaginateResult<DestinationLean> | undefined> {
+  ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
-      this.logger.debug(
-        `Looking destinations that contains: ${searchParams.word} on field: ${searchParams.field}`,
-      );
-      const query = generateDestinationsSearcherQuery(
-        searchParams,
-        queryParams,
-      );
-      const result = await this.destinationModel.aggregate(query);
-      const { docs, totalDocs } = result[0];
-      if (!docs.length)
-        throw new NotFoundException(
-          `Destinations not found with: ${searchParams.word} on field: ${searchParams.field} .`,
+      if (searchType === SearchType.EXACTMATCH) {
+        this.logger.debug(
+          `Looking destinations that contains: ${word} on field: ${field}`,
         );
-      return {
-        docs,
-        totalDocs,
-        hasPrevPage: queryParams.page > 1,
-        hasNextPage:
-          queryParams.page < Math.ceil(totalDocs / queryParams.limit),
-        page: queryParams.page,
-        totalPages: Math.ceil(totalDocs / queryParams.limit),
-      };
+        const query = generateDestinationsSearcherQuery(
+          { field, word, status, populate, sort },
+          queryParams,
+        );
+        const result = await this.destinationModel.aggregate(query);
+        const { docs, totalDocs } = result[0];
+        if (!docs.length)
+          throw new NotFoundException(
+            `Destinations not found with: ${word} on field: ${field} .`,
+          );
+        return {
+          docs,
+          totalDocs,
+          hasPrevPage: queryParams.page > 1,
+          hasNextPage:
+            queryParams.page < Math.ceil(totalDocs / queryParams.limit),
+          page: queryParams.page,
+          totalPages: Math.ceil(totalDocs / queryParams.limit),
+        };
+      } else {
+        this.logger.debug(`Looking destinations that contains: ${word}`);
+        const query = alikeQueryBuilder(word, status, sort);
+        const result = await this.destinationModel.aggregate(query);
+        if (!result)
+          throw new NotFoundException(
+            `Destinations not found with: ${word} on field: ${field} .`,
+          );
+        return result;
+      }
     } catch (e) {
       this.logger.error(
-        `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}: ${e}`,
+        `Something went wrong looking destination with ${word} in ${field}: ${e}`,
       );
       if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
-        `Something went wrong looking destination with ${searchParams.word} in ${searchParams.field}`,
+        `Something went wrong looking destination with ${word} in ${field}`,
       );
     }
   }

@@ -12,7 +12,7 @@ export function generateDestinationsSearcherQuery(
     field,
     word,
     status,
-    populate,
+    populate = false,
     sort = 'createdAt' as SortFields,
   }: SearcherDTO,
   { page, limit }: PaginationDTO,
@@ -25,18 +25,8 @@ export function generateDestinationsSearcherQuery(
       },
     });
   }
+
   if (field === SearchableFields.CATEGORY) {
-    query.push({
-      $lookup: {
-        from: 'categories',
-        localField: 'category',
-        foreignField: '_id',
-        as: 'category',
-      },
-    });
-    query.push({
-      $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
-    });
     query.push({
       $match: {
         'category.label': {
@@ -57,19 +47,6 @@ export function generateDestinationsSearcherQuery(
   }
 
   if (populate) {
-    query.push({
-      $lookup: {
-        from: 'categories',
-        localField: 'category',
-        foreignField: '_id',
-        as: 'category',
-      },
-    });
-
-    query.push({
-      $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
-    });
-
     query.push({
       $lookup: {
         from: 'origincities',
@@ -127,6 +104,69 @@ export function generateDestinationsSearcherQuery(
     $project: {
       docs: 1,
       totalDocs: { $arrayElemAt: ['$totalDocs.total', 0] },
+    },
+  });
+
+  return query;
+}
+
+export function alikeQueryBuilder(
+  word: string,
+  status: string | undefined,
+  sort = 'createdAt' as SortFields,
+): PipelineStage[] {
+  const query: PipelineStage[] = [];
+  if (status) {
+    query.push({
+      $match: {
+        status,
+      },
+    });
+  }
+  query.push({
+    $lookup: {
+      from: 'categories',
+      localField: 'category',
+      foreignField: '_id',
+      as: 'category',
+    },
+  });
+  query.push({
+    $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
+  });
+  query.push({
+    $match: {
+      $or: [
+        {
+          description: {
+            $regex: word,
+            $options: 'i',
+          },
+        },
+        {
+          code: {
+            $regex: word,
+            $options: 'i',
+          },
+        },
+        {
+          name: {
+            $regex: word,
+            $options: 'i',
+          },
+        },
+        {
+          'category.label': {
+            $regex: word,
+            $options: 'i',
+          },
+        },
+      ],
+    },
+  });
+  query.push({
+    $sort: {
+      [sort]: -1,
     },
   });
 

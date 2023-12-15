@@ -5,33 +5,35 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 import { Status } from '../../status.enum';
 import { SearchableFields } from './fields.enum';
 import { BooleanString } from '../../boolean-string.type';
 import { Transform } from 'class-transformer';
 import { SortFields } from './sortFields.enum';
+import { SearchType } from '../search-type.enum';
 
 export class SearcherDTO {
   @ApiProperty({
-    description: 'field to search',
-    example: SearchableFields.NAME,
-    type: String,
-    enum: SearchableFields,
-  })
-  @IsEnum(SearchableFields)
-  @IsNotEmpty()
-  @IsString()
-  field: SearchableFields;
-
-  @ApiProperty({
     description:
-      'value to search, it could be anything that we want to type in the front',
+      'value to search, if searchType is EXACTMATCH will just return the exact match of the word',
   })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   word: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to search, if searchType is EXACTMATCH',
+    example: SearchableFields.NAME,
+    enum: SearchableFields,
+  })
+  @ValidateIf((o) => o.searchType && o.searchType === SearchType.EXACTMATCH)
+  @IsEnum(SearchableFields)
+  @IsNotEmpty()
+  @IsString()
+  field?: SearchableFields;
 
   @ApiPropertyOptional({
     description: 'status of the table',
@@ -57,15 +59,24 @@ export class SearcherDTO {
   @ApiPropertyOptional({
     description: 'SortField to sort the results.',
     enum: SortFields,
-    default: SortFields.NAME,
+    default: SortFields.CREATED,
   })
   @IsOptional()
   @IsNotEmpty()
   @IsEnum(SortFields)
   sort?: SortFields;
 
-  constructor(field: SearchableFields, word: string) {
-    this.field = field;
+  @ApiPropertyOptional({
+    description: 'Kind of search indicator.',
+    enum: SearchType,
+    default: SearchType.EXACTMATCH,
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(SearchType)
+  searchType?: SearchType;
+
+  constructor(word: string) {
     this.word = word;
   }
 }
