@@ -259,7 +259,7 @@ export class DestinationService {
         };
       } else {
         this.logger.debug(`Looking destinations that contains: ${word}`);
-        const query = alikeQueryBuilder(word, status, sort);
+        const query = alikeQueryBuilder(word, status, sort, populate);
         const result = await this.destinationModel.aggregate(query);
         if (!result)
           throw new NotFoundException(

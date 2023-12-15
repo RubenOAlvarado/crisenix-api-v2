@@ -114,6 +114,7 @@ export function alikeQueryBuilder(
   word: string,
   status: string | undefined,
   sort = 'createdAt' as SortFields,
+  populate = false,
 ): PipelineStage[] {
   const query: PipelineStage[] = [];
   if (status) {
@@ -169,6 +170,47 @@ export function alikeQueryBuilder(
       [sort]: -1,
     },
   });
+
+  if (populate) {
+    query.push({
+      $lookup: {
+        from: 'origincities',
+        localField: 'originCity',
+        foreignField: '_id',
+        as: 'originCity',
+      },
+    });
+
+    query.push({
+      $unwind: { path: '$originCity', preserveNullAndEmptyArrays: true },
+    });
+
+    query.push({
+      $lookup: {
+        from: 'translationtypes',
+        localField: 'translationType',
+        foreignField: '_id',
+        as: 'translationType',
+      },
+    });
+
+    query.push({
+      $unwind: { path: '$translationType', preserveNullAndEmptyArrays: true },
+    });
+
+    query.push({
+      $lookup: {
+        from: 'aboardpoints',
+        localField: 'aboardPoint',
+        foreignField: '_id',
+        as: 'aboardPoint',
+      },
+    });
+
+    query.push({
+      $unwind: { path: '$aboardPoint', preserveNullAndEmptyArrays: true },
+    });
+  }
 
   return query;
 }
