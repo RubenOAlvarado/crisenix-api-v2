@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -16,6 +25,7 @@ import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
+import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -112,5 +122,41 @@ export class TourController {
   @Get('itineraries/:id')
   async getTourItineraries(@Param() param: UrlValidator) {
     return await this.tourService.getTourItineraries(param);
+  }
+
+  @ApiOkResponse({
+    description: 'Tour updated successfully.',
+    type: ResponseTourDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating tour.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tour not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Tour does not exist.',
+  })
+  @ApiBody({ type: UpdateTourDTO })
+  @Put(':id')
+  async updateTour(@Param() param: UrlValidator, @Body() tour: UpdateTourDTO) {
+    return await this.tourService.updateTour(param, tour, 'dev');
+  }
+
+  @ApiOkResponse({
+    description: 'Tour deleted successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong deleting tour.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tour not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Tour does not exist.',
+  })
+  @Delete(':id')
+  async deleteTour(@Param() param: UrlValidator) {
+    return await this.tourService.deleteTour(param, 'dev');
   }
 }

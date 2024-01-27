@@ -293,34 +293,30 @@ export class TourService {
 
   private validateNewTourStatus(
     newStatus: string,
-    tour: TourDocument,
-  ): boolean {
-    if (tour.status === newStatus)
+    { status }: TourDocument,
+  ): boolean | Error {
+    if (status === newStatus)
       throw new BadRequestException(`Tour is already in ${newStatus} status.`);
-    if (newStatus === TourStatus.INACTIVE && tour.status !== TourStatus.ACTIVE)
-      throw new BadRequestException(
-        'The tour must be in in active status to be inactivated.',
-      );
-    if (newStatus === TourStatus.ACTIVE && tour.status !== TourStatus.INACTIVE)
+    if (newStatus === TourStatus.ACTIVE && status !== TourStatus.INACTIVE)
       throw new BadRequestException(
         'The tour must be in in inactive status to be activated.',
       );
     if (
       newStatus === TourStatus.PUBLISH &&
-      tour.status !== TourStatus.ACTIVE &&
-      tour.status !== TourStatus.FINISH
+      status !== TourStatus.ACTIVE &&
+      status !== TourStatus.FINISH
     )
       throw new BadRequestException(
         'The tour must be in active or finish status to be published.',
       );
-    if (newStatus === TourStatus.CLOSE && tour.status !== TourStatus.PUBLISH)
+    if (newStatus === TourStatus.CLOSE && status !== TourStatus.PUBLISH)
       throw new BadRequestException(
         'The tour must be in publish status to be closed.',
       );
     if (
       newStatus === TourStatus.FINISH &&
-      tour.status !== TourStatus.PUBLISH &&
-      tour.status !== TourStatus.CLOSE
+      status !== TourStatus.PUBLISH &&
+      status !== TourStatus.CLOSE
     )
       throw new BadRequestException(
         'The tour must be in publish or close status to be finished.',
@@ -452,6 +448,35 @@ export class TourService {
       )
         throw error;
       else throw new InternalServerErrorException('Error updating seats');
+    }
+  }
+
+  async deleteTour({ id }: UrlValidator, user: string): Promise<void> {
+    try {
+      this.logger.debug(`deleting tour with id: ${id}`);
+      const tour = await this.tourModel.findById(id);
+      if (!tour) throw new NotFoundException('Tour not found.');
+      if (tour.status !== TourStatus.ACTIVE)
+        throw new BadRequestException('Tour must be active to be deleted.');
+      await this.tourModel.findByIdAndUpdate(id, {
+        status: TourStatus.INACTIVE,
+      });
+      await this.saveLogInDataBase({
+        serviceId: tour._id.toString(),
+        move: MOVES.DELETE,
+        user: user,
+        registry: tour,
+      });
+    } catch (error) {
+      this.logger.error(`Error deleting tour: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        `Something went wrong while deleting tour.`,
+      );
     }
   }
 }
