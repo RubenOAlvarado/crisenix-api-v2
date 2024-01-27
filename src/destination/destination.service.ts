@@ -227,7 +227,7 @@ export class DestinationService {
       field,
       word,
       status,
-      populate = false,
+      subCatalog = false,
       sort = 'createdAt' as SortFields,
       searchType = SearchType.EXACTMATCH,
     }: SearcherDTO,
@@ -239,7 +239,7 @@ export class DestinationService {
           `Looking destinations that contains: ${word} on field: ${field}`,
         );
         const query = generateDestinationsSearcherQuery(
-          { field, word, status, populate, sort },
+          { field, word, status, subCatalog, sort },
           queryParams,
         );
         const result = await this.destinationModel.aggregate(query);
@@ -259,7 +259,7 @@ export class DestinationService {
         };
       } else {
         this.logger.debug(`Looking destinations that contains: ${word}`);
-        const query = alikeQueryBuilder(word, status, sort, populate);
+        const query = alikeQueryBuilder(word, status, sort, subCatalog);
         const result = await this.destinationModel.aggregate(query);
         if (!result)
           throw new NotFoundException(

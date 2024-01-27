@@ -46,15 +46,15 @@ export class SearcherDTO {
   status?: Status;
 
   @ApiPropertyOptional({
-    description: 'Inidicator if we want to populate catalogs for destination.',
+    description: 'Inidicator if we want to load sub catalogs for destination.',
     default: false,
   })
   @IsOptional()
   @IsEnum(BooleanString, {
-    message: `The populate value must be either 'true' or 'false'`,
+    message: `The subCatalog value must be either 'true' or 'false'`,
   })
   @Transform(({ value }) => value === 'true', { toPlainOnly: true })
-  populate?: boolean;
+  subCatalog?: boolean;
 
   @ApiPropertyOptional({
     description: 'SortField to sort the results.',

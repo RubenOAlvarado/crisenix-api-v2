@@ -12,7 +12,7 @@ export function generateDestinationsSearcherQuery(
     field,
     word,
     status,
-    populate = false,
+    subCatalog = false,
     sort = 'createdAt' as SortFields,
   }: SearcherDTO,
   { page, limit }: PaginationDTO,
@@ -27,6 +27,17 @@ export function generateDestinationsSearcherQuery(
   }
 
   if (field === SearchableFields.CATEGORY) {
+    query.push({
+      $lookup: {
+        from: 'categories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    });
+    query.push({
+      $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
+    });
     query.push({
       $match: {
         'category.label': {
@@ -46,7 +57,7 @@ export function generateDestinationsSearcherQuery(
     });
   }
 
-  if (populate) {
+  if (subCatalog) {
     query.push({
       $lookup: {
         from: 'origincities',
@@ -89,7 +100,7 @@ export function generateDestinationsSearcherQuery(
 
   query.push({
     $sort: {
-      [sort]: -1,
+      [sort]: 1,
     },
   });
 
@@ -167,7 +178,7 @@ export function alikeQueryBuilder(
   });
   query.push({
     $sort: {
-      [sort]: -1,
+      [sort]: 1,
     },
   });
 
