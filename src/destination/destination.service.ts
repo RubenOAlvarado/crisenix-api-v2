@@ -3,8 +3,8 @@ import { FilerService } from '@/filer/filer.service';
 import { OriginCityService } from '@/origincity/origincity.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
+import { SearchableFields } from '@/shared/enums/searcher/destination/fields.enum';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
-import { SortFields } from '@/shared/enums/searcher/destination/sortFields.enum';
 import { SearchType } from '@/shared/enums/searcher/search-type.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
@@ -17,8 +17,13 @@ import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedes
 import { Destinations } from '@/shared/models/schemas/destination.schema';
 import {
   alikeQueryBuilder,
-  generateDestinationsSearcherQuery,
-} from '@/shared/utilities/query-maker.helper';
+  generateDefaultSearcherQuery,
+  paginationQuery,
+  populateSubcatalogsQuery,
+  searchByCategoryQuery,
+  sortQueryBuilder,
+  statusQueryBuilder,
+} from '@/shared/utilities/destination-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -31,7 +36,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PipelineStage } from 'mongoose';
 
 @Injectable()
 export class DestinationService {
@@ -223,30 +228,17 @@ export class DestinationService {
   }
 
   async search(
-    {
-      field,
-      word,
-      status,
-      subCatalog = false,
-      sort = 'createdAt' as SortFields,
-      searchType = SearchType.EXACTMATCH,
-    }: SearcherDTO,
+    searcherDTO: SearcherDTO,
     queryParams: PaginationDTO,
   ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
-      if (searchType === SearchType.EXACTMATCH) {
-        this.logger.debug(
-          `Looking destinations that contains: ${word} on field: ${field}`,
-        );
-        const query = generateDestinationsSearcherQuery(
-          { field, word, status, subCatalog, sort },
-          queryParams,
-        );
-        const result = await this.destinationModel.aggregate(query);
+      if (searcherDTO.searchType === SearchType.EXACTMATCH) {
+        const pipelines = this.pipelinesMaker(searcherDTO, queryParams);
+        const result = await this.destinationModel.aggregate(pipelines);
         const { docs, totalDocs } = result[0];
         if (!docs.length)
           throw new NotFoundException(
-            `Destinations not found with: ${word} on field: ${field} .`,
+            `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field} .`,
           );
         return {
           docs,
@@ -258,22 +250,21 @@ export class DestinationService {
           totalPages: Math.ceil(totalDocs / queryParams.limit),
         };
       } else {
-        this.logger.debug(`Looking destinations that contains: ${word}`);
-        const query = alikeQueryBuilder(word, status, sort, subCatalog);
-        const result = await this.destinationModel.aggregate(query);
+        const pipelines = this.pipelinesMaker(searcherDTO, queryParams);
+        const result = await this.destinationModel.aggregate(pipelines);
         if (!result)
           throw new NotFoundException(
-            `Destinations not found with: ${word} on field: ${field} .`,
+            `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field}.`,
           );
         return result;
       }
     } catch (e) {
       this.logger.error(
-        `Something went wrong looking destination with ${word} in ${field}: ${e}`,
+        `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}: ${e}`,
       );
       if (e instanceof NotFoundException) throw e;
       throw new InternalServerErrorException(
-        `Something went wrong looking destination with ${word} in ${field}`,
+        `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}`,
       );
     }
   }
@@ -436,5 +427,44 @@ export class DestinationService {
         'Something went wrong validating destination.',
       );
     }
+  }
+
+  private pipelinesMaker(
+    { word, field, status, subCatalog, sort, searchType }: SearcherDTO,
+    { page, limit }: PaginationDTO,
+  ): PipelineStage[] {
+    if (searchType === SearchType.EXACTMATCH) {
+      this.logger.debug(`Exact match search`);
+      this.logger.debug(
+        `Making pipelines for search with word: ${word} and field: ${field}`,
+      );
+      const searcherQuery =
+        field !== SearchableFields.CATEGORY
+          ? generateDefaultSearcherQuery({ field, word })
+          : searchByCategoryQuery(word);
+      return [
+        statusQueryBuilder(status),
+        searcherQuery,
+        populateSubcatalogsQuery(subCatalog),
+        sortQueryBuilder(sort),
+        paginationQuery({ page, limit }),
+      ]
+        .filter((pipeline) => pipeline !== undefined)
+        .flatMap((result) =>
+          Array.isArray(result) ? result : [result],
+        ) as PipelineStage[];
+    }
+    this.logger.debug(`Destination alike search`);
+    this.logger.debug(`Making pipelines for search with word: ${word}`);
+    return [
+      statusQueryBuilder(status),
+      alikeQueryBuilder(word),
+      populateSubcatalogsQuery(subCatalog),
+      sortQueryBuilder(sort),
+    ]
+      .filter((pipeline) => pipeline !== undefined)
+      .flatMap((result) =>
+        Array.isArray(result) ? result : [result],
+      ) as PipelineStage[];
   }
 }
