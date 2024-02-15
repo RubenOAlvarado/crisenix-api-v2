@@ -3,7 +3,6 @@ import { FilerService } from '@/filer/filer.service';
 import { OriginCityService } from '@/origincity/origincity.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { SearchableFields } from '@/shared/enums/searcher/destination/fields.enum';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { SearchType } from '@/shared/enums/searcher/search-type.enum';
 import { Status } from '@/shared/enums/status.enum';
@@ -15,15 +14,7 @@ import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
-import {
-  alikeQueryBuilder,
-  generateDefaultSearcherQuery,
-  paginationQuery,
-  populateSubcatalogsQuery,
-  searchByCategoryQuery,
-  sortQueryBuilder,
-  statusQueryBuilder,
-} from '@/shared/utilities/destination-query-maker.helper';
+import { pipelinesMaker } from '@/shared/utilities/destination-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -36,7 +27,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage } from 'mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class DestinationService {
@@ -233,7 +224,11 @@ export class DestinationService {
   ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
       if (searcherDTO.searchType === SearchType.EXACTMATCH) {
-        const pipelines = this.pipelinesMaker(searcherDTO, queryParams);
+        this.logger.debug('Exact match search.');
+        this.logger.debug(
+          `searching destination with: ${JSON.stringify(searcherDTO)}`,
+        );
+        const pipelines = pipelinesMaker(searcherDTO, queryParams);
         const result = await this.destinationModel.aggregate(pipelines);
         const { docs, totalDocs } = result[0];
         if (!docs.length)
@@ -250,7 +245,9 @@ export class DestinationService {
           totalPages: Math.ceil(totalDocs / queryParams.limit),
         };
       } else {
-        const pipelines = this.pipelinesMaker(searcherDTO, queryParams);
+        this.logger.debug('Alike search.');
+        this.logger.debug(`searching destination with: ${searcherDTO.word}`);
+        const pipelines = pipelinesMaker(searcherDTO, queryParams);
         const result = await this.destinationModel.aggregate(pipelines);
         if (!result)
           throw new NotFoundException(
@@ -427,44 +424,5 @@ export class DestinationService {
         'Something went wrong validating destination.',
       );
     }
-  }
-
-  private pipelinesMaker(
-    { word, field, status, subCatalog, sort, searchType }: SearcherDTO,
-    { page, limit }: PaginationDTO,
-  ): PipelineStage[] {
-    if (searchType === SearchType.EXACTMATCH) {
-      this.logger.debug(`Exact match search`);
-      this.logger.debug(
-        `Making pipelines for search with word: ${word} and field: ${field}`,
-      );
-      const searcherQuery =
-        field !== SearchableFields.CATEGORY
-          ? generateDefaultSearcherQuery({ field, word })
-          : searchByCategoryQuery(word);
-      return [
-        statusQueryBuilder(status),
-        searcherQuery,
-        populateSubcatalogsQuery(subCatalog),
-        sortQueryBuilder(sort),
-        paginationQuery({ page, limit }),
-      ]
-        .filter((pipeline) => pipeline !== undefined)
-        .flatMap((result) =>
-          Array.isArray(result) ? result : [result],
-        ) as PipelineStage[];
-    }
-    this.logger.debug(`Destination alike search`);
-    this.logger.debug(`Making pipelines for search with word: ${word}`);
-    return [
-      statusQueryBuilder(status),
-      alikeQueryBuilder(word),
-      populateSubcatalogsQuery(subCatalog),
-      sortQueryBuilder(sort),
-    ]
-      .filter((pipeline) => pipeline !== undefined)
-      .flatMap((result) =>
-        Array.isArray(result) ? result : [result],
-      ) as PipelineStage[];
   }
 }

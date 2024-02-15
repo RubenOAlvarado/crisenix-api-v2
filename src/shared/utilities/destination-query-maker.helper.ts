@@ -3,6 +3,8 @@ import { PipelineStage } from 'mongoose';
 import { PaginationDTO } from '../dtos/pagination.dto';
 import { SortFields } from '../enums/searcher/destination/sortFields.enum';
 import { Status } from '../enums/status.enum';
+import { SearcherDTO } from '../enums/searcher/destination/searcher.dto';
+import { SearchType } from '../enums/searcher/search-type.enum';
 
 export function statusQueryBuilder(status?: Status): PipelineStage | undefined {
   if (status) {
@@ -45,32 +47,38 @@ export function paginationQuery({
   ];
 }
 
-export function searchByCategoryQuery(word: string): PipelineStage[] {
-  return [
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'category',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    {
-      $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
-    },
-    {
-      $match: {
-        'category.label': {
-          $regex: word,
-          $options: 'i',
+export function searchByCategoryQuery({
+  field,
+  word,
+}: SearcherDTO): PipelineStage[] {
+  if (field === SearchableFields.CATEGORY && word) {
+    return [
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
         },
       },
-    },
-  ];
+      {
+        $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $match: {
+          'category.label': {
+            $regex: word,
+            $options: 'i',
+          },
+        },
+      },
+    ];
+  }
+  return [];
 }
 
 export function populateSubcatalogsQuery(
-  subCatalog = false,
+  subCatalog?: boolean,
 ): PipelineStage[] | undefined {
   if (subCatalog) {
     return [
@@ -118,15 +126,18 @@ export function generateDefaultSearcherQuery({
 }: {
   field?: SearchableFields;
   word: string;
-}): PipelineStage {
-  return {
-    $match: {
-      [field]: {
-        $regex: word,
-        $options: 'i',
+}): PipelineStage | undefined {
+  if (field !== SearchableFields.CATEGORY) {
+    return {
+      $match: {
+        [field]: {
+          $regex: word,
+          $options: 'i',
+        },
       },
-    },
-  };
+    };
+  }
+  return undefined;
 }
 
 export function alikeQueryBuilder(word: string): PipelineStage[] {
@@ -175,18 +186,32 @@ export function alikeQueryBuilder(word: string): PipelineStage[] {
   ];
 }
 
-type QueryBuilderFunction = (
-  ...args: any[]
-) => PipelineStage | PipelineStage[] | undefined;
-
-export function buildPipelineStages(
-  ...builders: QueryBuilderFunction[]
+export function pipelinesMaker(
+  { word, field, status, subCatalog, sort, searchType }: SearcherDTO,
+  { page, limit }: PaginationDTO,
 ): PipelineStage[] {
-  return builders
-    .map((builder) => builder())
-    .filter(
-      (result): result is PipelineStage | PipelineStage[] =>
-        result !== undefined,
-    )
-    .flatMap((result) => (Array.isArray(result) ? result : [result]));
+  if (searchType === SearchType.EXACTMATCH) {
+    return [
+      statusQueryBuilder(status),
+      searchByCategoryQuery({ field, word }),
+      generateDefaultSearcherQuery({ field, word }),
+      populateSubcatalogsQuery(subCatalog),
+      sortQueryBuilder(sort),
+      paginationQuery({ page, limit }),
+    ]
+      .filter(Boolean)
+      .flatMap((result) =>
+        Array.isArray(result) ? result : [result],
+      ) as PipelineStage[];
+  }
+  return [
+    statusQueryBuilder(status),
+    alikeQueryBuilder(word),
+    populateSubcatalogsQuery(subCatalog),
+    sortQueryBuilder(sort),
+  ]
+    .filter(Boolean)
+    .flatMap((result) =>
+      Array.isArray(result) ? result : [result],
+    ) as PipelineStage[];
 }
