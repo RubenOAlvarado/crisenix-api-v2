@@ -1,8 +1,11 @@
 import { DestinationService } from '@/destination/destination.service';
 import { EventlogService } from '@/eventlog/eventlog.service';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
+import { SearchType } from '@/shared/enums/searcher/search-type.enum';
+import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
@@ -12,6 +15,7 @@ import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
+import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
@@ -476,6 +480,49 @@ export class TourService {
         throw error;
       throw new InternalServerErrorException(
         `Something went wrong while deleting tour.`,
+      );
+    }
+  }
+
+  async searchTours(
+    body: SearcherTourDTO,
+    query: PaginationDTO,
+  ): Promise<PaginateResult<TourLean> | Array<TourLean>> {
+    try {
+      if (body?.searchType !== SearchType.EXACTMATCH) {
+        this.logger.debug('Alike searching.');
+        this.logger.debug(`searching tours by word: ${body.word}`);
+        const pipelines = pipelinesMaker(body, query);
+        const tours = await this.tourModel.aggregate(pipelines);
+        if (tours.length === 0) throw new NotFoundException('No tours found.');
+        return tours;
+      }
+      this.logger.debug('Exact match searching.');
+      this.logger.debug(`Searching tours by: ${JSON.stringify(body)}`);
+      const pipelines = pipelinesMaker(body, query);
+      const result = await this.tourModel.aggregate(pipelines);
+      const { docs, totalDocs } = result[0];
+      if (docs.length === 0)
+        throw new NotFoundException(
+          `Tours not found with ${JSON.stringify(body)}`,
+        );
+      return {
+        docs,
+        totalDocs,
+        hasPrevPage: query.page > 1,
+        hasNextPage: query.page < Math.ceil(totalDocs / query.limit),
+        page: query.page,
+        totalPages: Math.ceil(totalDocs / query.limit),
+      };
+    } catch (error) {
+      this.logger.error(`Error searching tours: ${error}`);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        `Something went wrong while searching tours.`,
       );
     }
   }

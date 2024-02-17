@@ -6,23 +6,26 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 import { TourStatus } from '../../tour/status.enum';
 import { Transform } from 'class-transformer';
 import { BooleanString } from '../../boolean-string.type';
 import { SortTourFields } from './sortFields.enum';
 import { SearchType } from '../search-type.enum';
+import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
 
 export class SearcherTourDTO {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'field to search',
     example: SearchableTourFields.NAME,
-    type: String,
     enum: SearchableTourFields,
   })
+  @ValidateIf((o) => o.field && o.field !== SearchType.ALIKE)
   @IsEnum(SearchableTourFields)
   @IsNotEmpty()
-  field: SearchableTourFields;
+  @IsString()
+  field?: SearchableTourFields;
 
   @ApiProperty({
     description:
@@ -31,6 +34,8 @@ export class SearcherTourDTO {
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
+  @ValidateIf((o) => o.field && o.field === SearchableTourFields.INITDATE)
+  @IsInitDate()
   word: string;
 
   @ApiPropertyOptional({
@@ -74,8 +79,7 @@ export class SearcherTourDTO {
   @IsEnum(SearchType)
   searchType?: SearchType;
 
-  constructor(field: SearchableTourFields, word: string) {
-    this.field = field;
+  constructor(word: string) {
     this.word = word;
   }
 }

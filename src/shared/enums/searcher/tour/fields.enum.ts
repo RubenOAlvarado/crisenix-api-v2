@@ -3,7 +3,7 @@ export enum SearchableTourFields {
   NAME = 'destination.name',
   DESCRIPTION = 'destination.description',
   DCODE = 'destination.code',
-  DCATEGORY = 'destination.category.label',
+  DCATEGORY = 'destination.category',
   // tour fields
   CODE = 'code',
   TYPE = 'tourType',
