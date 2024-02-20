@@ -180,9 +180,4 @@ export class TourController {
   ) {
     return await this.tourService.searchTours(body, query);
   }
-
-  @Get('test/fake')
-  async test() {
-    return this.tourService.test();
-  }
 }
