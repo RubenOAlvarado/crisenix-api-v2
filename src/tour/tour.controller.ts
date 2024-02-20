@@ -72,6 +72,7 @@ export class TourController {
   @ApiNotFoundResponse({
     description: 'Tour not found.',
   })
+  @Public()
   @Get(':id')
   async getTourById(@Param() param: UrlValidator) {
     return await this.tourService.findOne(param);
@@ -178,5 +179,10 @@ export class TourController {
     @Query() query: PaginationDTO,
   ) {
     return await this.tourService.searchTours(body, query);
+  }
+
+  @Get('test/fake')
+  async test() {
+    return this.tourService.test();
   }
 }

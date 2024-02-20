@@ -123,11 +123,17 @@ export function searchByIncludedServiceQuery({
         },
       },
       {
-        $unwind: { path: '$included', preserveNullAndEmptyArrays: true },
+        $unwind: {
+          path: '$included',
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $match: {
-          'included.concept': { $regex: word, $options: 'i' },
+          'included.concept': {
+            $regex: word,
+            $options: 'i',
+          },
         },
       },
     ];

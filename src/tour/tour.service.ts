@@ -497,9 +497,11 @@ export class TourService {
         if (tours.length === 0) throw new NotFoundException('No tours found.');
         return tours;
       }
+
       this.logger.debug('Exact match searching.');
       this.logger.debug(`Searching tours by: ${JSON.stringify(body)}`);
       const pipelines = pipelinesMaker(body, query);
+      this.logger.debug(`Pipelines: ${JSON.stringify(pipelines)}`);
       const result = await this.tourModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
       if (docs.length === 0)
@@ -525,5 +527,14 @@ export class TourService {
         `Something went wrong while searching tours.`,
       );
     }
+  }
+
+  async test() {
+    return this.tourModel
+      .find({
+        included: { $exists: true, $not: { $size: 0 } },
+      })
+      .populate('included')
+      .exec();
   }
 }
