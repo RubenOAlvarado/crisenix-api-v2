@@ -43,7 +43,7 @@ export class Tours {
   @Prop({ type: Date, required: true, index: true })
   initDate: Date;
 
-  @Prop({ type: Array })
+  @Prop({ type: Array, default: [] })
   aboardHour?: Array<{
     hour: string;
     aboardPoint: AboardPoints;
@@ -65,7 +65,7 @@ export class Tours {
   @Prop({ type: Date, required: true })
   returnDate: Date;
 
-  @Prop({ type: Array })
+  @Prop({ type: Array, default: [] })
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
   @Prop({ type: Array, ref: 'Departure' })

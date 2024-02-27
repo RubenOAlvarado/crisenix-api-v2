@@ -5,6 +5,7 @@ import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { SearchType } from '@/shared/enums/searcher/search-type.enum';
+import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
@@ -148,11 +149,11 @@ export class TourService {
         ])
         .populate({
           path: 'aboardHour.aboardPoint',
-          model: 'AboardPoint',
+          model: 'AboardPoints',
         })
         .populate({
           path: 'returnHour.aboardPoint',
-          model: 'AboardPoint',
+          model: 'AboardPoints',
         })
         .populate({
           path: 'departure',
@@ -202,11 +203,11 @@ export class TourService {
         ])
         .populate({
           path: 'aboardHour.aboardPoint',
-          model: 'AboardPoint',
+          model: 'AboardPoints',
         })
         .populate({
           path: 'returnHour.aboardPoint',
-          model: 'AboardPoint',
+          model: 'AboardPoints',
         })
         .populate({
           path: 'departure',
@@ -269,30 +270,45 @@ export class TourService {
 
   async changeTourStatus(
     { id }: UrlValidator,
-    newStatus: string,
+    { newStatus }: ChangeTourStatusDTO,
     user: string,
-  ): Promise<void> {
+  ): Promise<TourLean | undefined> {
     try {
-      this.logger.debug(`changing tour status to: ${newStatus}`);
+      this.logger.debug(`Changing tour status to: ${newStatus}`);
       const tour = await this.tourModel.findById(id);
 
-      if (!tour) throw new NotFoundException('Tour not found.');
-      if (!this.validateNewTourStatus(newStatus, tour)) return;
+      if (!tour) {
+        throw new NotFoundException('Tour not found.');
+      }
 
-      await this.tourModel.findByIdAndUpdate(id, { status: newStatus });
+      this.validateNewTourStatus(newStatus, tour);
+
+      const updatedTour = await this.tourModel.findByIdAndUpdate(id, {
+        status: newStatus,
+      });
+
+      if (!updatedTour) {
+        throw new NotFoundException('Tour not found after update.');
+      }
+
       await this.saveLogInDataBase({
         serviceId: tour._id.toString(),
         move: MOVES.UPDATE,
         user: user,
         registry: tour,
       });
+
+      return updatedTour;
     } catch (error) {
-      this.logger.error(`error changing tour status: ${error}`);
+      this.logger.error(`Error changing tour status: ${error}`);
+
       if (
         error instanceof NotFoundException ||
         error instanceof BadRequestException
-      )
+      ) {
         throw error;
+      }
+
       throw new InternalServerErrorException(
         `Something went wrong while changing tour status.`,
       );
@@ -303,32 +319,43 @@ export class TourService {
     newStatus: string,
     { status }: TourDocument,
   ): boolean | Error {
-    if (status === newStatus)
-      throw new BadRequestException(`Tour is already in ${newStatus} status.`);
-    if (newStatus === TourStatus.ACTIVE && status !== TourStatus.INACTIVE)
-      throw new BadRequestException(
-        'The tour must be in in inactive status to be activated.',
-      );
-    if (
-      newStatus === TourStatus.PUBLISH &&
-      status !== TourStatus.ACTIVE &&
-      status !== TourStatus.FINISH
-    )
-      throw new BadRequestException(
-        'The tour must be in active or finish status to be published.',
-      );
-    if (newStatus === TourStatus.CLOSE && status !== TourStatus.PUBLISH)
-      throw new BadRequestException(
-        'The tour must be in publish status to be closed.',
-      );
-    if (
-      newStatus === TourStatus.FINISH &&
-      status !== TourStatus.PUBLISH &&
-      status !== TourStatus.CLOSE
-    )
-      throw new BadRequestException(
-        'The tour must be in publish or close status to be finished.',
-      );
+    const throwError = (message: string) => {
+      throw new BadRequestException(message);
+    };
+
+    if (status === newStatus) {
+      throwError(`Tour is already in ${newStatus} status.`);
+    }
+
+    switch (newStatus) {
+      case TourStatus.ACTIVE:
+        if (status !== TourStatus.INACTIVE) {
+          throwError('The tour must be in inactive status to be activated.');
+        }
+        break;
+      case TourStatus.PUBLISH:
+        if (status !== TourStatus.ACTIVE && status !== TourStatus.FINISH) {
+          throwError(
+            'The tour must be in active or finish status to be published.',
+          );
+        }
+        break;
+      case TourStatus.CLOSE:
+        if (status !== TourStatus.PUBLISH) {
+          throwError('The tour must be in publish status to be closed.');
+        }
+        break;
+      case TourStatus.FINISH:
+        if (status !== TourStatus.PUBLISH && status !== TourStatus.CLOSE) {
+          throwError(
+            'The tour must be in publish or close status to be finished.',
+          );
+        }
+        break;
+      default:
+        throwError('Invalid new status.');
+    }
+
     return true;
   }
 

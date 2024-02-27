@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -28,6 +29,7 @@ import { DestinationValidator } from '@/shared/validators/destination.validator'
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -179,5 +181,29 @@ export class TourController {
     @Query() query: PaginationDTO,
   ) {
     return await this.tourService.searchTours(body, query);
+  }
+
+  @ApiOkResponse({
+    description: 'Tour status changed.',
+    type: ResponseTourDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong changing tour status.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tour not found.',
+  })
+  @ApiBadRequestResponse({
+    description: `Tour status can't be changed because it's invalid or it's already in the required status.`,
+  })
+  @Patch('status/:id')
+  @ApiBody({
+    type: ChangeTourStatusDTO,
+  })
+  async changeTourStatus(
+    @Param() param: UrlValidator,
+    @Body() body: ChangeTourStatusDTO,
+  ) {
+    return await this.tourService.changeTourStatus(param, body, 'dev');
   }
 }

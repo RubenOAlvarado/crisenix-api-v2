@@ -1,7 +1,7 @@
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class PaginatedTourDTO extends PaginationDTO {
   @ApiPropertyOptional({
@@ -9,6 +9,7 @@ export class PaginatedTourDTO extends PaginationDTO {
     description: 'Status to look for (optional)',
     enum: TourStatus,
   })
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   status?: TourStatus;
