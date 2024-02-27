@@ -90,6 +90,10 @@ export class TourService {
     status,
   }: PaginatedTourDTO): Promise<PaginateResult<Tours>> {
     try {
+      const debugMessage = status
+        ? `Getting all tours with status: ${status}`
+        : 'Getting all tours';
+      this.logger.debug(debugMessage);
       const docs = status
         ? await this.tourModel
             .find({ status })
