@@ -15,6 +15,7 @@ import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/tour/updateTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
 import {
@@ -263,8 +264,7 @@ export class TourService {
   }
 
   async changeTourStatus(
-    { id }: UrlValidator,
-    { newStatus }: ChangeTourStatusDTO,
+    { id, newStatus }: ChangeTourStatusDTO,
     user: string,
   ): Promise<TourLean | undefined> {
     try {
@@ -530,6 +530,35 @@ export class TourService {
       this.logger.error(`Error searching tours: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong while searching tours.',
+        error,
+      );
+    }
+  }
+
+  async updateTourCatalog(
+    { id, catalogName }: GetTourCatalogDTO,
+    { values }: UpdateTourCatalogDTO,
+    user: string,
+  ): Promise<TourLean> {
+    try {
+      this.logger.debug(`updating tour catalog: ${catalogName}`);
+      const tour = await this.tourModel.findByIdAndUpdate(
+        id,
+        { [catalogName]: values },
+        { new: true },
+      );
+      if (!tour) throw new NotFoundException('Tour not found.');
+      await this.saveLogInDataBase({
+        serviceId: tour._id.toString(),
+        move: MOVES.UPDATE,
+        user,
+        registry: tour,
+      });
+      return tour;
+    } catch (error) {
+      this.logger.error(`Error updating tour catalog: ${error}`);
+      throw handleErrorsOnServices(
+        `Something went wrong updating tour catalog ${catalogName}.`,
         error,
       );
     }

@@ -31,6 +31,7 @@ import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/tour/updateTourCatalog.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -126,8 +127,8 @@ export class TourController {
     description: 'Tour does not exist.',
   })
   @Public()
-  @Get(':catalogName/:id')
-  async getTourItineraries(@Param() param: GetTourCatalogDTO) {
+  @Get('get-catalog/:catalogName/:id')
+  async getTourCatalog(@Param() param: GetTourCatalogDTO) {
     return await this.tourService.getTourCatalog(param);
   }
 
@@ -197,14 +198,35 @@ export class TourController {
   @ApiBadRequestResponse({
     description: `Tour status can't be changed because it's invalid or it's already in the required status.`,
   })
-  @Patch('status/:id')
-  @ApiBody({
-    type: ChangeTourStatusDTO,
+  @Public()
+  @Patch('change-status/:newStatus/:id')
+  async changeTourStatus(@Param() param: ChangeTourStatusDTO) {
+    return await this.tourService.changeTourStatus(param, 'dev');
+  }
+
+  @ApiOkResponse({
+    description: 'Tour updated successfully.',
+    type: ResponseTourDTO,
   })
-  async changeTourStatus(
-    @Param() param: UrlValidator,
-    @Body() body: ChangeTourStatusDTO,
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating tour.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tour not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'You sent an invalid param or value.',
+  })
+  @Patch('update-catalog/:catalogName/:id')
+  @ApiBody({
+    type: UpdateTourCatalogDTO,
+  })
+  @Public()
+  async updateTourCatalog(
+    @Param() param: GetTourCatalogDTO,
+    @Body() body: UpdateTourCatalogDTO,
   ) {
-    return await this.tourService.changeTourStatus(param, body, 'dev');
+    // TODO: Implement user role validation
+    return await this.tourService.updateTourCatalog(param, body, 'dev');
   }
 }
