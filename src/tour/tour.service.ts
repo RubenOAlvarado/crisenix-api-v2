@@ -13,9 +13,14 @@ import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { User } from '@/shared/interfaces/user/user.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
+import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -114,21 +119,12 @@ export class TourService {
         ? await this.tourModel.countDocuments({ status }).exec()
         : await this.tourModel.countDocuments().exec();
 
-      const paginatedTours: PaginateResult<Tours> = {
-        docs,
-        totalDocs,
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalDocs / limit),
-        page,
-        totalPages: Math.ceil(totalDocs / limit),
-      };
-
-      return paginatedTours;
+      return createPaginatedObject<Tours>(docs, totalDocs, page, limit);
     } catch (error) {
-      this.logger.error(`Error getting all tours: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while getting tours.',
+      this.logger.error(`Something went wrong getting all tours.: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong getting all tours.',
+        error,
       );
     }
   }
@@ -170,10 +166,10 @@ export class TourService {
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;
     } catch (error) {
-      this.logger.error(`Error getting tour by id: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong looking tour by id.`,
+      this.logger.error(`Something went wrong getting tour by id: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong getting tour by id.',
+        error,
       );
     }
   }
@@ -225,14 +221,12 @@ export class TourService {
       if (!tour) throw new NotFoundException('No tour registered.');
       return tour;
     } catch (error) {
-      this.logger.error(`Error getting last registered tour: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        `Error getting last registered tour: ${error}`,
+      this.logger.error(
+        `Something went wrong getting last registered tour: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong getting last registered tour.',
+        error,
       );
     }
   }
@@ -260,10 +254,10 @@ export class TourService {
       });
       return updatedTour;
     } catch (error) {
-      this.logger.error(`error updating tour: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong while updating tour.`,
+      this.logger.error(`Something went wrong updating tour: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong updating tour.',
+        error,
       );
     }
   }
@@ -300,17 +294,10 @@ export class TourService {
 
       return updatedTour;
     } catch (error) {
-      this.logger.error(`Error changing tour status: ${error}`);
-
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(
-        `Something went wrong while changing tour status.`,
+      this.logger.error(`Something went wrong changing tour status: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong changing tour status.',
+        error,
       );
     }
   }
@@ -371,10 +358,12 @@ export class TourService {
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;
     } catch (error) {
-      this.logger.error(`Error getting web tour by id: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong looking web tour by id.`,
+      this.logger.error(
+        `Something went wrong getting web tour by id.: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong getting web tour by id.',
+        error,
       );
     }
   }
@@ -386,9 +375,9 @@ export class TourService {
       return tourPOJO;
     } catch (error) {
       this.logger.error(`Error getting POJO tour by id: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong looking POJO tour by id.`,
+      throw handleErrorsOnServices(
+        'Something went wrong getting POJO tour by id.',
+        error,
       );
     }
   }
@@ -405,10 +394,10 @@ export class TourService {
         throw new BadRequestException('There are not enough seats available.');
       return tour;
     } catch (error) {
-      this.logger.error(`Error validating saled tour: ${error}`);
-      if (error instanceof BadRequestException) throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong validating saled tour.`,
+      this.logger.error(`Something went wrong validating saled tour: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong validating saled tour.',
+        error,
       );
     }
   }
@@ -456,33 +445,35 @@ export class TourService {
         registry: updatedTour,
       });
     } catch (error) {
-      this.logger.error(`Error updating seats: ${error}`);
-      if (error instanceof BadRequestException) throw error;
-      else throw new InternalServerErrorException('Error updating seats');
+      this.logger.error(`Something went wrong updating seats: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong updating updating seats.',
+        error,
+      );
     }
   }
 
-  async getTourItineraries({ id }: UrlValidator): Promise<any> {
+  async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
     try {
       const tour = await this.tourModel
         .findById(id)
-        .populate('itinerary')
+        .populate(catalogName)
         .exec();
       if (!tour) {
         throw new BadRequestException('Tour not found.');
       }
-      if (!tour.itinerary) {
-        throw new NotFoundException('Tour has not itineraries registered yet.');
+      if (!tour[catalogName]?.length) {
+        throw new NotFoundException(
+          `Tour has not ${tour[catalogName]} registered yet.`,
+        );
       }
-      return tour.itinerary;
+      return tour[catalogName];
     } catch (error) {
-      this.logger.error(`Error finding tour itineraries: ${error}`);
-      if (
-        error instanceof BadRequestException ||
-        error instanceof NotFoundException
-      )
-        throw error;
-      else throw new InternalServerErrorException('Error updating seats');
+      this.logger.error(`Something went wrong finding tour catalog: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong finding tour catalog.',
+        error,
+      );
     }
   }
 
@@ -503,27 +494,23 @@ export class TourService {
         registry: tour,
       });
     } catch (error) {
-      this.logger.error(`Error deleting tour: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong while deleting tour.`,
+      this.logger.error(`Something went wrong deleting tour: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong deleting tour.',
+        error,
       );
     }
   }
 
   async searchTours(
     body: SearcherTourDTO,
-    query: PaginationDTO,
+    { page, limit }: PaginationDTO,
   ): Promise<PaginateResult<TourLean> | Array<TourLean>> {
     try {
       if (body?.searchType !== SearchType.EXACTMATCH) {
         this.logger.debug('Alike searching.');
         this.logger.debug(`searching tours by word: ${body.word}`);
-        const pipelines = pipelinesMaker(body, query);
+        const pipelines = pipelinesMaker(body, { page, limit });
         const tours = await this.tourModel.aggregate(pipelines);
         if (tours.length === 0) throw new NotFoundException('No tours found.');
         return tours;
@@ -531,30 +518,19 @@ export class TourService {
 
       this.logger.debug('Exact match searching.');
       this.logger.debug(`Searching tours by: ${JSON.stringify(body)}`);
-      const pipelines = pipelinesMaker(body, query);
+      const pipelines = pipelinesMaker(body, { page, limit });
       const result = await this.tourModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
       if (docs.length === 0)
         throw new NotFoundException(
           `Tours not found with ${JSON.stringify(body)}`,
         );
-      return {
-        docs,
-        totalDocs,
-        hasPrevPage: query.page > 1,
-        hasNextPage: query.page < Math.ceil(totalDocs / query.limit),
-        page: query.page,
-        totalPages: Math.ceil(totalDocs / query.limit),
-      };
+      return createPaginatedObject<TourLean>(docs, totalDocs, page, limit);
     } catch (error) {
       this.logger.error(`Error searching tours: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong while searching tours.`,
+      throw handleErrorsOnServices(
+        'Something went wrong while searching tours.',
+        error,
       );
     }
   }

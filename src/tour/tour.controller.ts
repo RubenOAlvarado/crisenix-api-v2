@@ -30,6 +30,7 @@ import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
+import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -113,21 +114,21 @@ export class TourController {
   }
 
   @ApiOkResponse({
-    description: 'Itineraries found.',
+    description: 'Catalog found.',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding itineraries.',
+    description: 'Something went wrong finding catalog.',
   })
   @ApiNotFoundResponse({
-    description: 'Itineraries not found.',
+    description: 'Tour not found.',
   })
   @ApiBadRequestResponse({
     description: 'Tour does not exist.',
   })
   @Public()
-  @Get('itineraries/:id')
-  async getTourItineraries(@Param() param: UrlValidator) {
-    return await this.tourService.getTourItineraries(param);
+  @Get(':catalogName/:id')
+  async getTourItineraries(@Param() param: GetTourCatalogDTO) {
+    return await this.tourService.getTourCatalog(param);
   }
 
   @ApiOkResponse({
