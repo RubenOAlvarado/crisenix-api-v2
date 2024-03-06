@@ -101,24 +101,30 @@ export class TourService {
         ? `Getting all tours with status: ${status}`
         : 'Getting all tours';
       this.logger.debug(debugMessage);
-      const docs = status
-        ? await this.tourModel
-            .find({ status })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.tourModel
-            .find()
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const query = status ? { status } : {};
+      const docs = await this.tourModel
+        .find(query)
+        .limit(limit)
+        .skip(limit * (page - 1))
+        .populate('destination')
+        .populate('transport')
+        .populate('tourType')
+        .populate('included')
+        .populate('itinerary')
+        .populate('price')
+        .populate('departure')
+        .populate({
+          path: 'aboardHour.aboardPoint',
+          model: 'AboardPoints',
+        })
+        .populate({
+          path: 'returnHour.aboardPoint',
+          model: 'AboardPoints',
+        })
+        .exec();
       if (docs.length === 0)
         throw new NotFoundException('No tours registered.');
-      const totalDocs = status
-        ? await this.tourModel.countDocuments({ status }).exec()
-        : await this.tourModel.countDocuments().exec();
+      const totalDocs = await this.tourModel.countDocuments(query).exec();
 
       return createPaginatedObject<Tours>(docs, totalDocs, page, limit);
     } catch (error) {
@@ -348,7 +354,7 @@ export class TourService {
 
   async getWebTourById({ id }: UrlValidator): Promise<TourLean> {
     try {
-      this.logger.debug(`getting web tour with id: ${id}`);
+      this.logger.debug(`Getting web tour with id: ${id}`);
       const tour = await this.tourModel
         .findById(id)
         .populate('destination')
@@ -410,26 +416,30 @@ export class TourService {
   ): Promise<void> {
     try {
       const { availableSeat = 0, ocuppiedSeat = 0, seating, _id } = tour;
-      let newAvailableSeat = availableSeat;
-      let newOcuppiedSeat = 0;
+
+      let newAvailableSeat: number;
+      let newOcuppiedSeat: number;
+
       if (
         saleMove === SalesMove.SALE &&
         availableSeat > 0 &&
         ocuppiedSeat > 0
       ) {
-        newAvailableSeat = availableSeat - soldSeats;
-        newOcuppiedSeat = ocuppiedSeat + soldSeats;
+        newAvailableSeat = Math.max(availableSeat - soldSeats, 0);
+        newOcuppiedSeat = Math.min(ocuppiedSeat + soldSeats, seating);
 
-        if (newAvailableSeat <= 0 && newOcuppiedSeat > seating)
+        if (newAvailableSeat <= 0 && newOcuppiedSeat > seating) {
           throw new BadRequestException(
-            'There are not enough seats available to sale.',
+            'There are not enough seats available for sale.',
           );
+        }
       } else {
-        newAvailableSeat = availableSeat + soldSeats;
-        newOcuppiedSeat = ocuppiedSeat - soldSeats;
+        newAvailableSeat = Math.min(availableSeat + soldSeats, seating);
+        newOcuppiedSeat = Math.max(ocuppiedSeat - soldSeats, 0);
 
-        if (newAvailableSeat > seating)
-          throw new BadRequestException('There are not enough seats.');
+        if (newAvailableSeat > seating) {
+          throw new BadRequestException('Not enough available seats.');
+        }
       }
 
       const updatedTour = await this.tourModel.findByIdAndUpdate(
@@ -439,15 +449,15 @@ export class TourService {
       );
 
       await this.saveLogInDataBase({
-        serviceId: tour._id.toString(),
+        serviceId: _id.toString(),
         move: MOVES.UPDATE,
         user: user.email,
         registry: updatedTour,
       });
     } catch (error) {
-      this.logger.error(`Something went wrong updating seats: ${error}`);
+      this.logger.error(`Error updating seats: ${error}`);
       throw handleErrorsOnServices(
-        'Something went wrong updating updating seats.',
+        'Something went wrong updating seats.',
         error,
       );
     }
@@ -455,25 +465,27 @@ export class TourService {
 
   async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
     try {
-      const tour = await this.tourModel
-        .findById(id)
-        .populate(catalogName)
-        .exec();
+      const isHourCatalog = ['returnHour', 'aboardHour'].includes(catalogName);
+      const query = isHourCatalog ? `${catalogName}.aboardPoint` : catalogName;
+
+      const tour = await this.tourModel.findById(id).populate(query).exec();
+
       if (!tour) {
         throw new BadRequestException('Tour not found.');
       }
-      if (!tour[catalogName]?.length) {
+
+      const catalogData = tour[catalogName];
+
+      if (!catalogData?.length) {
         throw new NotFoundException(
-          `Tour has not ${tour[catalogName]} registered yet.`,
+          `Tour has no ${catalogName} registered yet.`,
         );
       }
-      return tour[catalogName];
+
+      return catalogData;
     } catch (error) {
-      this.logger.error(`Something went wrong finding tour catalog: ${error}`);
-      throw handleErrorsOnServices(
-        'Something went wrong finding tour catalog.',
-        error,
-      );
+      this.logger.error(`Error finding tour catalog: ${error}`);
+      throw handleErrorsOnServices('Error finding tour catalog.', error);
     }
   }
 
@@ -541,20 +553,26 @@ export class TourService {
     user: string,
   ): Promise<TourLean> {
     try {
-      this.logger.debug(`updating tour catalog: ${catalogName}`);
-      const tour = await this.tourModel.findByIdAndUpdate(
+      this.logger.debug(`Updating tour catalog: ${catalogName}`);
+
+      const updatedTour = await this.tourModel.findByIdAndUpdate(
         id,
         { [catalogName]: values },
         { new: true },
       );
-      if (!tour) throw new NotFoundException('Tour not found.');
+
+      if (!updatedTour) {
+        throw new NotFoundException('Tour not found.');
+      }
+
       await this.saveLogInDataBase({
-        serviceId: tour._id.toString(),
+        serviceId: updatedTour._id.toString(),
         move: MOVES.UPDATE,
         user,
-        registry: tour,
+        registry: updatedTour,
       });
-      return tour;
+
+      return updatedTour;
     } catch (error) {
       this.logger.error(`Error updating tour catalog: ${error}`);
       throw handleErrorsOnServices(

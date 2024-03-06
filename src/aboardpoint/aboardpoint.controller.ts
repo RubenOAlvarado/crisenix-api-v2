@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -61,10 +60,7 @@ export class AboardPointController {
   })
   @Get()
   async findAll(@Query() query: StatusDTO) {
-    const aboardPoints = await this.service.findAll(query);
-    if (!aboardPoints)
-      throw new NotFoundException('No aboard points registered');
-    return aboardPoints;
+    return await this.service.findAll(query);
   }
 
   @ApiOkResponse({
@@ -80,9 +76,7 @@ export class AboardPointController {
   @Public()
   @Get(':id')
   async findOne(@Param() param: UrlValidator) {
-    const aboardPoint = await this.service.findOne(param);
-    if (!aboardPoint) throw new NotFoundException('Aboard point not found.');
-    return aboardPoint;
+    return await this.service.findOne(param);
   }
 
   @ApiOkResponse({
@@ -103,7 +97,7 @@ export class AboardPointController {
     @Param() param: UrlValidator,
     @Body() updateAboardPointDTO: UpdateAboardPointDTO,
   ) {
-    await this.service.update(param, updateAboardPointDTO);
+    return await this.service.update(param, updateAboardPointDTO);
   }
 
   @ApiOkResponse({

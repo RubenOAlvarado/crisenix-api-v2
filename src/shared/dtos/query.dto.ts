@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { Status } from '../enums/status.enum';
 
 export class QueryDTO {
   @ApiProperty({
@@ -26,13 +33,15 @@ export class QueryDTO {
   @ApiPropertyOptional({
     default: 'Activo',
     description: 'Status to look for (optional)',
+    enum: Status,
   })
   @IsOptional()
+  @IsEnum(Status)
   @IsNotEmpty()
   @IsString()
-  status?: string;
+  status?: Status;
 
-  constructor(page: number, limit: number, status?: string) {
+  constructor(page: number, limit: number, status?: Status) {
     this.page = page;
     this.limit = limit;
     this.status = status;
