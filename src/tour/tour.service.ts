@@ -140,7 +140,6 @@ export class TourService {
       const tour = await this.tourModel
         .findById(id)
         .populate([
-          'destination',
           'transport',
           'tourType',
           'included',
@@ -148,6 +147,17 @@ export class TourService {
           'price',
           'departure',
         ])
+        .populate({
+          path: 'destination',
+          populate: {
+            path: 'originCity',
+            model: 'OriginCity',
+            populate: {
+              path: 'aboardPoints',
+              model: 'AboardPoints',
+            },
+          },
+        })
         .populate({
           path: 'aboardHour.aboardPoint',
           model: 'AboardPoints',
