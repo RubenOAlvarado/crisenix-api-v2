@@ -48,18 +48,19 @@ export class CategoryController {
   @Post('create')
   @ApiBody({ description: 'Category object', type: CreateCategoryDTO })
   async create(@Body() createCategoryDTO: CreateCategoryDTO) {
-    await this.categoryService.create(createCategoryDTO);
+    return await this.categoryService.create(createCategoryDTO);
   }
 
   @ApiOkResponse({
     description: 'Categories found successfully.',
-    type: [ResponseCategoryDTO],
+    type: ResponseCategoryDTO,
+    isArray: true,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding all categories.',
   })
   @ApiNotFoundResponse({
-    description: 'No categories registered.',
+    description: 'No categories found.',
   })
   @Public()
   @Get()
@@ -77,7 +78,6 @@ export class CategoryController {
   @ApiNotFoundResponse({
     description: 'Category not found.',
   })
-  @Public()
   @Get(':id')
   async findOne(@Param() { id }: UrlValidator) {
     return await this.categoryService.findOne(id);
@@ -98,7 +98,7 @@ export class CategoryController {
     @Param() { id }: UrlValidator,
     @Body() updateCategoryDTO: UpdateCategoryDTO,
   ) {
-    await this.categoryService.update(id, updateCategoryDTO);
+    return await this.categoryService.update(id, updateCategoryDTO);
   }
 
   @ApiOkResponse({

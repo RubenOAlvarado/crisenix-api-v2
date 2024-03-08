@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
 import { Transports } from './transporst.schema';
 import { AboardPoints } from './aboarpoint.schema';
-import { Departure } from './departure.schema';
+import { Departures } from './departure.schema';
 import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
@@ -68,8 +68,8 @@ export class Tours {
   @Prop({ type: Array, default: [] })
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
-  @Prop({ type: Array, ref: 'Departure' })
-  departure?: Array<Departure>;
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Departures' }] })
+  departure?: Array<Departures>;
 
   @Prop({ type: Array })
   coordinator?: Array<{

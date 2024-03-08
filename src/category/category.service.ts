@@ -7,6 +7,7 @@ import {
   Categories,
   CategoryDocument,
 } from '@/shared/models/schemas/category.schema';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
   Injectable,
@@ -47,22 +48,20 @@ export class CategoryService {
   async findAll(status?: string): Promise<Array<CategoryLean>> {
     try {
       this.logger.debug(`finding all categories`);
-      const categories = status
-        ? await this.categoryModel
-            .find({ status })
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.categoryModel
-            .find()
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const query = status ? { status } : {};
+      const categories = await this.categoryModel
+        .find(query)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!categories) throw new NotFoundException('No categories registered.');
       return categories;
     } catch (error) {
-      this.logger.error(`Something went wrong while finding all categories`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      this.logger.error(
+        `Something went wrong while finding all categories: ${error}`,
+      );
+      throw handleErrorsOnServices(
         'Something went wrong while finding all categories',
+        error,
       );
     }
   }
@@ -74,10 +73,12 @@ export class CategoryService {
       if (!category) throw new NotFoundException('Category not found.');
       return category;
     } catch (error) {
-      this.logger.error(`Something went wrong while finding category`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while finding category',
+      this.logger.error(
+        `Something went wrong while finding category: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while finding category.',
+        error,
       );
     }
   }
@@ -85,19 +86,21 @@ export class CategoryService {
   async update(
     id: string,
     updateCategoryDTO: UpdateCategoryDTO,
-  ): Promise<void> {
+  ): Promise<CategoryLean | null> {
     try {
       this.logger.debug(`updating category with id: ${id}`);
       const category = await this.findOne(id);
       if (!category) throw new NotFoundException('Category not found.');
-      await this.categoryModel.findByIdAndUpdate(id, updateCategoryDTO, {
+      return await this.categoryModel.findByIdAndUpdate(id, updateCategoryDTO, {
         new: true,
       });
     } catch (error) {
-      this.logger.error(`Something went wrong while updating category`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while updating category',
+      this.logger.error(
+        `Something went wrong while updating category: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while updating category.',
+        error,
       );
     }
   }
@@ -117,14 +120,12 @@ export class CategoryService {
         },
       );
     } catch (error) {
-      this.logger.error(`Something went wrong while deleting category`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while deleting category',
+      this.logger.error(
+        `Something went wrong while deleting category: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while deleting category.',
+        error,
       );
     }
   }
@@ -144,14 +145,12 @@ export class CategoryService {
         },
       );
     } catch (error) {
-      this.logger.error(`Something went wrong while reactivating category`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while reactivating category',
+      this.logger.error(
+        `Something went wrong while reactivating category: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while reactivating category.',
+        error,
       );
     }
   }
@@ -182,25 +181,33 @@ export class CategoryService {
   }
 
   async mapFromNameToObjectId(names: string[]): Promise<string[] | undefined> {
-    this.logger.debug(`mapping from name to object id`);
     try {
+      this.logger.debug(`Mapping from name to object id`);
+
       if (!names.length) {
         return;
       }
-      const mappedCategories = names.map(async (name) => {
-        const category = await this.categoryModel
-          .findOne({ label: name })
-          .lean();
-        if (!category) {
-          const createdCategory = await this.create({
-            label: name,
-            status: Status.ACTIVE,
-          });
-          return createdCategory._id.toString();
-        }
-        return category._id.toString();
-      });
-      return await Promise.all(mappedCategories);
+
+      const mappedCategories = await Promise.all(
+        names.map(async (name) => {
+          const category = await this.categoryModel
+            .findOne({ label: name })
+            .lean();
+
+          if (!category) {
+            const createdCategory = await this.create({
+              label: name,
+              status: Status.ACTIVE,
+            });
+
+            return createdCategory._id.toString();
+          }
+
+          return category._id.toString();
+        }),
+      );
+
+      return mappedCategories;
     } catch (error) {
       this.logger.error(`Error mapping from name to object id: ${error}`);
       throw new InternalServerErrorException(

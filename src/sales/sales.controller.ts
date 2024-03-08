@@ -31,6 +31,7 @@ export class SalesController {
 
   @ApiCreatedResponse({
     description: 'Sale created successfully.',
+    type: ResponseSalesDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating sale.',

@@ -5,4 +5,5 @@ export enum TourCatalogs {
   PRICE = 'price',
   ABOARDHOUR = 'aboardHour',
   RETURNHOUR = 'returnHour',
+  DEPARTURE = 'departure',
 }

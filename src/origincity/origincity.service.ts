@@ -23,6 +23,10 @@ import {
   OriginCityDocument,
 } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 
 @Injectable()
 export class OriginCityService {
@@ -62,8 +66,9 @@ export class OriginCityService {
       return city;
     } catch (error) {
       this.logger.error(`error getting origin city: ${JSON.stringify(error)}`);
-      throw new InternalServerErrorException(
-        `Error getting origin city: ${error}`,
+      throw handleErrorsOnServices(
+        'Something went wrong while finding origin city.',
+        error,
       );
     }
   }
@@ -75,41 +80,31 @@ export class OriginCityService {
   }: QueryDTO): Promise<PaginateResult<OriginCityLean>> {
     try {
       this.logger.debug(`getting all origin cities`);
-      const docs = status
-        ? await this.originCityModel
-            .find({ status })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .populate('aboardPoints')
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.originCityModel
-            .find()
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .populate('aboardPoints')
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const Query = status ? { status } : {};
+      const docs = await this.originCityModel
+        .find(Query)
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .populate('aboardPoints')
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!docs.length)
         throw new NotFoundException('No origin cities registered.');
-      const totalDocs = status
-        ? await this.originCityModel.countDocuments({ status }).exec()
-        : await this.originCityModel.countDocuments().exec();
-      return {
+      const totalDocs = await this.originCityModel.countDocuments(Query).exec();
+      return createPaginatedObject<OriginCityLean>(
         docs,
         totalDocs,
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalDocs / limit),
         page,
-        totalPages: Math.ceil(totalDocs / limit),
-      };
+        limit,
+      );
     } catch (error) {
-      this.logger.error(`error getting all origin cities: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      else
-        throw new InternalServerErrorException(
-          `Error getting all origin cities: ${error}`,
-        );
+      this.logger.error(
+        `Something went wrong while finding origin cities: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while finding origin cities.',
+        error,
+      );
     }
   }
 
@@ -124,11 +119,11 @@ export class OriginCityService {
 
       return true;
     } catch (e) {
-      this.logger.error(`Error validating OriginCity: ${e}`);
-      if (e instanceof NotFoundException || e instanceof BadRequestException)
-        throw e;
-      else
-        throw new InternalServerErrorException('Error validating OriginCity');
+      this.logger.error(`Something went wrong validating origin city: ${e}`);
+      throw handleErrorsOnServices(
+        'Something went wrong validating origin city.',
+        e,
+      );
     }
   }
 
@@ -150,13 +145,11 @@ export class OriginCityService {
         throw new NotFoundException(`OriginCity ${id} was not found`);
       return updatedOriginCity;
     } catch (error) {
-      this.logger.error(`Error updating origin city: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else throw new InternalServerErrorException('Error updating origin city');
+      this.logger.error(`Something went wrong updating origin city: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong validating origin city.',
+        error,
+      );
     }
   }
 
@@ -170,13 +163,11 @@ export class OriginCityService {
           { new: true },
         );
     } catch (error) {
-      this.logger.error(`Error deleting origin city: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else throw new InternalServerErrorException('Error deleting origin city');
+      this.logger.error(`Something went wrong deleting origin city: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong validating origin city.',
+        error,
+      );
     }
   }
 
@@ -190,21 +181,20 @@ export class OriginCityService {
           { new: true },
         );
     } catch (error) {
-      this.logger.error(`Error reactivating origincity: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else
-        throw new InternalServerErrorException('Error reactivating OriginCity');
+      this.logger.error(
+        `Something went wrong reactivating origin city: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong reactivating origin city.',
+        error,
+      );
     }
   }
 
   async searcher({ word }: SearcherDTO): Promise<Array<OriginCityLean>> {
     try {
       this.logger.debug(`Searching origin cities: ${word}`);
-      const searchResult = this.originCityModel
+      const searchResult = await this.originCityModel
         .find({
           $or: [
             { name: { $regex: word, $options: 'i' } },
@@ -214,16 +204,15 @@ export class OriginCityService {
         .populate('aboardPoints')
         .select({ __v: 0, createdAt: 0 })
         .lean();
-      if (!searchResult)
+      if (!searchResult.length)
         throw new NotFoundException('Any origin city match your search.');
       return searchResult;
     } catch (error) {
       this.logger.error(`Error searching origin cities: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      else
-        throw new InternalServerErrorException(
-          `Error searching origin cities: ${error}`,
-        );
+      throw handleErrorsOnServices(
+        'Something went wrong searching origin city.',
+        error,
+      );
     }
   }
 
@@ -241,35 +230,35 @@ export class OriginCityService {
         );
     } catch (error) {
       this.logger.error(`Error adding aboard points to origin city: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else
-        throw new InternalServerErrorException(
-          'Error adding aboard points to origin city',
-        );
+      throw handleErrorsOnServices(
+        'Something went wrong adding aboard points to origin city.',
+        error,
+      );
     }
   }
 
   private async mapToDTO(
     jsonObject: OriginCityExcel[],
   ): Promise<CreateOriginCityDTO[]> {
-    const mappedOriginCities = jsonObject.map(async (originCity) => {
-      const { puntosDeAbordaje } = originCity;
-      const aboardPoints = await this.aboardPointService.mapFromNameToObjectId(
-        puntosDeAbordaje?.split(','),
-      );
-      return {
-        state: originCity.estado,
-        name: originCity.nombre,
-        status: originCity.status as Status,
-        aboardPoints,
-      } as unknown as CreateOriginCityDTO;
-    });
+    const mappedOriginCities = await Promise.all(
+      jsonObject.map(async (originCity) => {
+        const { puntosDeAbordaje, estado, nombre, status } = originCity;
 
-    return await Promise.all(mappedOriginCities);
+        const aboardPoints =
+          await this.aboardPointService.mapFromNameToObjectId(
+            puntosDeAbordaje?.split(','),
+          );
+
+        return {
+          state: estado,
+          name: nombre,
+          status: status as Status,
+          aboardPoints,
+        } as CreateOriginCityDTO;
+      }),
+    );
+
+    return mappedOriginCities;
   }
 
   async loadFromExcel(filePath: string): Promise<void> {
@@ -290,32 +279,39 @@ export class OriginCityService {
   async mapFromDestinationExcel(originCities: string): Promise<string[]> {
     try {
       this.logger.debug(`Mapping origin cities from destination excel`);
+
       const mappedCitiesFromExcel = mapCitiesFromDestinationExcel(originCities);
-      const mappedCities = mappedCitiesFromExcel.map(async (city) => {
-        const existingCity = await this.originCityModel
-          .findOne({ name: city.name })
-          .lean();
-        if (!existingCity) {
-          const { aboardPoints } = city;
-          const mappedAboardPoints =
-            await this.aboardPointService.mapFromNameToObjectId(aboardPoints);
-          const createdOriginCity = await this.create({
-            name: city.name,
-            state: city.state,
-            aboardPoints: mappedAboardPoints,
-          } as CreateOriginCityDTO);
-          return createdOriginCity._id.toString();
-        }
-        return existingCity._id.toString();
-      });
-      return await Promise.all(mappedCities);
+
+      const mappedCities = await Promise.all(
+        mappedCitiesFromExcel.map(async (city) => {
+          const existingCity = await this.originCityModel
+            .findOne({ name: city.name })
+            .lean();
+
+          if (!existingCity) {
+            const mappedAboardPoints =
+              await this.aboardPointService.mapFromNameToObjectId(
+                city.aboardPoints,
+              );
+
+            const createdOriginCity = await this.create({
+              name: city.name as string,
+              state: city.state as Status,
+              aboardPoints: mappedAboardPoints,
+            });
+
+            return createdOriginCity._id.toString();
+          }
+
+          return existingCity._id.toString();
+        }),
+      );
+
+      return mappedCities;
     } catch (error) {
-      this.logger.error(
-        `Error mapping origin cities from destination excel: ${error}`,
-      );
-      throw new InternalServerErrorException(
-        `Error mapping origin cities from destination excel: ${error}`,
-      );
+      const errorMessage = `Error mapping origin cities from destination excel: ${error}`;
+      this.logger.error(errorMessage);
+      throw new InternalServerErrorException(errorMessage);
     }
   }
 }

@@ -47,7 +47,8 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: [CreateRoleDTO],
+    type: CreateRoleDTO,
+    isArray: true,
     description: 'Roles found successfully.',
   })
   @ApiNotFoundResponse({ description: 'No roles registered.' })
@@ -81,7 +82,7 @@ export class RolesController {
     description: 'Something went wrong updating role.',
   })
   @Put(':id')
-  @ApiBody({ type: CreateRoleDTO })
+  @ApiBody({ type: UpdateRoleDTO })
   async updateRole(
     @Body() updateRoleDTO: UpdateRoleDTO,
     @Param() params: UrlValidator,

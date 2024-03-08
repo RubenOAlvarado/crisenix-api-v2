@@ -97,22 +97,20 @@ export class TourService {
     status,
   }: PaginatedTourDTO): Promise<PaginateResult<Tours>> {
     try {
-      const debugMessage = status
-        ? `Getting all tours with status: ${status}`
-        : 'Getting all tours';
-      this.logger.debug(debugMessage);
       const query = status ? { status } : {};
       const docs = await this.tourModel
         .find(query)
         .limit(limit)
         .skip(limit * (page - 1))
-        .populate('destination')
-        .populate('transport')
-        .populate('tourType')
-        .populate('included')
-        .populate('itinerary')
-        .populate('price')
-        .populate('departure')
+        .populate([
+          'destination',
+          'transport',
+          'tourType',
+          'included',
+          'itinerary',
+          'price',
+          'departure',
+        ])
         .populate({
           path: 'aboardHour.aboardPoint',
           model: 'AboardPoints',
@@ -188,45 +186,47 @@ export class TourService {
       this.logger.debug(
         `getting last registered tour for destination with id: ${destination}`,
       );
-      await this.destinationService.validateFromTour({
+      const validDestination = await this.destinationService.validateFromTour({
         destination,
       });
-      this.logger.debug(`Destination is valid`);
-      const tour = await this.tourModel
-        .findOne({ destination })
-        .sort({ createdAt: -1 })
-        .populate([
-          'destination',
-          'transport',
-          'tourType',
-          'included',
-          'itinerary',
-          'price',
-          'departure',
-        ])
-        .populate({
-          path: 'aboardHour.aboardPoint',
-          model: 'AboardPoints',
-        })
-        .populate({
-          path: 'returnHour.aboardPoint',
-          model: 'AboardPoints',
-        })
-        .populate({
-          path: 'departure',
-          options: {
-            sort: {
-              date: 1,
-              hour: 1,
+      if (validDestination) {
+        const tour = await this.tourModel
+          .findOne({ destination })
+          .sort({ createdAt: -1 })
+          .populate([
+            'destination',
+            'transport',
+            'tourType',
+            'included',
+            'itinerary',
+            'price',
+            'departure',
+          ])
+          .populate({
+            path: 'aboardHour.aboardPoint',
+            model: 'AboardPoints',
+          })
+          .populate({
+            path: 'returnHour.aboardPoint',
+            model: 'AboardPoints',
+          })
+          .populate({
+            path: 'departure',
+            options: {
+              sort: {
+                date: 1,
+                hour: 1,
+              },
             },
-          },
-        })
-        .select({ __v: 0, createdAt: 0 })
-        .limit(1)
-        .lean();
+          })
+          .select({ __v: 0, createdAt: 0 })
+          .limit(1)
+          .lean();
 
-      if (!tour) throw new NotFoundException('No tour registered.');
-      return tour;
+        if (!tour) throw new NotFoundException('No tour registered.');
+        return tour;
+      }
+      return {} as TourLean;
     } catch (error) {
       this.logger.error(
         `Something went wrong getting last registered tour: ${error}`,

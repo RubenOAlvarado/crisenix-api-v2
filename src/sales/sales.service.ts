@@ -20,6 +20,10 @@ import { State } from '@/shared/enums/sales/state.enum';
 import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { TourService } from '@/tour/tour.service';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 
 @Injectable()
 export class SalesService {
@@ -64,8 +68,9 @@ export class SalesService {
       this.logger.error(
         `Something went wrong finding the sale: ${JSON.stringify(error)}`,
       );
-      throw new InternalServerErrorException(
-        `Something went wrong finding the sale.`,
+      throw handleErrorsOnServices(
+        'Something went wrong finding the sale.',
+        error,
       );
     }
   }
@@ -75,9 +80,7 @@ export class SalesService {
     { page, limit }: PaginationDTO,
   ): Promise<PaginateResult<Sales>> {
     try {
-      this.logger.debug(`finding sales by user`);
       await this.userService.validateUser(id);
-      this.logger.debug(`User found, finding sales`);
       const docs = await this.salesModel
         .find({ user: id })
         .populate({
@@ -92,28 +95,15 @@ export class SalesService {
         .skip((page - 1) * limit)
         .select({ __v: 0, createdAt: 0 })
         .lean();
-      if (!docs.length) {
-        this.logger.error(`User does not have sales registered.`);
+      if (!docs.length)
         throw new BadRequestException(`User does not have sales registered.`);
-      }
       const totalDocs = await this.salesModel.countDocuments({ user: id });
-      return {
-        docs,
-        totalDocs,
-        page,
-        totalPages: Math.ceil(totalDocs / limit),
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalDocs / limit),
-      };
+      return createPaginatedObject<Sales>(docs, totalDocs, page, limit);
     } catch (error) {
       this.logger.error(`Something went wrong finding the sales: ${error}`);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        `Something went wrong finding the sales.`,
+      throw handleErrorsOnServices(
+        'Something went wrong finding the sales.',
+        error,
       );
     }
   }
@@ -123,16 +113,14 @@ export class SalesService {
     user: any,
   ): Promise<ResponseSavedPaypalResponse> {
     try {
-      this.logger.debug(`Validating sale response`);
-      const validatedSale = await this.validateSale(sale);
+      const validatedSale = await this.validateSaleForPayment(sale);
       const tour = await this.tourService.validateSaledTour(
         validatedSale.tour._id.toString(),
       );
-      let response: ResponseSavedPaypalResponse =
-        {} as ResponseSavedPaypalResponse;
+
       if (validatedSale && tour) {
         // All validations passed, saving sale response
-        this.logger.debug(`Processing paypal response `);
+        this.logger.debug(`Processing PayPal response `);
 
         if (state === State.APPROVED) {
           // TODO: create email service
@@ -145,77 +133,66 @@ export class SalesService {
             { status: SalesStatus.CHECKED },
             { new: true },
           );
-          response = {
+
+          return {
             sale: updateSale,
             message: 'Sale approved.',
           };
         } else {
           this.logger.debug(
-            'Sale declined by paypal; updating status and seats',
+            'Sale declined by PayPal; updating status and seats',
           );
+
           await this.tourService.updateTourSeats(
             validatedSale.tour,
             validatedSale.reservedSeat,
             user,
             SalesMove.DELETE,
           );
+
           const updatedSale = await this.salesModel.findByIdAndUpdate(
             sale,
             { status: SalesStatus.DECLINED, failureReason, state },
             { new: true },
           );
-          response = {
+
+          return {
             sale: updatedSale,
             message: 'Sale declined.',
           };
         }
       }
 
-      return response;
+      return {} as ResponseSavedPaypalResponse;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong saving sale response: ${JSON.stringify(error)}`,
-      );
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else
-        throw new InternalServerErrorException(
-          'Something went wrong saving sale response.',
-        );
+      this.logger.error(`Error saving sale response: ${JSON.stringify(error)}`);
+      throw handleErrorsOnServices('Error saving sale response.', error);
     }
   }
 
-  private async validateSale(saleId: string): Promise<Sales> {
+  private async validateSaleForPayment(saleId: string): Promise<Sales> {
     try {
-      this.logger.debug(`Validating sale`);
       const currentSale = await this.findOne(saleId);
+
       if (!currentSale) {
-        this.logger.error(`Sale not found.`);
         throw new NotFoundException(`Sale not found.`);
       }
+
       if (currentSale.status !== SalesStatus.RESERVED) {
-        this.logger.error(`Sale not in ${SalesStatus.RESERVED} status.`);
         throw new BadRequestException(
-          `Sale must be in reserved status to allow pay it.`,
+          `Sale must be in reserved status to allow payment.`,
         );
       }
+
       return currentSale;
     } catch (error) {
       this.logger.error(
         `Something went wrong validating sale: ${JSON.stringify(error)}`,
       );
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else
-        throw new InternalServerErrorException(
-          `Something went wrong validating sale.`,
-        );
+      throw handleErrorsOnServices(
+        'Something went wrong validating sale.',
+        error,
+      );
     }
   }
 }

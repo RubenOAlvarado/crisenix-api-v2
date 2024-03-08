@@ -15,6 +15,10 @@ import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdes
 import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
 import { pipelinesMaker } from '@/shared/utilities/destination-query-maker.helper';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -68,44 +72,31 @@ export class DestinationService {
   }: QueryDTO): Promise<PaginateResult<DestinationLean>> {
     try {
       this.logger.debug(`finding destinations with status: ${status}`);
-      const docs = status
-        ? await this.destinationModel
-            .find({ status })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .populate('originCity')
-            .populate('category')
-            .populate('translationType')
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.destinationModel
-            .find()
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .populate('originCity')
-            .populate('category')
-            .populate('translationType')
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const query = status ? { status } : {};
+      const docs = await this.destinationModel
+        .find(query)
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .populate('originCity')
+        .populate('category')
+        .populate('translationType')
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!docs.length) throw new NotFoundException('Destinations not found.');
-      const totalDocs = status
-        ? await this.destinationModel.countDocuments({ status })
-        : await this.destinationModel.countDocuments();
-      return {
+      const totalDocs = await this.destinationModel.countDocuments(query);
+      return createPaginatedObject<DestinationLean>(
         docs,
         totalDocs,
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalDocs / limit),
         page,
-        totalPages: Math.ceil(totalDocs / limit),
-      };
+        limit,
+      );
     } catch (error) {
       this.logger.error(
         `Something went wrong while finding destinations: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while finding destinations.',
+        error,
       );
     }
   }
@@ -127,9 +118,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while finding destination: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while finding destination.',
+        error,
       );
     }
   }
@@ -147,9 +138,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while finding destination: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while finding destination.',
+        error,
       );
     }
   }
@@ -171,9 +162,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while updating destination: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while updating destination.',
+        error,
       );
     }
   }
@@ -191,9 +182,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while deleting destination: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while deleting destination.',
+        error,
       );
     }
   }
@@ -211,9 +202,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while reactivating destination: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while reactivating destination.',
+        error,
       );
     }
   }
@@ -235,15 +226,12 @@ export class DestinationService {
           throw new NotFoundException(
             `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field} .`,
           );
-        return {
+        return createPaginatedObject<DestinationLean>(
           docs,
           totalDocs,
-          hasPrevPage: queryParams.page > 1,
-          hasNextPage:
-            queryParams.page < Math.ceil(totalDocs / queryParams.limit),
-          page: queryParams.page,
-          totalPages: Math.ceil(totalDocs / queryParams.limit),
-        };
+          queryParams.page,
+          queryParams.limit,
+        );
       } else {
         this.logger.debug('Alike search.');
         this.logger.debug(`searching destination with: ${searcherDTO.word}`);
@@ -259,9 +247,9 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}: ${e}`,
       );
-      if (e instanceof NotFoundException) throw e;
-      throw new InternalServerErrorException(
-        `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}`,
+      throw handleErrorsOnServices(
+        'Something went wrong while looking destination.',
+        e,
       );
     }
   }
@@ -300,23 +288,19 @@ export class DestinationService {
       this.logger.error(
         `Something went wrong while deleting destination photos: ${error}`,
       );
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while deleting destination photos.',
+        error,
       );
     }
   }
 
   async findCities({ id }: UrlValidator): Promise<OriginCityLean> {
     try {
-      this.logger.debug(`finding cities from destination with id: ${id}`);
+      this.logger.debug(`Finding cities from destination with id: ${id}`);
+
       const destination = await this.destinationModel
         .findById(id)
-        .populate('originCity')
         .populate({
           path: 'originCity',
           populate: {
@@ -325,19 +309,21 @@ export class DestinationService {
         })
         .select({ __v: 0, createdAt: 0 })
         .lean();
-      if (!destination) throw new NotFoundException('Destination not found.');
+
+      if (!destination) {
+        throw new NotFoundException('Destination not found.');
+      }
+
       const originCity = destination.originCity;
-      if (!originCity?.length)
+
+      if (!originCity?.length) {
         throw new NotFoundException('Destination cities not found.');
+      }
+
       return originCity as unknown as OriginCityLean;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding destination cities: ${error}`,
-      );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while finding destination cities.',
-      );
+      this.logger.error(`Error finding destination cities: ${error}`);
+      throw handleErrorsOnServices('Error finding destination cities.', error);
     }
   }
 
@@ -360,69 +346,72 @@ export class DestinationService {
   private async mapToDTO(
     jsonObject: DestinationsExcel[],
   ): Promise<CreateDestinationDTO[]> {
-    const mappedDTO = jsonObject.map(async (destination) => {
-      const {
-        codigo,
-        nombre,
-        descripcion,
-        categorias,
-        estatus,
-        ciudadDeOrigen,
-        fechasProgramadas,
-        pasaporte,
-        visa,
-        tipoDeTraslado,
-        traslado,
-      } = destination;
-      return {
-        code: codigo,
-        name: nombre,
-        description: descripcion,
-        category: await this.categoryService.mapFromNameToObjectId(
-          categorias?.split(','),
-        ),
-        status: estatus as Status,
-        originCity: await this.originCityService.mapFromDestinationExcel(
+    const mappedDTO = await Promise.all(
+      jsonObject.map(async (destination) => {
+        const {
+          codigo,
+          nombre,
+          descripcion,
+          categorias,
+          estatus,
           ciudadDeOrigen,
-        ),
-        scheduledDates: fechasProgramadas,
-        passport: pasaporte === 'Si' ? true : false,
-        visa: visa as Visa,
-        translationType:
+          fechasProgramadas,
+          pasaporte,
+          visa,
+          tipoDeTraslado,
+          traslado,
+        } = destination;
+
+        const category = await this.categoryService.mapFromNameToObjectId(
+          categorias?.split(','),
+        );
+
+        const originCity = await this.originCityService.mapFromDestinationExcel(
+          ciudadDeOrigen,
+        );
+
+        const translationType =
           await this.translationTypeService.mapTranslationTypeNames(
             tipoDeTraslado?.split(','),
-          ),
-        translation: traslado,
-      } as unknown as CreateDestinationDTO;
-    });
-    return await Promise.all(mappedDTO);
+          );
+
+        return {
+          code: codigo,
+          name: nombre,
+          description: descripcion,
+          category,
+          status: estatus as Status,
+          originCity,
+          scheduledDates: fechasProgramadas,
+          passport: pasaporte === 'Si',
+          visa: visa as Visa,
+          translationType,
+          translation: traslado,
+        } as CreateDestinationDTO;
+      }),
+    );
+
+    return mappedDTO;
   }
 
   async validateFromTour({
     destination,
   }: DestinationValidator): Promise<boolean> {
     try {
-      this.logger.debug(`Validating destination with id: ${destination}`);
       const destinationToValidate = await this.destinationModel.findById(
         destination,
       );
+
       if (!destinationToValidate)
         throw new NotFoundException('Destination not found.');
+
       if (destinationToValidate.status !== Status.ACTIVE)
         throw new BadRequestException('Destination must be in Active status.');
+
       return true;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong validating destination: ${error}`,
-      );
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong validating destination.',
-      );
+      this.logger.error(`Error validating destination: ${error}`);
+      throw handleErrorsOnServices('Error validating destination.', error);
     }
   }
 }

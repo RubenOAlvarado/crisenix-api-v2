@@ -18,6 +18,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CaptionsLean } from '@/shared/interfaces/captions/captions.lean.interface';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 
 @Injectable()
 export class CaptionsService {
@@ -44,22 +45,18 @@ export class CaptionsService {
   async findAll({ status }: StatusDTO): Promise<Array<CaptionsLean>> {
     try {
       this.logger.debug('Finding all captions');
-      const captions = status
-        ? await this.captionModel
-            .find({ status })
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.captionModel
-            .find()
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const query = status ? { status } : {};
+      const captions = await this.captionModel
+        .find(query)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!captions) throw new NotFoundException('No captions registered');
       return captions;
     } catch (error) {
       this.logger.error('Something went wrong finding all captions', error);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong finding all captions',
+        error,
       );
     }
   }
@@ -75,24 +72,28 @@ export class CaptionsService {
       return caption;
     } catch (error) {
       this.logger.error('Something went wrong finding the caption', error);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong finding the caption',
+        error,
       );
     }
   }
 
-  async update(
-    { id }: UrlValidator,
-    updateCaptionDTO: UpdateCaptionDTO,
-  ): Promise<void> {
+  async update({ id }: UrlValidator, updateCaptionDTO: UpdateCaptionDTO) {
     try {
       this.logger.debug(`Updating caption ${id}`);
-      await this.captionModel.findByIdAndUpdate(id, updateCaptionDTO);
+      const caption = await this.captionModel.findByIdAndUpdate(
+        id,
+        updateCaptionDTO,
+        { new: true },
+      );
+      if (!caption) throw new NotFoundException(`Caption ${id} not found`);
+      return caption;
     } catch (error) {
       this.logger.error('Something went wrong updating the caption', error);
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong updating the caption',
+        error,
       );
     }
   }
@@ -100,15 +101,13 @@ export class CaptionsService {
   async delete({ id }: UrlValidator): Promise<void> {
     try {
       this.logger.debug(`Deleting caption ${id}`);
-      await this.captionModel.findByIdAndUpdate(
-        id,
-        { status: Status.INACTIVE },
-        { new: true },
-      );
+      const caption = await this.captionModel.findByIdAndDelete(id);
+      if (!caption) throw new NotFoundException(`Caption ${id} not found`);
     } catch (error) {
       this.logger.error('Something went wrong deleting the caption', error);
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong deleting the caption',
+        error,
       );
     }
   }
@@ -127,15 +126,10 @@ export class CaptionsService {
       );
     } catch (error) {
       this.logger.error('Something went wrong reactivating the caption', error);
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      )
-        throw error;
-      else
-        throw new InternalServerErrorException(
-          'Something went wrong reactivating the caption',
-        );
+      throw handleErrorsOnServices(
+        'Something went wrong reactivating the caption',
+        error,
+      );
     }
   }
 

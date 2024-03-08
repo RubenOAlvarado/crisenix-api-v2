@@ -36,6 +36,8 @@ import 'multer';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
+import { Public } from '@/auth/public.decorator';
+import { AddAboardPointsDTO } from '@/shared/models/dtos/originCity/add-aboard-points.dto';
 
 @ApiBearerAuth()
 @Controller('origincity')
@@ -84,6 +86,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin cities.',
   })
+  @Public()
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
@@ -122,7 +125,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting the origin city.',
   })
-  @Delete('delete/:id')
+  @Delete(':id')
   async delete(@Param() urlValidator: UrlValidator): Promise<string> {
     await this.originCityService.delete(urlValidator);
     return 'The origin city has been successfully deleted.';
@@ -176,16 +179,14 @@ export class OriginCityController {
   @Patch('addpoints/:id')
   @ApiBody({
     description: 'Array of aboard points ids',
-    type: [String],
+    type: AddAboardPointsDTO,
+    isArray: true,
   })
   async addPoints(
     @Param() urlValidator: UrlValidator,
-    @Body() updateOriginCityDTO: UpdateOriginCityDTO,
+    @Body() aboardPointsDTO: AddAboardPointsDTO,
   ): Promise<string> {
-    await this.originCityService.addAboardPoints(
-      urlValidator,
-      updateOriginCityDTO,
-    );
+    await this.originCityService.addAboardPoints(urlValidator, aboardPointsDTO);
     return 'The aboard point/s has been successfully added to the origin city.';
   }
 

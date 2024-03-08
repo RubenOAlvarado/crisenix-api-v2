@@ -30,6 +30,7 @@ import { excelFileFilter } from '@/filer/filer.utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { Public } from '@/auth/public.decorator';
+import { ResponseCaptionsDTO } from '@/shared/models/dtos/captions/responseCaptions.dto';
 
 @ApiTags('Captions')
 @ApiBearerAuth()
@@ -44,8 +45,6 @@ export class CaptionsController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the caption.',
   })
-  // TODO: delete decorator
-  @Public()
   @Post('create')
   @ApiBody({
     description: 'Caption object',
@@ -72,6 +71,7 @@ export class CaptionsController {
 
   @ApiOkResponse({
     description: 'Caption found.',
+    type: ResponseCaptionsDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the caption.',
@@ -90,13 +90,15 @@ export class CaptionsController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong updating the caption.',
   })
+  @ApiNotFoundResponse({
+    description: 'Caption not found.',
+  })
   @Put(':id')
   async update(
     @Param() params: UrlValidator,
     @Body() updateCaptionDTO: CreateCaptionDTO,
-  ): Promise<string> {
-    await this.captionService.update(params, updateCaptionDTO);
-    return 'Caption updated.';
+  ) {
+    return await this.captionService.update(params, updateCaptionDTO);
   }
 
   @ApiOkResponse({
@@ -105,10 +107,12 @@ export class CaptionsController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting the caption.',
   })
+  @ApiNotFoundResponse({
+    description: 'Caption not found.',
+  })
   @Delete(':id')
-  async delete(@Param() params: UrlValidator): Promise<string> {
+  async delete(@Param() params: UrlValidator) {
     await this.captionService.delete(params);
-    return 'Caption deleted.';
   }
 
   @ApiOkResponse({
@@ -124,9 +128,8 @@ export class CaptionsController {
     description: 'Caption already active.',
   })
   @Put('reactivate/:id')
-  async activate(@Param() params: UrlValidator): Promise<string> {
+  async activate(@Param() params: UrlValidator) {
     await this.captionService.reactivate(params);
-    return 'Caption activated.';
   }
 
   @ApiExcludeEndpoint()
