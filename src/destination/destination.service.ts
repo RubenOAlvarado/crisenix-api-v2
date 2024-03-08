@@ -260,38 +260,42 @@ export class DestinationService {
   }: PhotoValidator): Promise<void> {
     try {
       this.logger.debug(
-        `deleting photo from destination with id: ${destination}`,
+        `Deleting photo from destination with id: ${destination}`,
       );
+
       const destinationToUpdate = await this.destinationModel.findById(
         destination,
       );
-      if (!destinationToUpdate)
+
+      if (!destinationToUpdate) {
         throw new NotFoundException('Destination not found.');
-      if (destinationToUpdate.status !== Status.ACTIVE)
+      }
+
+      if (destinationToUpdate.status !== Status.ACTIVE) {
         throw new BadRequestException('Destination must be in Active status.');
+      }
+
       const { photos } = destinationToUpdate;
-      if (photos?.some((current) => current === photoToDelete)) {
-        delete photos[photos.indexOf(photoToDelete)];
-        await this.destinationModel.findByIdAndUpdate(destination, {
-          photos,
-        });
-        this.logger.debug('Photo successfully deleted.');
-      } else {
+
+      if (!photos || !photos.includes(photoToDelete)) {
         throw new BadRequestException(
           'Photo does not belong to the requested destination.',
         );
       }
+
+      const updatedPhotos = photos.filter(
+        (current) => current !== photoToDelete,
+      );
+
       await this.destinationModel.findByIdAndUpdate(destination, {
-        photos,
+        photos: updatedPhotos,
       });
+
+      this.logger.debug('Photo successfully deleted.');
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while deleting destination photos: ${error}`,
-      );
-      throw handleErrorsOnServices(
-        'Something went wrong while deleting destination photos.',
-        error,
-      );
+      const errorMessage = `Error deleting destination photos: ${error}`;
+      this.logger.error(errorMessage);
+      throw handleErrorsOnServices('Error deleting destination photos.', error);
     }
   }
 
@@ -314,7 +318,7 @@ export class DestinationService {
         throw new NotFoundException('Destination not found.');
       }
 
-      const originCity = destination.originCity;
+      const { originCity } = destination;
 
       if (!originCity?.length) {
         throw new NotFoundException('Destination cities not found.');
