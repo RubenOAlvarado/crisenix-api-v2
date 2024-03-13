@@ -148,4 +148,24 @@ export class PriceService {
       );
     }
   }
+
+  async getPricesByCity({ id }: UrlValidator): Promise<Prices[]> {
+    try {
+      this.logger.log(`Getting prices for city with id: ${id}`);
+      const prices = await this.priceModel.find({ city: id }).lean();
+      if (!prices.length) {
+        this.logger.error('Prices for origin city not found');
+        throw new NotFoundException('Prices for origin city not found');
+      }
+      return prices;
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while getting prices for city: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while getting prices for city.',
+        error,
+      );
+    }
+  }
 }

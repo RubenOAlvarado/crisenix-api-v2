@@ -132,4 +132,20 @@ export class PriceController {
   async reactivatePrice(@Param() param: UrlValidator) {
     await this.priceService.reactivatePrice(param);
   }
+
+  @ApiOkResponse({
+    description: 'Prices for origin city found.',
+    type: ResponsePriceDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong while getting prices.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Prices not found.',
+  })
+  @Get('city/:id')
+  async getPricesByCity(@Param() param: UrlValidator) {
+    return await this.priceService.getPricesByCity(param);
+  }
 }
