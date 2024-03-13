@@ -72,7 +72,7 @@ export class PriceService {
   async getPrice({ id }: UrlValidator): Promise<Prices> {
     try {
       this.logger.log(`Looking for price with id: ${id}`);
-      const price = await this.priceModel.findById(id).lean();
+      const price = await this.priceModel.findById(id).populate('city').lean();
       if (!price) {
         this.logger.error(`Price with id: ${id} not found`);
         throw new NotFoundException(`Price with id: ${id} not found`);
@@ -80,9 +80,9 @@ export class PriceService {
       return price;
     } catch (error) {
       this.logger.error(`Something went wrong while getting price: ${error}`);
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while getting price.',
+        error,
       );
     }
   }
