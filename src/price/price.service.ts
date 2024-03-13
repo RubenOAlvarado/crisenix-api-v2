@@ -1,4 +1,13 @@
+import { QueryDTO } from '@/shared/dtos/query.dto';
+import { Status } from '@/shared/enums/status.enum';
+import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { CreatePriceDTO } from '@/shared/models/dtos/price/createprice.dto';
+import { UpdatePriceDTO } from '@/shared/models/dtos/price/updateprice.dto';
 import { Prices } from '@/shared/models/schemas/price.schema';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   Injectable,
@@ -17,6 +26,49 @@ export class PriceService {
 
   readonly logger = new Logger(PriceService.name);
 
+  async createPrice(createPriceDTO: CreatePriceDTO): Promise<Prices> {
+    try {
+      this.logger.log('Creating price');
+      const price = new this.priceModel(createPriceDTO);
+      return await price.save();
+    } catch (error) {
+      this.logger.error(`Something went wrong while creating price: ${error}`);
+      throw new InternalServerErrorException(
+        'Something went wrong while creating price.',
+      );
+    }
+  }
+
+  async getPrices({
+    page,
+    limit,
+    status,
+  }: QueryDTO): Promise<PaginateResult<Prices>> {
+    try {
+      this.logger.log('Getting prices');
+      const query = status ? { status } : {};
+      const docs = await this.priceModel
+        .find(query)
+        .populate('city')
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!docs.length) {
+        this.logger.error('Prices not found');
+        throw new NotFoundException('Prices not found');
+      }
+      const totalDocs = await this.priceModel.countDocuments(query).exec();
+      return createPaginatedObject<Prices>(docs, totalDocs, page, limit);
+    } catch (error) {
+      this.logger.error(`Something went wrong while getting prices: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong while getting prices.',
+        error,
+      );
+    }
+  }
+
   async getPrice({ id }: UrlValidator): Promise<Prices> {
     try {
       this.logger.log(`Looking for price with id: ${id}`);
@@ -31,6 +83,68 @@ export class PriceService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(
         'Something went wrong while getting price.',
+      );
+    }
+  }
+
+  async updatePrice(
+    { id }: UrlValidator,
+    updatePriceDTO: UpdatePriceDTO,
+  ): Promise<Prices> {
+    try {
+      const price = await this.priceModel.findByIdAndUpdate(
+        id,
+        updatePriceDTO,
+        { new: true },
+      );
+      if (!price) {
+        this.logger.error(`Price with id: ${id} not found`);
+        throw new NotFoundException(`Price with id: ${id} not found`);
+      }
+      return price;
+    } catch (error) {
+      this.logger.error(`Something went wrong while updating price: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong while updating price.',
+        error,
+      );
+    }
+  }
+
+  async deletePrice({ id }: UrlValidator): Promise<void> {
+    try {
+      const price = await this.priceModel.findByIdAndDelete(id);
+      if (!price) {
+        this.logger.error(`Price with id: ${id} not found`);
+        throw new NotFoundException(`Price with id: ${id} not found`);
+      }
+    } catch (error) {
+      this.logger.error(`Something went wrong while deleting price: ${error}`);
+      throw handleErrorsOnServices(
+        'Something went wrong while deleting price.',
+        error,
+      );
+    }
+  }
+
+  async reactivatePrice({ id }: UrlValidator): Promise<void> {
+    try {
+      const price = await this.priceModel.findByIdAndUpdate(
+        id,
+        { status: Status.ACTIVE },
+        { new: true },
+      );
+      if (!price) {
+        this.logger.error(`Price with id: ${id} not found`);
+        throw new NotFoundException(`Price with id: ${id} not found`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while reactivating price: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong while reactivating price.',
+        error,
       );
     }
   }

@@ -132,7 +132,6 @@ export class OriginCityService {
     updateOriginCity: UpdateOriginCityDTO,
   ): Promise<OriginCityLean> {
     try {
-      this.logger.debug('Updating origin city');
       await this.validateOriginCity(id);
       const updatedOriginCity = await this.originCityModel.findByIdAndUpdate(
         id,

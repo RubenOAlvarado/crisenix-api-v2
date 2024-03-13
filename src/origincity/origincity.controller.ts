@@ -96,6 +96,7 @@ export class OriginCityController {
 
   @ApiOkResponse({
     description: 'The origin city has been successfully updated.',
+    type: ResponseOriginCityDTO,
   })
   @ApiNotFoundResponse({
     description: 'Origin city not found.',
@@ -111,9 +112,11 @@ export class OriginCityController {
   async update(
     @Param() urlValidator: UrlValidator,
     @Body() updateOriginCityDTO: UpdateOriginCityDTO,
-  ): Promise<string> {
-    await this.originCityService.update(urlValidator, updateOriginCityDTO);
-    return 'The origin city has been successfully updated.';
+  ): Promise<ResponseOriginCityDTO> {
+    return await this.originCityService.update(
+      urlValidator,
+      updateOriginCityDTO,
+    );
   }
 
   @ApiOkResponse({
