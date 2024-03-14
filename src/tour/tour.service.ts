@@ -22,7 +22,10 @@ import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
-import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
+import {
+  createQueryForCatalog,
+  pipelinesMaker,
+} from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
@@ -475,8 +478,7 @@ export class TourService {
 
   async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
     try {
-      const isHourCatalog = ['returnHour', 'aboardHour'].includes(catalogName);
-      const query = isHourCatalog ? `${catalogName}.aboardPoint` : catalogName;
+      const query = createQueryForCatalog(catalogName);
 
       const tour = await this.tourModel.findById(id).populate(query).exec();
 

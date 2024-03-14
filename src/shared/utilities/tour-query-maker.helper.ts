@@ -6,6 +6,7 @@ import { SearchableTourFields } from '../enums/searcher/tour/fields.enum';
 import { SearchType } from '../enums/searcher/search-type.enum';
 import { alikeQueryBuilder } from './destination-query-maker.helper';
 import dayjs from 'dayjs';
+import { TourCatalogs } from '../enums/tour/catalogs.enum';
 
 export function statusQueryBuilder(status?: string): PipelineStage | undefined {
   if (status) {
@@ -323,4 +324,50 @@ export function pipelinesMaker(
     .flatMap((result) =>
       Array.isArray(result) ? result : [result],
     ) as PipelineStage[];
+}
+
+export function createQueryForCatalog(catalog: string) {
+  const departurePopulate = {
+    path: 'departure',
+    options: {
+      sort: { date: 1, hour: 1 },
+    },
+  };
+
+  switch (catalog) {
+    case 'returnHour':
+    case 'aboardHour':
+      return {
+        path: catalog,
+        model: 'AboardPoints',
+        populate: departurePopulate,
+      };
+    case TourCatalogs.PRICE:
+      return [
+        {
+          path: catalog,
+          populate: {
+            path: 'city',
+            model: 'OriginCity',
+          },
+        },
+        departurePopulate,
+      ];
+    case TourCatalogs.ITINERARY:
+      return [
+        {
+          path: catalog,
+          populate: {
+            path: 'clasification',
+            model: 'Clasifications',
+          },
+        },
+        departurePopulate,
+      ];
+    default:
+      return {
+        path: catalog,
+        populate: departurePopulate,
+      };
+  }
 }
