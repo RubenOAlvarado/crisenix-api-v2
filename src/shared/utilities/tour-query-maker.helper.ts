@@ -337,11 +337,13 @@ export function createQueryForCatalog(catalog: string) {
   switch (catalog) {
     case 'returnHour':
     case 'aboardHour':
-      return {
-        path: catalog,
-        model: 'AboardPoints',
-        populate: departurePopulate,
-      };
+      return [
+        {
+          path: `${catalog}.aboardPoint`,
+          model: 'AboardPoints',
+        },
+        departurePopulate,
+      ];
     case TourCatalogs.PRICE:
       return [
         {
