@@ -4,7 +4,6 @@ import { OriginCityService } from '@/origincity/origincity.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
-import { SearchType } from '@/shared/enums/searcher/search-type.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
@@ -217,35 +216,22 @@ export class DestinationService {
     queryParams: PaginationDTO,
   ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
-      if (searcherDTO.searchType === SearchType.EXACTMATCH) {
-        this.logger.debug('Exact match search.');
-        this.logger.debug(
-          `searching destination with: ${JSON.stringify(searcherDTO)}`,
+      this.logger.debug(
+        `searching destination with: ${JSON.stringify(searcherDTO)}`,
+      );
+      const pipelines = pipelinesMaker(searcherDTO, queryParams);
+      const result = await this.destinationModel.aggregate(pipelines);
+      const { docs, totalDocs } = result[0];
+      if (!docs.length)
+        throw new NotFoundException(
+          `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field} .`,
         );
-        const pipelines = pipelinesMaker(searcherDTO, queryParams);
-        const result = await this.destinationModel.aggregate(pipelines);
-        const { docs, totalDocs } = result[0];
-        if (!docs.length)
-          throw new NotFoundException(
-            `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field} .`,
-          );
-        return createPaginatedObject<DestinationLean>(
-          docs,
-          totalDocs,
-          queryParams.page,
-          queryParams.limit,
-        );
-      } else {
-        this.logger.debug('Alike search.');
-        this.logger.debug(`searching destination with: ${searcherDTO.word}`);
-        const pipelines = pipelinesMaker(searcherDTO, queryParams);
-        const result = await this.destinationModel.aggregate(pipelines);
-        if (!result)
-          throw new NotFoundException(
-            `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field}.`,
-          );
-        return result;
-      }
+      return createPaginatedObject<DestinationLean>(
+        docs,
+        totalDocs,
+        queryParams.page,
+        queryParams.limit,
+      );
     } catch (e) {
       this.logger.error(
         `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}: ${e}`,

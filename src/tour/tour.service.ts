@@ -4,7 +4,6 @@ import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
-import { SearchType } from '@/shared/enums/searcher/search-type.enum';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
@@ -76,7 +75,6 @@ export class TourService {
     user = UserRoles.ADMIN,
   ): Promise<Tours> {
     try {
-      this.logger.debug(`creating tour by user: ${user}`);
       const newTour = new this.tourModel(tour);
       await newTour.save();
       await this.saveLogInDataBase({
@@ -139,7 +137,6 @@ export class TourService {
 
   async findOne({ id }: UrlValidator): Promise<TourLean> {
     try {
-      this.logger.debug(`getting tour with id: ${id}`);
       const tour = await this.tourModel
         .findById(id)
         .populate([
@@ -196,9 +193,6 @@ export class TourService {
     destination,
   }: DestinationValidator): Promise<TourLean> {
     try {
-      this.logger.debug(
-        `getting last registered tour for destination with id: ${destination}`,
-      );
       const validDestination = await this.destinationService.validateFromTour({
         destination,
       });
@@ -257,7 +251,6 @@ export class TourService {
     user: string,
   ) {
     try {
-      this.logger.debug(`updating tour with id: ${id}`);
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         id,
         updateTourDTO,
@@ -287,7 +280,6 @@ export class TourService {
     user: string,
   ): Promise<TourLean | undefined> {
     try {
-      this.logger.debug(`Changing tour status to: ${newStatus}`);
       const tour = await this.tourModel.findById(id);
 
       if (!tour) {
@@ -365,28 +357,6 @@ export class TourService {
     return true;
   }
 
-  async getWebTourById({ id }: UrlValidator): Promise<TourLean> {
-    try {
-      this.logger.debug(`Getting web tour with id: ${id}`);
-      const tour = await this.tourModel
-        .findById(id)
-        .populate('destination')
-        .select({ __v: 0, createdAt: 0 })
-        .lean();
-
-      if (!tour) throw new NotFoundException('Tour not found.');
-      return tour;
-    } catch (error) {
-      this.logger.error(
-        `Something went wrong getting web tour by id.: ${error}`,
-      );
-      throw handleErrorsOnServices(
-        'Something went wrong getting web tour by id.',
-        error,
-      );
-    }
-  }
-
   private async getPOJOTourById(id: string): Promise<TourLean> {
     try {
       const tourPOJO = await this.tourModel.findById(id).lean();
@@ -403,7 +373,6 @@ export class TourService {
 
   async validateSaledTour(id: string): Promise<TourLean> {
     try {
-      this.logger.debug(`validating saled tour with id: ${id}`);
       const tour = await this.getPOJOTourById(id);
       if (tour.status !== TourStatus.PUBLISH)
         throw new BadRequestException(
@@ -503,7 +472,6 @@ export class TourService {
 
   async deleteTour({ id }: UrlValidator, user: string): Promise<void> {
     try {
-      this.logger.debug(`deleting tour with id: ${id}`);
       const tour = await this.tourModel.findById(id);
       if (!tour) throw new NotFoundException('Tour not found.');
       if (tour.status !== TourStatus.ACTIVE)
@@ -531,17 +499,6 @@ export class TourService {
     { page, limit }: PaginationDTO,
   ): Promise<PaginateResult<TourLean> | Array<TourLean>> {
     try {
-      if (body?.searchType !== SearchType.EXACTMATCH) {
-        this.logger.debug('Alike searching.');
-        this.logger.debug(`searching tours by word: ${body.word}`);
-        const pipelines = pipelinesMaker(body, { page, limit });
-        const tours = await this.tourModel.aggregate(pipelines);
-        if (tours.length === 0) throw new NotFoundException('No tours found.');
-        return tours;
-      }
-
-      this.logger.debug('Exact match searching.');
-      this.logger.debug(`Searching tours by: ${JSON.stringify(body)}`);
       const pipelines = pipelinesMaker(body, { page, limit });
       const result = await this.tourModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
@@ -565,8 +522,6 @@ export class TourService {
     user: string,
   ): Promise<TourLean> {
     try {
-      this.logger.debug(`Updating tour catalog: ${catalogName}`);
-
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         id,
         { [catalogName]: values },

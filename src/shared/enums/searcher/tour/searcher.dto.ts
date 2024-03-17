@@ -12,7 +12,6 @@ import { TourStatus } from '../../tour/status.enum';
 import { Transform } from 'class-transformer';
 import { BooleanString } from '../../boolean-string.type';
 import { SortTourFields } from './sortFields.enum';
-import { SearchType } from '../search-type.enum';
 import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
 
 export class SearcherTourDTO {
@@ -21,7 +20,7 @@ export class SearcherTourDTO {
     example: SearchableTourFields.NAME,
     enum: SearchableTourFields,
   })
-  @ValidateIf((o) => o.field && o.field !== SearchType.ALIKE)
+  @IsOptional()
   @IsEnum(SearchableTourFields)
   @IsNotEmpty()
   @IsString()
@@ -49,7 +48,7 @@ export class SearcherTourDTO {
   status?: TourStatus;
 
   @ApiPropertyOptional({
-    description: 'Inidicator if we want to populate catalogs for destination.',
+    description: 'Indicator if we want to populate catalogs for tour.',
     default: false,
   })
   @IsOptional()
@@ -68,16 +67,6 @@ export class SearcherTourDTO {
   @IsNotEmpty()
   @IsEnum(SortTourFields)
   sort?: SortTourFields;
-
-  @ApiPropertyOptional({
-    description: 'Kind of search indicator.',
-    enum: SearchType,
-    default: SearchType.EXACTMATCH,
-  })
-  @IsOptional()
-  @IsNotEmpty()
-  @IsEnum(SearchType)
-  searchType?: SearchType;
 
   constructor(word: string) {
     this.word = word;

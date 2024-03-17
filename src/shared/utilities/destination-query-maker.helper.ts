@@ -4,7 +4,6 @@ import { PaginationDTO } from '../dtos/pagination.dto';
 import { SortFields } from '../enums/searcher/destination/sortFields.enum';
 import { Status } from '../enums/status.enum';
 import { SearcherDTO } from '../enums/searcher/destination/searcher.dto';
-import { SearchType } from '../enums/searcher/search-type.enum';
 
 export function statusQueryBuilder(status?: Status): PipelineStage | undefined {
   if (status) {
@@ -187,28 +186,16 @@ export function alikeQueryBuilder(word: string): PipelineStage[] {
 }
 
 export function pipelinesMaker(
-  { word, field, status, subCatalog, sort, searchType }: SearcherDTO,
+  { word, field, status, subCatalog, sort }: SearcherDTO,
   { page, limit }: PaginationDTO,
 ): PipelineStage[] {
-  if (searchType === SearchType.EXACTMATCH) {
-    return [
-      statusQueryBuilder(status),
-      searchByCategoryQuery({ field, word }),
-      generateDefaultSearcherQuery({ field, word }),
-      populateSubcatalogsQuery(subCatalog),
-      sortQueryBuilder(sort),
-      paginationQuery({ page, limit }),
-    ]
-      .filter(Boolean)
-      .flatMap((result) =>
-        Array.isArray(result) ? result : [result],
-      ) as PipelineStage[];
-  }
   return [
     statusQueryBuilder(status),
-    alikeQueryBuilder(word),
+    searchByCategoryQuery({ field, word }),
+    generateDefaultSearcherQuery({ field, word }),
     populateSubcatalogsQuery(subCatalog),
     sortQueryBuilder(sort),
+    paginationQuery({ page, limit }),
   ]
     .filter(Boolean)
     .flatMap((result) =>

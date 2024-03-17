@@ -61,21 +61,6 @@ export class TourController {
   @ApiNotFoundResponse({
     description: 'Tour not found.',
   })
-  @Get('web/:id')
-  async getTour(@Param() param: UrlValidator) {
-    return await this.tourService.getWebTourById(param);
-  }
-
-  @ApiOkResponse({
-    description: 'Tour found.',
-    type: ResponseTourDTO,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding tour.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Tour not found.',
-  })
   @Public()
   @Get(':id')
   async getTourById(@Param() param: UrlValidator) {
