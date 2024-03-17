@@ -350,6 +350,11 @@ export class TourService {
           );
         }
         break;
+      case TourStatus.INACTIVE:
+        if (status !== TourStatus.ACTIVE) {
+          throwError('The tour must be in active status to be inactivated.');
+        }
+        break;
       default:
         throwError('Invalid new status.');
     }
