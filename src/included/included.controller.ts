@@ -23,8 +23,6 @@ import { IncludedService } from './included.service';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { Entry } from '@/shared/enums/entry.enum';
-import { HotelStatus } from '@/shared/enums/hotelstatus.enum';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { CreateItineraryDTO } from '@/shared/models/dtos/itinerary/createitinerary.dto';
