@@ -1,7 +1,16 @@
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { IncludedLean } from '@/shared/interfaces/included/included.lean.interface';
+import { Entry } from '@/shared/enums/entry.enum';
+import { HotelStatus } from '@/shared/enums/hotelstatus.enum';
+import { Status } from '@/shared/enums/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
+import { CreateItineraryDTO } from '@/shared/models/dtos/itinerary/createitinerary.dto';
+import { UpdateItineraryDTO } from '@/shared/models/dtos/itinerary/updateitinerary.dto';
 import { Includeds } from '@/shared/models/schemas/included.schema';
+import {
+  createPaginatedObject,
+  handleErrorsOnServices,
+} from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   Injectable,
@@ -21,23 +30,46 @@ export class IncludedService {
 
   private readonly logger = new Logger(IncludedService.name);
 
-  async findOne({ id }: UrlValidator): Promise<IncludedLean> {
+  async create(
+    createItineraryDTO: CreateItineraryDTO,
+  ): Promise<ResponseIncludedDTO> {
     try {
-      this.logger.debug(`finding included service with id: ${id}`);
-      const destination = await this.includedModel
+      const createdIncluded = new this.includedModel(createItineraryDTO);
+      const savedIncluded = await createdIncluded.save();
+      return {
+        ...savedIncluded,
+        entry: savedIncluded?.entry as Entry,
+        hotelStatus: savedIncluded?.hotelStatus as HotelStatus,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while creating included service: ${error}`,
+      );
+      throw new InternalServerErrorException(
+        'Something went wrong while creating included service.',
+      );
+    }
+  }
+
+  async findOne({ id }: UrlValidator): Promise<ResponseIncludedDTO> {
+    try {
+      const included = await this.includedModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
         .lean();
-      if (!destination)
-        throw new NotFoundException('Included service not found.');
-      return destination;
+      if (!included) throw new NotFoundException('Included service not found.');
+      return {
+        ...included,
+        entry: included?.entry as Entry,
+        hotelStatus: included?.hotelStatus as HotelStatus,
+      };
     } catch (error) {
       this.logger.error(
         `Something went wrong while finding included service: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while finding included service.',
+      throw handleErrorsOnServices(
+        'Something went wrong finding included service',
+        error,
       );
     }
   }
@@ -46,42 +78,102 @@ export class IncludedService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<IncludedLean>> {
+  }: QueryDTO): Promise<PaginateResult<ResponseIncludedDTO>> {
     try {
-      this.logger.debug(`finding all included services.`);
-      const docs = status
-        ? await this.includedModel
-            .find({ status })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .select({ __v: 0, createdAt: 0 })
-            .lean()
-        : await this.includedModel
-            .find()
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .select({ __v: 0, createdAt: 0 })
-            .lean();
+      const query = status ? { status } : {};
+      const docs = await this.includedModel
+        .find(query)
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
       if (!docs.length)
         throw new NotFoundException('No included services registered.');
-      const totalDocs = status
-        ? await this.includedModel.countDocuments({ status }).exec()
-        : await this.includedModel.countDocuments().exec();
-      return {
-        docs,
+      const totalDocs = await this.includedModel.countDocuments(query).exec();
+      const mappedDocs = docs.map((included) => ({
+        ...included,
+        entry: included?.entry as Entry,
+        hotelStatus: included?.hotelStatus as HotelStatus,
+      }));
+      return createPaginatedObject<ResponseIncludedDTO>(
+        mappedDocs,
         totalDocs,
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalDocs / limit),
         page,
-        totalPages: Math.ceil(totalDocs / limit),
-      };
+        limit,
+      );
     } catch (error) {
       this.logger.error(
         `Something went wrong while finding included services: ${error}`,
       );
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(
-        'Something went wrong while finding included services.',
+      throw handleErrorsOnServices(
+        'Something went wrong finding included services',
+        error,
+      );
+    }
+  }
+
+  async update(
+    { id }: UrlValidator,
+    body: UpdateItineraryDTO,
+  ): Promise<ResponseIncludedDTO> {
+    try {
+      const included = await this.includedModel
+        .findByIdAndUpdate(id, body, { new: true })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!included) throw new NotFoundException('Included service not found.');
+      return {
+        ...included,
+        entry: included?.entry as Entry,
+        hotelStatus: included?.hotelStatus as HotelStatus,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while updating included service: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong updating included service',
+        error,
+      );
+    }
+  }
+
+  async delete({ id }: UrlValidator): Promise<ResponseIncludedDTO> {
+    try {
+      const included = await this.includedModel
+        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!included) throw new NotFoundException('Included service not found.');
+      return {
+        ...included,
+        entry: included?.entry as Entry,
+        hotelStatus: included?.hotelStatus as HotelStatus,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while deleting included service: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong deleting included service',
+        error,
+      );
+    }
+  }
+
+  async reactivate({ id }: UrlValidator): Promise<void> {
+    try {
+      const included = await this.includedModel
+        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
+        .exec();
+      if (!included) throw new NotFoundException('Included service not found.');
+    } catch (error) {
+      this.logger.error(
+        `Something went wrong while reactivating included service: ${error}`,
+      );
+      throw handleErrorsOnServices(
+        'Something went wrong reactivating included service',
+        error,
       );
     }
   }
