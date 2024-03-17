@@ -55,6 +55,7 @@ export class DestinationController {
   })
   @ApiBody({ type: CreateDestinationDTO })
   @Post('/create')
+  @Public()
   async create(
     @Body() createDestinationDTO: CreateDestinationDTO,
   ): Promise<ResponseDestinationDTO> {
@@ -87,6 +88,7 @@ export class DestinationController {
     description: 'Something went wrong finding the destination.',
   })
   @Get(':id')
+  @Public()
   async findOne(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseDestinationDTO> {

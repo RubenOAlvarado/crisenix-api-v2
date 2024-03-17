@@ -367,9 +367,11 @@ export function createQueryForCatalog(catalog: string) {
         departurePopulate,
       ];
     default:
-      return {
-        path: catalog,
-        populate: departurePopulate,
-      };
+      return [
+        {
+          path: catalog,
+        },
+        departurePopulate,
+      ];
   }
 }

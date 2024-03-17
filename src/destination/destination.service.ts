@@ -71,13 +71,17 @@ export class DestinationService {
     status,
   }: QueryDTO): Promise<PaginateResult<DestinationLean>> {
     try {
-      this.logger.debug(`finding destinations with status: ${status}`);
       const query = status ? { status } : {};
       const docs = await this.destinationModel
         .find(query)
         .limit(limit * 1)
         .skip((page - 1) * limit)
-        .populate('originCity')
+        .populate({
+          path: 'originCity',
+          populate: {
+            path: 'aboardPoints',
+          },
+        })
         .populate('category')
         .populate('translationType')
         .select({ __v: 0, createdAt: 0 })
@@ -103,13 +107,16 @@ export class DestinationService {
 
   async findOne({ id }: UrlValidator): Promise<DestinationLean> {
     try {
-      this.logger.debug(`finding destination with id: ${id}`);
       const destination = await this.destinationModel
         .findById(id)
-        .populate('originCity')
+        .populate({
+          path: 'originCity',
+          populate: {
+            path: 'aboardPoints',
+          },
+        })
         .populate('category')
         .populate('translationType')
-        .populate('aboardPoint')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!destination) throw new NotFoundException('Destination not found.');
@@ -127,7 +134,6 @@ export class DestinationService {
 
   async findOneWeb({ id }: UrlValidator): Promise<DestinationLean> {
     try {
-      this.logger.debug(`finding destination with id: ${id}`);
       const destination = await this.destinationModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
@@ -150,7 +156,6 @@ export class DestinationService {
     updateDestinationDTO: UpdateDestinationDTO,
   ): Promise<DestinationLean> {
     try {
-      this.logger.debug(`updating destination with id: ${id}`);
       const destination = await this.destinationModel
         .findByIdAndUpdate(id, updateDestinationDTO, { new: true })
         .select({ __v: 0, createdAt: 0 })
@@ -171,7 +176,6 @@ export class DestinationService {
 
   async delete({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug(`deleting destination with id: ${id}`);
       const destination = await this.destinationModel.findByIdAndUpdate(
         id,
         { status: Status.INACTIVE },
@@ -191,7 +195,6 @@ export class DestinationService {
 
   async reactivate({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug(`reactivating destination with id: ${id}`);
       const destination = await this.destinationModel.findByIdAndUpdate(
         id,
         { status: Status.ACTIVE },
