@@ -6,7 +6,7 @@ import { TranslationTypes } from './translationtype.schema';
 
 @Schema()
 export class Destinations {
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, index: true, unique: true })
   code: string;
 
   @Prop({ type: String, required: true, index: true })

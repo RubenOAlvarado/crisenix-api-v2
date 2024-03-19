@@ -18,7 +18,7 @@ export class Tours {
   })
   destination: Destinations;
 
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, required: true, index: true, unique: true })
   code: string;
 
   @Prop({

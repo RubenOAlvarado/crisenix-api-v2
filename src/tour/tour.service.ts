@@ -84,11 +84,15 @@ export class TourService {
         registry: newTour,
       });
       return newTour;
-    } catch (error) {
-      this.logger.error(`Error creating tour: ${error}`);
-      throw new InternalServerErrorException(
-        'Something went wrong while creating tour.',
-      );
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Tour code already exists.');
+      } else {
+        this.logger.error(`Error creating tour: ${error}`);
+        throw new InternalServerErrorException(
+          'Something went wrong while creating tour.',
+        );
+      }
     }
   }
 
@@ -110,7 +114,6 @@ export class TourService {
           'included',
           'itinerary',
           'price',
-          'departure',
         ])
         .populate({
           path: 'aboardHour.aboardPoint',
@@ -119,6 +122,15 @@ export class TourService {
         .populate({
           path: 'returnHour.aboardPoint',
           model: 'AboardPoints',
+        })
+        .populate({
+          path: 'departure',
+          options: {
+            sort: {
+              date: 1,
+              hour: 1,
+            },
+          },
         })
         .exec();
       if (docs.length === 0)

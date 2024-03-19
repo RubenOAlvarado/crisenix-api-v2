@@ -9,7 +9,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Visa } from 'src/shared/enums/visa.enum';
+import { Visa } from '@/shared/enums/visa.enum';
 
 export class CreateDestinationDTO {
   @ApiProperty({

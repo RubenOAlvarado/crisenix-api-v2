@@ -49,18 +49,21 @@ export class DestinationService {
     createDestinationDTO: CreateDestinationDTO,
   ): Promise<DestinationLean> {
     try {
-      this.logger.debug('creating destination');
       const destination = await new this.destinationModel(
         createDestinationDTO,
       ).save();
       return destination.toObject();
-    } catch (error) {
-      this.logger.error(
-        `Something went wrong while creating destination: ${error}`,
-      );
-      throw new InternalServerErrorException(
-        'Something went wrong while creating destination.',
-      );
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Destination code already exists.');
+      } else {
+        this.logger.error(
+          `Something went wrong while creating destination: ${error}`,
+        );
+        throw new InternalServerErrorException(
+          'Something went wrong while creating destination.',
+        );
+      }
     }
   }
 
@@ -405,6 +408,16 @@ export class DestinationService {
     } catch (error) {
       this.logger.error(`Error validating destination: ${error}`);
       throw handleErrorsOnServices('Error validating destination.', error);
+    }
+  }
+
+  async isCodeRegistered(code: string): Promise<boolean> {
+    try {
+      const destination = await this.destinationModel.findOne({ code });
+      return !!destination;
+    } catch (error) {
+      this.logger.error(`Error validating destination code: ${error}`);
+      throw handleErrorsOnServices('Error validating destination code.', error);
     }
   }
 }

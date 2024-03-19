@@ -54,6 +54,7 @@ export class DestinationController {
     description: 'Something went wrong creating the destination.',
   })
   @ApiBody({ type: CreateDestinationDTO })
+  @Public()
   @Post('/create')
   async create(
     @Body() createDestinationDTO: CreateDestinationDTO,
