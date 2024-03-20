@@ -24,7 +24,7 @@ import { CreateDepartureDTO } from '@/shared/models/dtos/departure/createdepartu
 import { ResponseDepartureDTO } from '@/shared/models/dtos/departure/responsedeparture.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { PaginateResult } from '../../dist/src/shared/interfaces/paginate.interface';
+import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { UpdateDepartureDTO } from '@/shared/models/dtos/departure/updatedeparture.dto';
