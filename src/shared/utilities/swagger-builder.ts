@@ -23,6 +23,7 @@ import { PriceModule } from '@/price/price.module';
 import { DestinationModule } from '@/destination/destination.module';
 import { IncludedModule } from '@/included/included.module';
 import { ItineraryModule } from '@/itinerary/itinerary.module';
+import { DepartureModule } from '@/departure/departure.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -58,6 +59,7 @@ export const buildSwaggerModule = async (
       DestinationModule,
       IncludedModule,
       ItineraryModule,
+      DepartureModule,
     ],
   });
 
