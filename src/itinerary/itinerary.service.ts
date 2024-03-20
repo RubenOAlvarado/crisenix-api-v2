@@ -16,6 +16,7 @@ import { CreateItineraryDTO } from '@/shared/models/dtos/itinerary/createitinera
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { UpdateItineraryDTO } from '@/shared/models/dtos/itinerary/updateitinerary.dto';
+import { Status } from '@/shared/enums/status.enum';
 
 @Injectable()
 export class ItineraryService {
@@ -115,7 +116,7 @@ export class ItineraryService {
   async delete({ id }: UrlValidator): Promise<void> {
     try {
       const itinerary = await this.itinerariesModel
-        .findByIdAndDelete(id)
+        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
         .exec();
       if (!itinerary) throw new NotFoundException('Itinerary not found.');
     } catch (error) {
@@ -133,7 +134,7 @@ export class ItineraryService {
   async reactivate({ id }: UrlValidator): Promise<Itineraries> {
     try {
       const itinerary = await this.itinerariesModel
-        .findByIdAndUpdate(id, { status: 'active' }, { new: true })
+        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
         .exec();
       if (!itinerary) throw new NotFoundException('Itinerary not found.');
       return itinerary;

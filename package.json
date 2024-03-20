@@ -1,6 +1,6 @@
 {
   "name": "crisenix-api-v2",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Second version of crisenix API",
   "author": "Ruben O. Alvarado",
   "private": true,

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Put,
@@ -74,7 +75,8 @@ export class ItineraryController {
     description: 'Itinerary not found.',
   })
   @Get(':id')
-  async getItineraryById(@Query() param: UrlValidator) {
+  @Public()
+  async getItineraryById(@Param() param: UrlValidator) {
     return await this.itineraryService.findById(param);
   }
 
@@ -92,7 +94,7 @@ export class ItineraryController {
   @ApiBody({ type: UpdateItineraryDTO })
   async updateItinerary(
     @Body() body: UpdateItineraryDTO,
-    @Query() param: UrlValidator,
+    @Param() param: UrlValidator,
   ) {
     return await this.itineraryService.update(body, param);
   }
@@ -107,7 +109,7 @@ export class ItineraryController {
     description: 'Itinerary not found.',
   })
   @Delete(':id')
-  async deleteItinerary(@Query() param: UrlValidator) {
+  async deleteItinerary(@Param() param: UrlValidator) {
     return await this.itineraryService.delete(param);
   }
 
@@ -121,7 +123,7 @@ export class ItineraryController {
     description: 'Itinerary not found.',
   })
   @Patch(':id/reactivate')
-  async reactivateItinerary(@Query() param: UrlValidator) {
+  async reactivateItinerary(@Param() param: UrlValidator) {
     return await this.itineraryService.reactivate(param);
   }
 }
