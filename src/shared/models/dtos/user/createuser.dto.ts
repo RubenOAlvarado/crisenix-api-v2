@@ -1,6 +1,6 @@
 import {
-  IsBoolean,
   IsDateString,
+  IsEnum,
   IsMobilePhone,
   IsMongoId,
   IsNotEmpty,
@@ -12,62 +12,85 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateUserDTO {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Firebase uid of the user (if not sended, it will be created)',
+    example: '1234567890',
+    type: String,
+  })
   @IsOptional()
   @IsString()
   firebaseUid?: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsBoolean()
-  fbregistered: boolean;
-
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Name of the user',
+    example: 'John',
+    type: String,
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Doe',
+    type: String,
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
   lastName: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Second last name of the user (mexican clients)',
+    example: 'Smith',
+    type: String,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(150)
   secondLast?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'User phone number',
+    example: '1234567890',
+    type: String,
+  })
   @IsOptional()
   @IsMobilePhone()
   phone?: string;
 
-  @ApiPropertyOptional({ enum: Status })
+  @ApiPropertyOptional({
+    enum: Status,
+    description: 'User status',
+    example: Status.ACTIVE,
+    type: String,
+  })
   @IsOptional()
+  @IsEnum(Status)
   status?: Status;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description:
+      'User inactivation date (soft delete) but it delete his firebase account',
+    example: '2021-12-31T23:59:59.999Z',
+  })
   @IsOptional()
   @IsDateString()
   deletedAt?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'User role id',
+    example: '1234567890',
+    type: String,
+  })
   @IsOptional()
   @IsMongoId()
   role?: string;
 
-  constructor(
-    name: string,
-    lastName: string,
-    fbregistered: boolean,
-    firebaseUid?: string,
-  ) {
+  constructor(name: string, lastName: string, firebaseUid?: string) {
     this.firebaseUid = firebaseUid;
     this.name = name;
     this.lastName = lastName;
-    this.fbregistered = fbregistered;
   }
 }

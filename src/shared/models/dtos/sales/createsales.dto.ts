@@ -6,13 +6,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUrl,
   MaxLength,
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SalesStatus } from '../../../enums/sales/salesstatus.enum';
-import { SaleOrigin } from '../../../enums/sales/saleorigin.enum';
 
 export class CreateSaleDTO {
   @ApiProperty({
@@ -31,15 +29,6 @@ export class CreateSaleDTO {
   @IsOptional()
   @IsString()
   status?: SalesStatus;
-
-  @ApiProperty({
-    enum: SaleOrigin,
-    example: SaleOrigin.WEB,
-    description: 'Sale origin platform',
-  })
-  @IsNotEmpty()
-  @IsString()
-  origin: SaleOrigin;
 
   @ApiProperty({
     example: 'Juan',
@@ -77,14 +66,6 @@ export class CreateSaleDTO {
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({
-    description: 'Client oficial id photo url',
-    example: 'https://www.test.com/test.jpg',
-  })
-  @IsOptional()
-  @IsUrl()
-  oficialId?: string;
-
   @ApiProperty({
     description: 'Reserved seats by client',
     example: 1,
@@ -103,14 +84,6 @@ export class CreateSaleDTO {
   reservationDate: Date;
 
   @ApiPropertyOptional({
-    description: 'Pay limit date',
-    example: '2020-10-30T00:00:00.000Z',
-  })
-  @IsOptional()
-  @IsDateString()
-  payLimitDate?: Date;
-
-  @ApiPropertyOptional({
     description: 'Total payed mount including all seats',
     example: 100,
   })
@@ -125,14 +98,6 @@ export class CreateSaleDTO {
   @IsNotEmpty()
   @IsDateString()
   payDate?: Date;
-
-  @ApiPropertyOptional({
-    description: 'Saler id',
-    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
-  })
-  @IsOptional()
-  @IsMongoId()
-  saler?: string;
 
   @ApiPropertyOptional({
     description: 'List of passengers ids',
@@ -158,7 +123,6 @@ export class CreateSaleDTO {
     reservedSeat: number,
     reservationDate: Date,
     payDate: Date,
-    origin: SaleOrigin,
   ) {
     this.tour = tour;
     this.clientName = clientName;
@@ -167,6 +131,5 @@ export class CreateSaleDTO {
     this.reservedSeat = reservedSeat;
     this.reservationDate = reservationDate;
     this.payDate = payDate;
-    this.origin = origin;
   }
 }

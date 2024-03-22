@@ -2,8 +2,11 @@ import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import {
   BadRequestException,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+
+const logger = new Logger();
 
 export function createPaginatedObject<T>(
   docs: T[],
@@ -22,7 +25,11 @@ export function createPaginatedObject<T>(
 }
 
 export function handleErrorsOnServices(message: string, error: any) {
-  if (
+  logger.error(`${message}: ${error}`);
+
+  if (typeof error.code === 'string' && error.code.includes('auth/')) {
+    throw new BadRequestException(error.message);
+  } else if (
     error instanceof BadRequestException ||
     error instanceof NotFoundException
   ) {

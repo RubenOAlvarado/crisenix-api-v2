@@ -18,6 +18,9 @@ export class ResponseWebUserDTO {
   disabled?: boolean;
 
   @ApiProperty()
+  email?: string;
+
+  @ApiProperty()
   firebaseUid: string;
 
   @ApiProperty()
@@ -47,6 +50,7 @@ export class ResponseWebUserDTO {
     secondLast?: string,
     phone?: string,
     displayName?: string,
+    email?: string,
   ) {
     this.displayName = displayName;
     this.firebaseUid = firebaseUid;
@@ -59,5 +63,6 @@ export class ResponseWebUserDTO {
     this.disabled = disabled;
     this.secondLast = secondLast;
     this.phone = phone;
+    this.email = email;
   }
 }

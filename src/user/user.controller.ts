@@ -22,7 +22,6 @@ import {
 import { UserService } from './user.service';
 import { UpdateUserDTO } from 'src/shared/models/dtos/user/updateuser.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { CreateUserDTO } from 'src/shared/models/dtos/user/createuser.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { User } from '@/shared/models/schemas/user.schema';
@@ -39,7 +38,7 @@ export class UserController {
 
   @ApiCreatedResponse({
     description: 'The user has been successfully created.',
-    type: WebUserDTO,
+    type: ResponseWebUserDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the user.',
@@ -50,21 +49,22 @@ export class UserController {
   @Post('create')
   @ApiBody({
     description: 'User object',
-    type: CreateUserDTO,
+    type: WebUserDTO,
   })
+  @Public()
   async createWebUser(@Body() webUserDTO: WebUserDTO) {
     return await this.userService.createWebUser(webUserDTO, 'develop');
   }
 
-  @ApiPaginatedResponse(CreateUserDTO)
+  @ApiPaginatedResponse(ResponseWebUserDTO)
   @ApiNotFoundResponse({
     description: 'No users found!',
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the users profiles.',
   })
-  @Public()
   @Get('all')
+  @Public()
   async getUsers(@Query() query: PaginationDTO) {
     return await this.userService.getDbUsers(query);
   }
@@ -83,6 +83,7 @@ export class UserController {
     description: 'User object',
     type: UpdateWebUserDTO,
   })
+  @Public()
   async updateWebUser(
     @Param() params: UrlValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
@@ -93,6 +94,7 @@ export class UserController {
 
   @ApiOkResponse({
     description: 'The user has been successfully deleted.',
+    type: String,
   })
   @ApiNotFoundResponse({
     description: 'User not found.',
@@ -101,38 +103,32 @@ export class UserController {
     description: 'Something went wrong deleting the user.',
   })
   @Delete(':id')
+  @Public()
   async deleteWebUser(@Param() params: UrlValidator) {
     await this.userService.deletedWebUser(params, 'develop');
     return 'The user has been successfully deleted.';
   }
 
-  @ApiCreatedResponse({
-    description: 'The user has been successfully created in database.',
-    type: CreateUserDTO,
+  @ApiOkResponse({
+    description: 'The user profile have been succesfully found.',
+    type: ResponseWebUserDTO,
+  })
+  @ApiNotFoundResponse({
+    description: 'No user profile found.',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong creating the user in database.',
+    description: 'Something went wrong finding the user profiles.',
   })
-  @ApiBadRequestResponse({
-    description: 'Sended role not found.',
-  })
-  @Post('profile/create')
-  @ApiBody({
-    description: 'User object',
-    type: CreateUserDTO,
-  })
-  async createDbUser(@Body() createUserDTO: CreateUserDTO) {
-    const newUser = await this.userService.createDbUser(
-      createUserDTO,
-      'develop',
-    );
-
-    return newUser;
+  @Get(':id')
+  @Public()
+  async getProfiles(@Param() params: UrlValidator) {
+    return await this.userService.getWebUser(params);
   }
 
+  // app endpoints
   @ApiOkResponse({
     description: 'The user profile has been found.',
-    type: User,
+    type: ResponseWebUserDTO,
   })
   @ApiNotFoundResponse({
     description: `Profile for user not found.`,
@@ -141,13 +137,14 @@ export class UserController {
     description: 'Something went wrong finding the user profile.',
   })
   @Get('profile/:id')
+  @Public()
   async getUserProfile(@Param() params: UrlValidator) {
     return await this.userService.getDbUserById(params);
   }
 
   @ApiOkResponse({
     description: 'The user profile has been found by his firebase id.',
-    type: User,
+    type: ResponseWebUserDTO,
   })
   @ApiNotFoundResponse({
     description: `Any profile match given firebase id.`,
@@ -169,33 +166,16 @@ export class UserController {
     description: 'No user profile found.',
   })
   @Patch('profile/:id')
+  @ApiBody({
+    description: 'User object',
+    type: UpdateUserDTO,
+  })
+  @Public()
   async updateProfile(
     @Body() updateUserDTO: UpdateUserDTO,
     @Param() params: UrlValidator,
   ) {
     await this.userService.updateDbUser(params, updateUserDTO, 'develop');
-    return 'The user profiles have been succesfully updated.';
-  }
-
-  @ApiOkResponse({
-    description: 'The user profiles have been succesfully updated.',
-  })
-  @ApiNotFoundResponse({
-    description: 'No user profile found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong updating the user profile.',
-  })
-  @Patch('replaceProfile/:id')
-  @ApiBody({
-    description: 'User object',
-    type: UpdateUserDTO,
-  })
-  async replaceProfile(
-    @Body() updateUserDTO: UpdateUserDTO,
-    @Param() params: UrlValidator,
-  ) {
-    await this.userService.replaceDbUser(params, updateUserDTO, 'develop');
     return 'The user profiles have been succesfully updated.';
   }
 
@@ -209,24 +189,10 @@ export class UserController {
     description: 'Something went wrong deleting the user profile.',
   })
   @Delete('profile/:id')
+  @Public()
   async deleteProfile(@Param() params: UrlValidator) {
     await this.userService.deleteDbUser(params, 'develop');
     return 'The user profile has been successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'The user profiles have been succesfully found.',
-    type: ResponseWebUserDTO,
-  })
-  @ApiNotFoundResponse({
-    description: 'No user profile found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the user profiles.',
-  })
-  @Get('profiles/:id')
-  async getProfiles(@Param() params: UrlValidator) {
-    return await this.userService.getWebUser(params);
   }
 
   /* @Get('test')

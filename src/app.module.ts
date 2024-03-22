@@ -13,8 +13,6 @@ import { OrigincityModule } from './origincity/origincity.module';
 import { PassengerModule } from './passenger/passenger.module';
 import { PriceModule } from './price/price.module';
 import { RolesModule } from './roles/roles.module';
-import { SalerModule } from './saler/saler.module';
-import { SalertypeModule } from './salertype/salertype.module';
 import { TemplatesModule } from './templates/templates.module';
 import { TourtypeModule } from './tourtype/tourtype.module';
 import { TranslationtypeModule } from './translationtype/translationtype.module';
@@ -62,8 +60,6 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     PassengerModule,
     PriceModule,
     RolesModule,
-    SalerModule,
-    SalertypeModule,
     TemplatesModule,
     TourtypeModule,
     TranslationtypeModule,

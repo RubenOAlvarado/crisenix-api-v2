@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Salers } from './saler.schema';
 import { Passengers } from './passenger.schema';
 import type { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { User } from './user.schema';
@@ -19,9 +18,6 @@ export class Sales {
   })
   status: string;
 
-  @Prop({ enum: ['Web', 'App'], required: true })
-  origin: string;
-
   @Prop({ required: true })
   clientName: string;
 
@@ -34,9 +30,6 @@ export class Sales {
   @Prop()
   email?: string;
 
-  @Prop()
-  oficialId?: string;
-
   @Prop({ required: true })
   reservedSeat: number;
 
@@ -44,16 +37,10 @@ export class Sales {
   reservationDate: Date;
 
   @Prop()
-  payLimitDate?: Date;
-
-  @Prop()
   totalPayedMount?: number;
 
   @Prop()
   payDate?: Date;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Salers' })
-  saler?: Salers;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
   passenger?: Array<Passengers>;
@@ -65,7 +52,6 @@ export class Sales {
     tour: TourLean,
     user: User,
     status: string,
-    origin: string,
     clientName: string,
     clientLastName: string,
     reservedSeat: number,
@@ -74,7 +60,6 @@ export class Sales {
     this.tour = tour;
     this.user = user;
     this.status = status;
-    this.origin = origin;
     this.clientName = clientName;
     this.clientLastName = clientLastName;
     this.reservedSeat = reservedSeat;
