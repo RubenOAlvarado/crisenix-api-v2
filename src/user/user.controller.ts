@@ -24,7 +24,6 @@ import { UpdateUserDTO } from 'src/shared/models/dtos/user/updateuser.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
-import { User } from '@/shared/models/schemas/user.schema';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { Public } from '@/auth/public.decorator';
