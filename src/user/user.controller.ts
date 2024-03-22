@@ -50,7 +50,6 @@ export class UserController {
     description: 'User object',
     type: WebUserDTO,
   })
-  @Public()
   async createWebUser(@Body() webUserDTO: WebUserDTO) {
     return await this.userService.createWebUser(webUserDTO, 'develop');
   }
@@ -63,7 +62,6 @@ export class UserController {
     description: 'Something went wrong finding the users profiles.',
   })
   @Get('all')
-  @Public()
   async getUsers(@Query() query: PaginationDTO) {
     return await this.userService.getDbUsers(query);
   }
@@ -82,7 +80,6 @@ export class UserController {
     description: 'User object',
     type: UpdateWebUserDTO,
   })
-  @Public()
   async updateWebUser(
     @Param() params: UrlValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
@@ -102,7 +99,6 @@ export class UserController {
     description: 'Something went wrong deleting the user.',
   })
   @Delete(':id')
-  @Public()
   async deleteWebUser(@Param() params: UrlValidator) {
     await this.userService.deletedWebUser(params, 'develop');
     return 'The user has been successfully deleted.';
@@ -119,7 +115,6 @@ export class UserController {
     description: 'Something went wrong finding the user profiles.',
   })
   @Get(':id')
-  @Public()
   async getProfiles(@Param() params: UrlValidator) {
     return await this.userService.getWebUser(params);
   }
@@ -136,7 +131,6 @@ export class UserController {
     description: 'Something went wrong finding the user profile.',
   })
   @Get('profile/:id')
-  @Public()
   async getUserProfile(@Param() params: UrlValidator) {
     return await this.userService.getDbUserById(params);
   }
@@ -152,7 +146,6 @@ export class UserController {
     description:
       'Something went wrong finding the user profile by his firebase id.',
   })
-  @Public()
   @Get('profileFb/:id')
   async getUserProfileByFbId(@Param('id') id: string) {
     return await this.userService.getDbUserByFbUid(id);
@@ -169,7 +162,6 @@ export class UserController {
     description: 'User object',
     type: UpdateUserDTO,
   })
-  @Public()
   async updateProfile(
     @Body() updateUserDTO: UpdateUserDTO,
     @Param() params: UrlValidator,
@@ -188,7 +180,6 @@ export class UserController {
     description: 'Something went wrong deleting the user profile.',
   })
   @Delete('profile/:id')
-  @Public()
   async deleteProfile(@Param() params: UrlValidator) {
     await this.userService.deleteDbUser(params, 'develop');
     return 'The user profile has been successfully deleted.';
