@@ -25,8 +25,8 @@ import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { CreateItineraryDTO } from '@/shared/models/dtos/itinerary/createitinerary.dto';
-import { UpdateItineraryDTO } from '@/shared/models/dtos/itinerary/updateitinerary.dto';
+import { CreateIncludedDTO } from '@/shared/models/dtos/included/createincluded.dto';
+import { UpdateIncludedDTO } from '@/shared/models/dtos/included/updateincluded.dto';
 
 @Controller('included')
 @ApiTags('Included')
@@ -41,12 +41,12 @@ export class IncludedController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the included service.',
   })
-  @ApiBody({ type: CreateItineraryDTO })
+  @ApiBody({ type: CreateIncludedDTO })
   @Post('create')
   async create(
-    @Body() createItineraryDTO: CreateItineraryDTO,
+    @Body() createIncludedDTO: CreateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
-    return await this.includedService.create(createItineraryDTO);
+    return await this.includedService.create(createIncludedDTO);
   }
 
   @ApiOkResponse({
@@ -93,7 +93,7 @@ export class IncludedController {
   @Put(':id')
   async update(
     @Param() urlValidator: UrlValidator,
-    @Body() updateItineraryDTO: UpdateItineraryDTO,
+    @Body() updateItineraryDTO: UpdateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
     return await this.includedService.update(urlValidator, updateItineraryDTO);
   }

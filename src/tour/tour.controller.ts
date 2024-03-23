@@ -200,15 +200,16 @@ export class TourController {
     description: 'Tour not found.',
   })
   @ApiBadRequestResponse({
-    description: 'You sent an invalid param or value.',
+    description: 'You sent an invalid catalog name or incorrect values.',
   })
-  @Patch('update-catalog/:catalogName/:id')
+  @Patch('update-catalog/:id')
   @ApiBody({
+    description: 'The catalog name and the new values to be updated.',
     type: UpdateTourCatalogDTO,
   })
   @Public()
   async updateTourCatalog(
-    @Param() param: GetTourCatalogDTO,
+    @Param() param: UrlValidator,
     @Body() body: UpdateTourCatalogDTO,
   ) {
     // TODO: Implement user role validation

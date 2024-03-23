@@ -7,7 +7,7 @@ import { ResponseCoordinatorDto } from './response-coordinator.dto';
 import { ResponseTourTypeDTO } from '../tourType/responseTourType.dto';
 import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
 import { IncludedTransformers } from '../../../utilities/transformers/included.transformer';
-import { ResponseItineraryDTO } from '../itinerary/reponseitinerary.dto';
+import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 

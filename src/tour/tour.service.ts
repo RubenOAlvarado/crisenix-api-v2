@@ -534,8 +534,8 @@ export class TourService {
   }
 
   async updateTourCatalog(
-    { id, catalogName }: GetTourCatalogDTO,
-    { values }: UpdateTourCatalogDTO,
+    { id }: UrlValidator,
+    { catalogName, values }: UpdateTourCatalogDTO,
     user: string,
   ): Promise<TourLean> {
     try {

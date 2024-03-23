@@ -8,10 +8,10 @@ export class ResponseItineraryDTO {
   dayNumber: number;
 
   @ApiProperty({
-    description: 'Activity listed this day',
+    description: 'Clasification of the activity',
     example: 'camping',
   })
-  activity: string;
+  clasification: string;
 
   @ApiPropertyOptional({
     description: 'Activity additional cost (optional)',
@@ -67,9 +67,9 @@ export class ResponseItineraryDTO {
   })
   order: number;
 
-  constructor(dayNumber: number, activity: string, order: number) {
+  constructor(dayNumber: number, clasification: string, order: number) {
     this.dayNumber = dayNumber;
-    this.activity = activity;
+    this.clasification = clasification;
     this.order = order;
   }
 }

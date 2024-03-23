@@ -3,11 +3,10 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
 import { Transports } from './transporst.schema';
 import { AboardPoints } from './aboarpoint.schema';
-import { Departures } from './departure.schema';
 import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
-import { Itineraries } from './itinerary.schema';
+import { Clasifications } from './clasification.schema';
 
 @Schema()
 export class Tours {
@@ -68,8 +67,23 @@ export class Tours {
   @Prop({ type: Array, default: [] })
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Departures' }] })
-  departure?: Array<Departures>;
+  @Prop({ type: Array, default: [] })
+  departure?: Array<{
+    start: {
+      aeroline: string;
+      door: string;
+      gate: string;
+      flightNumber: string;
+      date: Date;
+    };
+    end: {
+      aeroline: string;
+      door: string;
+      gate: string;
+      flightNumber: string;
+      date: Date;
+    };
+  }>;
 
   @Prop({ type: Array })
   coordinator?: Array<{
@@ -97,15 +111,16 @@ export class Tours {
   @Prop({ type: Array })
   itinerary?: Array<{
     dayNumber: number;
-    activity: Itineraries;
+    clasification: Clasifications;
+    name: string;
     additionalCost: number;
     initDate: Date;
     initHour: string;
     finishDate: Date;
     finishHour: string;
-    aeroline: string;
-    flight: string;
-    route: string;
+    aeroline?: string;
+    flight?: string;
+    route?: string;
     order: number;
   }>;
 

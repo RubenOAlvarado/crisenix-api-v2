@@ -3,9 +3,9 @@ import { Entry } from '@/shared/enums/entry.enum';
 import { HotelStatus } from '@/shared/enums/hotelstatus.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
+import { CreateIncludedDTO } from '@/shared/models/dtos/included/createincluded.dto';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
-import { CreateItineraryDTO } from '@/shared/models/dtos/itinerary/createitinerary.dto';
-import { UpdateItineraryDTO } from '@/shared/models/dtos/itinerary/updateitinerary.dto';
+import { UpdateIncludedDTO } from '@/shared/models/dtos/included/updateincluded.dto';
 import { Includeds } from '@/shared/models/schemas/included.schema';
 import {
   createPaginatedObject,
@@ -31,10 +31,10 @@ export class IncludedService {
   private readonly logger = new Logger(IncludedService.name);
 
   async create(
-    createItineraryDTO: CreateItineraryDTO,
+    createIncludedDTO: CreateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
     try {
-      const createdIncluded = new this.includedModel(createItineraryDTO);
+      const createdIncluded = new this.includedModel(createIncludedDTO);
       const savedIncluded = await createdIncluded.save();
       return {
         ...savedIncluded,
@@ -64,9 +64,6 @@ export class IncludedService {
         hotelStatus: included?.hotelStatus as HotelStatus,
       };
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding included service: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong finding included service',
         error,
@@ -102,9 +99,6 @@ export class IncludedService {
         limit,
       );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding included services: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong finding included services',
         error,
@@ -114,7 +108,7 @@ export class IncludedService {
 
   async update(
     { id }: UrlValidator,
-    body: UpdateItineraryDTO,
+    body: UpdateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
     try {
       const included = await this.includedModel
@@ -128,9 +122,6 @@ export class IncludedService {
         hotelStatus: included?.hotelStatus as HotelStatus,
       };
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while updating included service: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong updating included service',
         error,
@@ -151,9 +142,6 @@ export class IncludedService {
         hotelStatus: included?.hotelStatus as HotelStatus,
       };
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while deleting included service: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong deleting included service',
         error,
@@ -168,9 +156,6 @@ export class IncludedService {
         .exec();
       if (!included) throw new NotFoundException('Included service not found.');
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while reactivating included service: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong reactivating included service',
         error,

@@ -1,8 +1,12 @@
 import {
+  ArrayNotEmpty,
   IsDateString,
+  IsDefined,
+  IsEnum,
   IsInt,
   IsMongoId,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -18,6 +22,7 @@ import { CoordinatorDTO } from './coordinator.dto';
 import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
+import { DeparturesDTO } from './departures.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -35,7 +40,7 @@ export class CreateTourDTO {
     example: BoxLunch.NO,
   })
   @IsOptional()
-  @IsString()
+  @IsEnum(BoxLunch)
   boxLunch?: BoxLunch;
 
   @ApiProperty({
@@ -84,9 +89,11 @@ export class CreateTourDTO {
     isArray: true,
   })
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ArrayNotEmpty()
+  @IsDefined()
   @Type(() => AboardHourDTO)
-  aboardHour?: AboardHourDTO[];
+  @ValidateNested({ each: true })
+  aboardHour?: Array<AboardHourDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour days long',
@@ -104,6 +111,7 @@ export class CreateTourDTO {
   })
   @IsOptional()
   @IsInt()
+  @IsPositive()
   nights?: number;
 
   @ApiProperty({
@@ -124,21 +132,26 @@ export class CreateTourDTO {
 
   @ApiPropertyOptional({
     description: 'hour and place of return',
-    type: [AboardHourDTO],
-  })
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => AboardHourDTO)
-  returnHour?: AboardHourDTO[];
-
-  @ApiPropertyOptional({
-    description: 'Tour departure',
-    type: String,
+    type: AboardHourDTO,
     isArray: true,
   })
   @IsOptional()
-  @IsMongoId({ each: true })
-  departure?: Array<string>;
+  @ArrayNotEmpty()
+  @IsDefined()
+  @Type(() => AboardHourDTO)
+  @ValidateNested({ each: true })
+  returnHour?: Array<AboardHourDTO>;
+
+  @ApiPropertyOptional({
+    description: 'Tour departure information',
+    type: DeparturesDTO,
+  })
+  @IsOptional()
+  @IsNotEmptyObject()
+  @IsDefined()
+  @Type(() => DeparturesDTO)
+  @ValidateNested()
+  departure?: DeparturesDTO;
 
   @ApiPropertyOptional({
     description: 'Coordinator/s assigned to the tour',
@@ -146,9 +159,11 @@ export class CreateTourDTO {
     isArray: true,
   })
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ArrayNotEmpty()
+  @IsDefined()
   @Type(() => CoordinatorDTO)
-  coordinator?: CoordinatorDTO[];
+  @ValidateNested({ each: true })
+  coordinator?: Array<CoordinatorDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour front image',
@@ -190,9 +205,11 @@ export class CreateTourDTO {
     isArray: true,
   })
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ArrayNotEmpty()
+  @IsDefined()
   @Type(() => ItineraryDTO)
-  itinerary?: ItineraryDTO[];
+  @ValidateNested({ each: true })
+  itinerary?: Array<ItineraryDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour price',

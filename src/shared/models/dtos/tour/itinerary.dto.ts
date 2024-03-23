@@ -23,12 +23,12 @@ export class ItineraryDTO {
   dayNumber: number;
 
   @ApiProperty({
-    description: 'Activity listed this day',
+    description: 'Activity clasification',
     example: 'camping',
   })
   @IsNotEmpty()
   @IsMongoId()
-  activity: string;
+  clasification: string;
 
   @ApiPropertyOptional({
     description: 'Activity additional cost (optional)',
@@ -104,9 +104,9 @@ export class ItineraryDTO {
   @IsNumber()
   order: number;
 
-  constructor(dayNumber: number, activity: string, order: number) {
+  constructor(dayNumber: number, clasification: string, order: number) {
     this.dayNumber = dayNumber;
-    this.activity = activity;
+    this.clasification = clasification;
     this.order = order;
   }
 }

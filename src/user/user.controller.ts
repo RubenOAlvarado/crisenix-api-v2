@@ -26,7 +26,6 @@ import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto'
 import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { Public } from '@/auth/public.decorator';
 import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
 
 @ApiTags('User')

@@ -6,8 +6,6 @@ import { AboardpointModule } from './aboardpoint/aboardpoint.module';
 import { CaptionsModule } from './captions/captions.module';
 import { CategoryModule } from './category/category.module';
 import { ClasificationModule } from './clasification/clasification.module';
-import { CommissionsModule } from './commissions/commissions.module';
-import { DepartureModule } from './departure/departure.module';
 import { IncludedModule } from './included/included.module';
 import { OrigincityModule } from './origincity/origincity.module';
 import { PassengerModule } from './passenger/passenger.module';
@@ -20,7 +18,6 @@ import { TransportsModule } from './transports/transports.module';
 import { DestinationModule } from './destination/destination.module';
 import { EventlogModule } from './eventlog/eventlog.module';
 import { FilerModule } from './filer/filer.module';
-import { ItineraryModule } from './itinerary/itinerary.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PrivatetourModule } from './privatetour/privatetour.module';
 import { SalesModule } from './sales/sales.module';
@@ -53,8 +50,6 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     CaptionsModule,
     CategoryModule,
     ClasificationModule,
-    CommissionsModule,
-    DepartureModule,
     IncludedModule,
     OrigincityModule,
     PassengerModule,
@@ -67,7 +62,6 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     DestinationModule,
     EventlogModule,
     FilerModule,
-    ItineraryModule,
     MailerModule,
     PrivatetourModule,
     SalesModule,
