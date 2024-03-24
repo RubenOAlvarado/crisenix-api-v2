@@ -20,13 +20,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { IncludedService } from './included.service';
-import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { CreateIncludedDTO } from '@/shared/models/dtos/included/createincluded.dto';
-import { UpdateIncludedDTO } from '@/shared/models/dtos/included/updateincluded.dto';
+import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
+import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
+import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
 
 @Controller('included')
 @ApiTags('Included')
@@ -91,6 +91,7 @@ export class IncludedController {
     description: 'Something went wrong updating the included service.',
   })
   @Put(':id')
+  @ApiBody({ type: UpdateIncludedDTO })
   async update(
     @Param() urlValidator: UrlValidator,
     @Body() updateItineraryDTO: UpdateIncludedDTO,
@@ -100,7 +101,7 @@ export class IncludedController {
 
   @ApiOkResponse({
     description: 'The included service has been deleted.',
-    type: ResponseIncludedDTO,
+    type: String,
   })
   @ApiNotFoundResponse({
     description: 'Included service not found.',
@@ -109,15 +110,14 @@ export class IncludedController {
     description: 'Something went wrong deleting the included service.',
   })
   @Delete(':id')
-  async delete(
-    @Param() urlValidator: UrlValidator,
-  ): Promise<ResponseIncludedDTO> {
-    return await this.includedService.delete(urlValidator);
+  async delete(@Param() urlValidator: UrlValidator): Promise<string> {
+    await this.includedService.delete(urlValidator);
+    return 'Included service deleted successfully.';
   }
 
   @ApiOkResponse({
     description: 'The included service has been reactivated.',
-    type: ResponseIncludedDTO,
+    type: String,
   })
   @ApiNotFoundResponse({
     description: 'Included service not found.',
@@ -126,7 +126,8 @@ export class IncludedController {
     description: 'Something went wrong reactivating the included service.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() urlValidator: UrlValidator): Promise<void> {
-    return await this.includedService.reactivate(urlValidator);
+  async reactivate(@Param() urlValidator: UrlValidator): Promise<string> {
+    await this.includedService.reactivate(urlValidator);
+    return 'Included service reactivated successfully.';
   }
 }

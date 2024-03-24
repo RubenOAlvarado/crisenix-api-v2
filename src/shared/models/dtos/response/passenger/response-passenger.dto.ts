@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ResponseOriginCityDTO } from '../originCity/responseorigincity.dto';
+import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 
 export class ResponsePassengerDTO {

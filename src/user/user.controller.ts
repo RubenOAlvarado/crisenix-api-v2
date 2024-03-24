@@ -20,13 +20,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { UpdateUserDTO } from 'src/shared/models/dtos/user/updateuser.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { UpdateWebUserDTO } from 'src/shared/models/dtos/user/updatewebuser.dto';
-import { WebUserDTO } from 'src/shared/models/dtos/user/createwebuser.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
+import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
+import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
+import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
+import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -83,8 +83,7 @@ export class UserController {
     @Param() params: UrlValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
   ) {
-    await this.userService.updateWebUser(params, updateWebUserDTO, 'develop');
-    return 'The user has been updated succesfully.';
+    return await this.userService.updateWebUser(params, updateWebUserDTO);
   }
 
   @ApiOkResponse({
@@ -165,8 +164,7 @@ export class UserController {
     @Body() updateUserDTO: UpdateUserDTO,
     @Param() params: UrlValidator,
   ) {
-    await this.userService.updateDbUser(params, updateUserDTO, 'develop');
-    return 'The user profiles have been succesfully updated.';
+    return await this.userService.updateDbUser(params, updateUserDTO);
   }
 
   @ApiOkResponse({

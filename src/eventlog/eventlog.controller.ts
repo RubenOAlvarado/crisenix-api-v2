@@ -5,7 +5,7 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EventlogService } from './eventlog.service';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 
@@ -14,14 +14,12 @@ import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 export class EventlogController {
   constructor(private eventLogService: EventlogService) {}
 
-  @ApiResponse({ status: HttpStatus.OK })
+  @ApiOkResponse({
+    description: 'All logs found.',
+  })
   @Get()
   async getEventLog() {
-    const logs = await this.eventLogService.getLogs();
-
-    if (!logs) throw new NotFoundException('No logs registered!');
-
-    return logs;
+    return await this.eventLogService.getLogs();
   }
 
   @ApiResponse({ status: HttpStatus.OK })

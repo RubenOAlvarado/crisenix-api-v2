@@ -1,8 +1,8 @@
-import { ResponseItineraryDTO } from '@/shared/models/dtos/tour/reponseitinerary.dto';
+import { ItineraryDTO } from '@/shared/models/dtos/request/tour/itinerary.dto';
 import { TransformerInterface } from './transformer.interface';
-import { ItineraryDTO } from '@/shared/models/dtos/tour/itinerary.dto';
 import { applyDecorators } from '@nestjs/common';
 import { Transform } from 'class-transformer';
+import { ResponseItineraryDTO } from '@/shared/models/dtos/response/tour/reponseitinerary.dto';
 
 export const itineraryTransformer: TransformerInterface<ItineraryDTO[]> = ({
   value,

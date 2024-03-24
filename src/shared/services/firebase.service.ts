@@ -2,9 +2,9 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DecodedIdToken, UserRecord, getAuth } from 'firebase-admin/auth';
 import { FirebaseError } from 'firebase-admin';
 import { UserRoles } from '../enums/roles';
-import { CreateFbUserDTO } from '../models/dtos/user/createfbuser.dto';
 import { handleErrorsOnServices } from '../utilities/helpers';
-import { UpdateFbUserDTO } from '../models/dtos/user/updatefbuser.dto';
+import { CreateFbUserDTO } from '../models/dtos/request/user/createfbuser.dto';
+import { UpdateFbUserDTO } from '../models/dtos/request/user/updatefbuser.dto';
 
 @Injectable()
 export class FirebaseService {

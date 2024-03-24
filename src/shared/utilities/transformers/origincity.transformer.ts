@@ -1,8 +1,8 @@
-import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { OriginCity } from '@/shared/models/schemas/origincity.schema';
 import { applyDecorators } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { TransformerInterface } from './transformer.interface';
+import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 
 export const originCityTransformer: TransformerInterface<OriginCity[]> = ({
   value,

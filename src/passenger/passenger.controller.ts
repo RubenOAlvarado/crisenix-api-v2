@@ -7,8 +7,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PassengerService } from './passenger.service';
-import { CreatePassengerDTO } from '@/shared/models/dtos/passenger/createpassenger.dto';
-import { ResponsePassengerDTO } from '@/shared/models/dtos/passenger/response-passenger.dto';
+import { ResponsePassengerDTO } from '@/shared/models/dtos/response/passenger/response-passenger.dto';
+import { CreatePassengerDTO } from '@/shared/models/dtos/request/passenger/createpassenger.dto';
 
 @ApiBearerAuth()
 @ApiTags('Passenger')

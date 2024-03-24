@@ -22,10 +22,10 @@ import {
 import { RolesService } from './roles.service';
 import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { CreateRoleDTO } from '@/shared/models/dtos/role/createrole.dto';
-import { UpdateRoleDTO } from '@/shared/models/dtos/role/updaterole.dto';
-import { Roles } from '@/shared/models/schemas/roles.schema';
-import { DescriptionDTO } from '@/shared/models/dtos/role/findByDescription.dto';
+import { ResponseRoleDTO } from '@/shared/models/dtos/response/role/response-role.dto';
+import { CreateRoleDTO } from '@/shared/models/dtos/request/role/createrole.dto';
+import { UpdateRoleDTO } from '@/shared/models/dtos/request/role/updaterole.dto';
+import { DescriptionDTO } from '@/shared/models/dtos/request/role/findByDescription.dto';
 
 @ApiTags('Roles')
 @ApiBearerAuth()
@@ -34,7 +34,7 @@ export class RolesController {
   constructor(private rolesService: RolesService) {}
 
   @ApiCreatedResponse({
-    type: CreateRoleDTO,
+    type: ResponseRoleDTO,
     description: 'Role created successfully.',
   })
   @ApiInternalServerErrorResponse({
@@ -47,7 +47,7 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: CreateRoleDTO,
+    type: ResponseRoleDTO,
     isArray: true,
     description: 'Roles found successfully.',
   })
@@ -61,7 +61,7 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: CreateRoleDTO,
+    type: ResponseRoleDTO,
     description: 'Role found successfully.',
   })
   @ApiNotFoundResponse({ description: 'Role not found.' })
@@ -74,7 +74,7 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: CreateRoleDTO,
+    type: ResponseRoleDTO,
     description: 'Role updated successfully.',
   })
   @ApiNotFoundResponse({ description: 'Role not found.' })
@@ -122,7 +122,7 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: Roles,
+    type: ResponseRoleDTO,
     description: 'Role found successfully.',
   })
   @ApiNotFoundResponse({ description: 'Role not found.' })

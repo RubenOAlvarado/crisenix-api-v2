@@ -9,7 +9,6 @@ import { ClasificationModule } from './clasification/clasification.module';
 import { IncludedModule } from './included/included.module';
 import { OrigincityModule } from './origincity/origincity.module';
 import { PassengerModule } from './passenger/passenger.module';
-import { PriceModule } from './price/price.module';
 import { RolesModule } from './roles/roles.module';
 import { TemplatesModule } from './templates/templates.module';
 import { TourtypeModule } from './tourtype/tourtype.module';
@@ -53,7 +52,6 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     IncludedModule,
     OrigincityModule,
     PassengerModule,
-    PriceModule,
     RolesModule,
     TemplatesModule,
     TourtypeModule,

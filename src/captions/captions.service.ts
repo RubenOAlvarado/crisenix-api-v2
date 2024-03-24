@@ -1,7 +1,5 @@
 import { FilerService } from 'src/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
-import { CreateCaptionDTO } from '@/shared/models/dtos/captions/createcaption.dto';
-import { UpdateCaptionDTO } from '@/shared/models/dtos/captions/updatecaption.dto';
 import {
   CaptionDocument,
   Captions,
@@ -19,6 +17,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CaptionsLean } from '@/shared/interfaces/captions/captions.lean.interface';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
+import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
+import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
 
 @Injectable()
 export class CaptionsService {
@@ -53,7 +53,6 @@ export class CaptionsService {
       if (!captions) throw new NotFoundException('No captions registered');
       return captions;
     } catch (error) {
-      this.logger.error('Something went wrong finding all captions', error);
       throw handleErrorsOnServices(
         'Something went wrong finding all captions',
         error,
@@ -71,7 +70,6 @@ export class CaptionsService {
       if (!caption) throw new NotFoundException(`Caption ${id} not found`);
       return caption;
     } catch (error) {
-      this.logger.error('Something went wrong finding the caption', error);
       throw handleErrorsOnServices(
         'Something went wrong finding the caption',
         error,
@@ -90,7 +88,6 @@ export class CaptionsService {
       if (!caption) throw new NotFoundException(`Caption ${id} not found`);
       return caption;
     } catch (error) {
-      this.logger.error('Something went wrong updating the caption', error);
       throw handleErrorsOnServices(
         'Something went wrong updating the caption',
         error,
@@ -104,7 +101,6 @@ export class CaptionsService {
       const caption = await this.captionModel.findByIdAndDelete(id);
       if (!caption) throw new NotFoundException(`Caption ${id} not found`);
     } catch (error) {
-      this.logger.error('Something went wrong deleting the caption', error);
       throw handleErrorsOnServices(
         'Something went wrong deleting the caption',
         error,
@@ -114,7 +110,6 @@ export class CaptionsService {
 
   async reactivate({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug(`Reactivating caption ${id}`);
       const validCaption = await this.findOne({ id });
       if (!validCaption) throw new NotFoundException('Caption not found');
       if (validCaption.status === Status.ACTIVE)
@@ -125,7 +120,6 @@ export class CaptionsService {
         { new: true },
       );
     } catch (error) {
-      this.logger.error('Something went wrong reactivating the caption', error);
       throw handleErrorsOnServices(
         'Something went wrong reactivating the caption',
         error,
@@ -135,7 +129,6 @@ export class CaptionsService {
 
   async loadFromExcel(file: Express.Multer.File): Promise<void> {
     try {
-      this.logger.debug('Loading captions from excel');
       const jsonObject = this.filer.excelToJson(file.path);
       const captions: CreateCaptionDTO[] = this.mapJsonToDTO(jsonObject);
       await this.captionModel.insertMany(captions);

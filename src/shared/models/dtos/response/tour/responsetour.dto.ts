@@ -6,10 +6,10 @@ import { ResponseTransportsDTO } from '../transports/responsetransports.dto';
 import { ResponseCoordinatorDto } from './response-coordinator.dto';
 import { ResponseTourTypeDTO } from '../tourType/responseTourType.dto';
 import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
-import { IncludedTransformers } from '../../../utilities/transformers/included.transformer';
 import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
+import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
 
 export class ResponseTourDTO {
   @ApiProperty({

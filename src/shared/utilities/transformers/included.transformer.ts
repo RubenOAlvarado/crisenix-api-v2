@@ -1,9 +1,9 @@
 import { Includeds } from '@/shared/models/schemas/included.schema';
 import { TransformerInterface } from './transformer.interface';
-import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
 import { Entry } from '@/shared/enums/entry.enum';
 import { Transform } from 'class-transformer';
 import { applyDecorators } from '@nestjs/common';
+import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 
 export const includedTransformer: TransformerInterface<Includeds[]> = ({
   value,

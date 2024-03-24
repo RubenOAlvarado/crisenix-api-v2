@@ -11,16 +11,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
-import { CreateSaleDTO } from '@/shared/models/dtos/sales/createsales.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { Public } from '@/auth/public.decorator';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
-import { ResponseSalesDTO } from '@/shared/models/dtos/sales/responsesales.dto';
-import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/sales/response-paypal.response.dto';
-import { PaypalResponse } from '@/shared/models/dtos/sales/paypal.response.dto';
 import type { UserRequest } from '@/shared/interfaces/userRequest.interface';
+import { ResponseSalesDTO } from '@/shared/models/dtos/response/sales/responsesales.dto';
+import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dto';
+import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/response/sales/response-paypal.response.dto';
+import { PaypalResponse } from '@/shared/models/dtos/response/sales/paypal.response.dto';
 
 @ApiBearerAuth()
 @ApiTags('Sales')

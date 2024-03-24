@@ -2,12 +2,14 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventLog } from 'src/shared/models/schemas/eventlog.schema';
-import { CreateEventLogDTO } from 'src/shared/models/dtos/eventlog/eventlog.dto';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
+import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
 
 @Injectable()
 export class EventlogService {
@@ -42,67 +44,61 @@ export class EventlogService {
 
   async getLogs(): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Looking for logs');
       const logs = await this.eventLogModel.find().exec();
+      if (!logs) throw new NotFoundException('No logs found.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking for logs: ${e}`);
-      throw new InternalServerErrorException('Error looking for logs');
+      throw handleErrorsOnServices('Error looking for logs', e);
     }
   }
 
   async getLogsByTour(tour: string): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Lookign eventlogs by tour');
       const logs = await this.eventLogModel.find({ tour }).exec();
+      if (!logs) throw new NotFoundException('No logs found for this tour.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking logs by tour: ${e}`);
-      throw new InternalServerErrorException('Error looking logs by tour');
+      throw handleErrorsOnServices('Error looking logs by tour', e);
     }
   }
 
   async getLogsByService(service: string): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Looking logs by service');
       const logs = await this.eventLogModel.find({ service }).exec();
+      if (!logs) throw new NotFoundException('No logs found for this service.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking logs by service: ${e}`);
-      throw new InternalServerErrorException('Error looking logs by service');
+      throw handleErrorsOnServices('Error looking logs by service', e);
     }
   }
 
   async getLogsByMove(move: string): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Looking logs by move');
       const logs = await this.eventLogModel.find({ move }).exec();
+      if (!logs) throw new NotFoundException('No logs found for this move.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking logs by move: ${e}`);
-      throw new InternalServerErrorException('Error looking logs by move');
+      throw handleErrorsOnServices('Error looking logs by move', e);
     }
   }
 
   async getLogsByUser(user: string): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Looking logs by user');
       const logs = await this.eventLogModel.find({ user }).exec();
+      if (!logs) throw new NotFoundException('No logs found for this user.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking logs by user: ${e}`);
-      throw new InternalServerErrorException('Error looking logs by user');
+      throw handleErrorsOnServices('Error looking logs by user', e);
     }
   }
 
   async getLogsByDate(date: Date): Promise<Array<EventLog>> {
     try {
-      this.logger.debug('Looking logs by date');
       const logs = await this.eventLogModel.find({ date }).exec();
+      if (!logs) throw new NotFoundException('No logs found for this date.');
       return logs;
     } catch (e) {
-      this.logger.error(`Error looking logs by date: ${e}`);
-      throw new InternalServerErrorException('Error looking logs by date');
+      throw handleErrorsOnServices('Error looking logs by date', e);
     }
   }
 

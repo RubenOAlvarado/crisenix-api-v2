@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PrivatetourService } from './privatetour.service';
-import { CreatePrivatetourDto } from '@/shared/models/dtos/privatetour/create-privatetour.dto';
+import { CreatePrivatetourDto } from '@/shared/models/dtos/request/privatetour/create-privatetour.dto';
 
 @ApiBearerAuth()
 @ApiTags('Private Tour')

@@ -1,8 +1,6 @@
-import { CreateSaleDTO } from '@/shared/models/dtos/sales/createsales.dto';
 import { Sales, SalesDocument } from '@/shared/models/schemas/sales.schema';
 import {
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
   BadRequestException,
@@ -14,8 +12,6 @@ import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/sales/response-paypal.response.dto';
-import { PaypalResponse } from '@/shared/models/dtos/sales/paypal.response.dto';
 import { State } from '@/shared/enums/sales/state.enum';
 import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
@@ -24,6 +20,9 @@ import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
+import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dto';
+import { PaypalResponse } from '@/shared/models/dtos/response/sales/paypal.response.dto';
+import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/response/sales/response-paypal.response.dto';
 
 @Injectable()
 export class SalesService {
@@ -38,36 +37,28 @@ export class SalesService {
 
   async create(sale: CreateSaleDTO): Promise<SalesDocument> {
     try {
-      this.logger.debug(`creating new sale`);
       const createdSale = new this.salesModel(sale);
       return createdSale.save();
     } catch (error) {
-      this.logger.error(
-        `Something went wrong creating the sale: ${JSON.stringify(error)}`,
-      );
-      throw new InternalServerErrorException(
-        `Something went wrong creating the sale.`,
+      throw handleErrorsOnServices(
+        'Something went wrong creating sale.',
+        error,
       );
     }
   }
 
   async findOne(id: string): Promise<Sales> {
     try {
-      this.logger.debug(`finding sale by id`);
       const sale = await this.salesModel
         .findById(id)
         .populate('tour')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!sale) {
-        this.logger.error(`Sale not found.`);
         throw new NotFoundException(`Sale not found.`);
       }
       return sale;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong finding the sale: ${JSON.stringify(error)}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong finding the sale.',
         error,
@@ -100,7 +91,6 @@ export class SalesService {
       const totalDocs = await this.salesModel.countDocuments({ user: id });
       return createPaginatedObject<Sales>(docs, totalDocs, page, limit);
     } catch (error) {
-      this.logger.error(`Something went wrong finding the sales: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong finding the sales.',
         error,
@@ -165,7 +155,6 @@ export class SalesService {
 
       return {} as ResponseSavedPaypalResponse;
     } catch (error) {
-      this.logger.error(`Error saving sale response: ${JSON.stringify(error)}`);
       throw handleErrorsOnServices('Error saving sale response.', error);
     }
   }
@@ -186,9 +175,6 @@ export class SalesService {
 
       return currentSale;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong validating sale: ${JSON.stringify(error)}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong validating sale.',
         error,

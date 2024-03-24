@@ -10,8 +10,8 @@ import { DestinationLean } from '@/shared/interfaces/destination/destination.int
 import { DestinationsExcel } from '@/shared/interfaces/excel/destinations.excel.interface';
 import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
-import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
+import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
+import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { Destinations } from '@/shared/models/schemas/destination.schema';
 import { pipelinesMaker } from '@/shared/utilities/destination-query-maker.helper';
 import {
@@ -54,16 +54,9 @@ export class DestinationService {
       ).save();
       return destination.toObject();
     } catch (error: any) {
-      if (error.code === 11000) {
-        throw new BadRequestException('Destination code already exists.');
-      } else {
-        this.logger.error(
-          `Something went wrong while creating destination: ${error}`,
-        );
-        throw new InternalServerErrorException(
-          'Something went wrong while creating destination.',
-        );
-      }
+      throw new InternalServerErrorException(
+        'Something went wrong while creating destination.',
+      );
     }
   }
 
@@ -97,9 +90,6 @@ export class DestinationService {
         limit,
       );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding destinations: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding destinations.',
         error,
@@ -124,9 +114,6 @@ export class DestinationService {
       if (!destination) throw new NotFoundException('Destination not found.');
       return destination;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding destination: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding destination.',
         error,
@@ -143,9 +130,6 @@ export class DestinationService {
       if (!destination) throw new NotFoundException('Destination not found.');
       return destination;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding destination: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding destination.',
         error,
@@ -166,9 +150,6 @@ export class DestinationService {
       if (!destination) throw new NotFoundException('Destination not found.');
       return destination;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while updating destination: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while updating destination.',
         error,
@@ -185,9 +166,6 @@ export class DestinationService {
       );
       if (!destination) throw new NotFoundException('Destination not found.');
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while deleting destination: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while deleting destination.',
         error,
@@ -204,9 +182,6 @@ export class DestinationService {
       );
       if (!destination) throw new NotFoundException('Destination not found.');
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while reactivating destination: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while reactivating destination.',
         error,
@@ -236,9 +211,6 @@ export class DestinationService {
         queryParams.limit,
       );
     } catch (e) {
-      this.logger.error(
-        `Something went wrong looking destination with ${searcherDTO.word} in ${searcherDTO.field}: ${e}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while looking destination.',
         e,
@@ -251,10 +223,6 @@ export class DestinationService {
     destination,
   }: PhotoValidator): Promise<void> {
     try {
-      this.logger.debug(
-        `Deleting photo from destination with id: ${destination}`,
-      );
-
       const destinationToUpdate = await this.destinationModel.findById(
         destination,
       );
@@ -264,7 +232,7 @@ export class DestinationService {
       }
 
       if (destinationToUpdate.status !== Status.ACTIVE) {
-        throw new BadRequestException('Destination must be in Active status.');
+        throw new BadRequestException('Destination must be in active status.');
       }
 
       const { photos } = destinationToUpdate;
@@ -285,16 +253,12 @@ export class DestinationService {
 
       this.logger.debug('Photo successfully deleted.');
     } catch (error) {
-      const errorMessage = `Error deleting destination photos: ${error}`;
-      this.logger.error(errorMessage);
       throw handleErrorsOnServices('Error deleting destination photos.', error);
     }
   }
 
   async findCities({ id }: UrlValidator): Promise<OriginCityLean> {
     try {
-      this.logger.debug(`Finding cities from destination with id: ${id}`);
-
       const destination = await this.destinationModel
         .findById(id)
         .populate({
@@ -318,14 +282,12 @@ export class DestinationService {
 
       return originCity as unknown as OriginCityLean;
     } catch (error) {
-      this.logger.error(`Error finding destination cities: ${error}`);
       throw handleErrorsOnServices('Error finding destination cities.', error);
     }
   }
 
   async loadCatalog(filePath: string): Promise<void> {
     try {
-      this.logger.debug('loading destinations from excel file.');
       const jsonObject: DestinationsExcel[] =
         this.filerService.excelToJson(filePath);
       if (!jsonObject.length) throw new BadRequestException('Empty file.');
@@ -406,18 +368,7 @@ export class DestinationService {
 
       return true;
     } catch (error) {
-      this.logger.error(`Error validating destination: ${error}`);
       throw handleErrorsOnServices('Error validating destination.', error);
-    }
-  }
-
-  async isCodeRegistered(code: string): Promise<boolean> {
-    try {
-      const destination = await this.destinationModel.findOne({ code });
-      return !!destination;
-    } catch (error) {
-      this.logger.error(`Error validating destination code: ${error}`);
-      throw handleErrorsOnServices('Error validating destination code.', error);
     }
   }
 }

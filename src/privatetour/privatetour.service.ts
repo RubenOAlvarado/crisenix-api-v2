@@ -1,10 +1,7 @@
-import { CreatePrivatetourDto } from '@/shared/models/dtos/privatetour/create-privatetour.dto';
+import { CreatePrivatetourDto } from '@/shared/models/dtos/request/privatetour/create-privatetour.dto';
 import { PrivateTours } from '@/shared/models/schemas/privatetour.schema';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -15,13 +12,12 @@ export class PrivatetourService {
     private readonly privateTourModel: Model<PrivateTours>,
   ) {}
 
-  private readonly logger = new Logger(PrivatetourService.name);
+  // private readonly logger = new Logger(PrivatetourService.name);
 
   async create(
     createPrivateTourDto: CreatePrivatetourDto,
   ): Promise<CreatePrivatetourDto> {
     try {
-      this.logger.debug(`Creating new private tour`);
       const createdPrivateTour = new this.privateTourModel(
         createPrivateTourDto,
       );
@@ -31,11 +27,9 @@ export class PrivatetourService {
       };
       return responseDTO;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong creating the passenger: ${JSON.stringify(error)}`,
-      );
-      throw new InternalServerErrorException(
-        `Something went wrong creating the passenger.`,
+      throw handleErrorsOnServices(
+        'Something went wrong creating the private tour.',
+        error,
       );
     }
   }

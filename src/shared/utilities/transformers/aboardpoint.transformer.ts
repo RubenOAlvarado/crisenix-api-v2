@@ -1,8 +1,8 @@
 import { AboardPoints } from '@/shared/models/schemas/aboarpoint.schema';
 import { TransformerInterface } from './transformer.interface';
-import { ResponseAboardPointDTO } from '@/shared/models/dtos/aboardpoint/responseaboardpoint.dto';
 import { applyDecorators } from '@nestjs/common';
 import { Transform } from 'class-transformer';
+import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 
 export const aboardPointsTransformer: TransformerInterface<AboardPoints[]> = ({
   value,

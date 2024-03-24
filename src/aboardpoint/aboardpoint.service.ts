@@ -1,6 +1,6 @@
 import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
-import { CreateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/createaboardpoint.dto';
-import { UpdateAboardPointDTO } from '@/shared/models/dtos/aboardpoint/updateaboardpoint.dto';
+import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
+import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   Injectable,

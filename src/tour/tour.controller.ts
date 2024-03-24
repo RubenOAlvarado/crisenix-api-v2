@@ -20,18 +20,18 @@ import {
 } from '@nestjs/swagger';
 import { TourService } from './tour.service';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { ResponseTourDTO } from '@/shared/models/dtos/tour/responsetour.dto';
 import { Public } from '@/auth/public.decorator';
-import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
-import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
-import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
-import { UpdateTourCatalogDTO } from '@/shared/models/dtos/tour/updateTourCatalog.dto';
+import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
+import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
+import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
+import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
+import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -80,7 +80,6 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'Destination state must be active.',
   })
-  @Public()
   @Get('last/:destination')
   async getLastTour(@Param() param: DestinationValidator) {
     return await this.tourService.getLastRegisteredTour(param);
@@ -133,7 +132,7 @@ export class TourController {
   @ApiBody({ type: UpdateTourDTO })
   @Put(':id')
   async updateTour(@Param() param: UrlValidator, @Body() tour: UpdateTourDTO) {
-    return await this.tourService.updateTour(param, tour, 'dev');
+    return await this.tourService.updateTour(param, tour);
   }
 
   @ApiOkResponse({

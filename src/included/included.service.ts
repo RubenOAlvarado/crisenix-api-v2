@@ -3,9 +3,9 @@ import { Entry } from '@/shared/enums/entry.enum';
 import { HotelStatus } from '@/shared/enums/hotelstatus.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { CreateIncludedDTO } from '@/shared/models/dtos/included/createincluded.dto';
-import { ResponseIncludedDTO } from '@/shared/models/dtos/included/responseIncluded.dto';
-import { UpdateIncludedDTO } from '@/shared/models/dtos/included/updateincluded.dto';
+import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
+import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
+import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 import { Includeds } from '@/shared/models/schemas/included.schema';
 import {
   createPaginatedObject,
@@ -129,18 +129,13 @@ export class IncludedService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<ResponseIncludedDTO> {
+  async delete({ id }: UrlValidator): Promise<void> {
     try {
       const included = await this.includedModel
         .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!included) throw new NotFoundException('Included service not found.');
-      return {
-        ...included,
-        entry: included?.entry as Entry,
-        hotelStatus: included?.hotelStatus as HotelStatus,
-      };
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong deleting included service',

@@ -18,7 +18,6 @@ import { TourModule } from '@/tour/tour.module';
 import { PrivatetourModule } from '@/privatetour/privatetour.module';
 import { PassengerModule } from '@/passenger/passenger.module';
 import { SalesModule } from '@/sales/sales.module';
-import { PriceModule } from '@/price/price.module';
 import { DestinationModule } from '@/destination/destination.module';
 import { IncludedModule } from '@/included/included.module';
 
@@ -51,7 +50,6 @@ export const buildSwaggerModule = async (
       PrivatetourModule,
       PassengerModule,
       SalesModule,
-      PriceModule,
       DestinationModule,
       IncludedModule,
     ],

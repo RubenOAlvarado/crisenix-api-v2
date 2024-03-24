@@ -23,21 +23,21 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
-import { CreateOriginCityDTO } from 'src/shared/models/dtos/originCity/createorigincity.dto';
 import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
-import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateorigincity.dto';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
-import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 import { Public } from '@/auth/public.decorator';
-import { AddAboardPointsDTO } from '@/shared/models/dtos/originCity/add-aboard-points.dto';
+import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
+import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
+import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
+import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
 
 @ApiBearerAuth()
 @Controller('origincity')
@@ -60,7 +60,7 @@ export class OriginCityController {
   })
   async create(
     @Body() createOriginCityDTO: CreateOriginCityDTO,
-  ): Promise<OriginCity> {
+  ): Promise<ResponseOriginCityDTO> {
     return await this.originCityService.create(createOriginCityDTO);
   }
 
@@ -75,6 +75,7 @@ export class OriginCityController {
     description: 'Something went wrong finding the origin city.',
   })
   @Get(':id')
+  @Public()
   async findOne(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseOriginCityDTO> {

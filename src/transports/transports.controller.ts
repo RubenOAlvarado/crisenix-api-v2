@@ -8,7 +8,7 @@ import {
 import { TransportsService } from './transports.service';
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { CreateTransportsDTO } from '@/shared/models/dtos/transports/createtransports.dto';
+import { CreateTransportsDTO } from '@/shared/models/dtos/request/transports/createtransports.dto';
 
 @ApiTags('Transports')
 @Controller('transports')

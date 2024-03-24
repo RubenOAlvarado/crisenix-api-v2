@@ -1,5 +1,4 @@
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
-import { ResponseDestinationDTO } from '@/shared/models/dtos/destination/responsedestination.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   Controller,
@@ -28,17 +27,18 @@ import {
 import { DestinationService } from './destination.service';
 import { Public } from '@/auth/public.decorator';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
-import { CreateDestinationDTO } from '@/shared/models/dtos/destination/createdestination.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { UpdateDestinationDTO } from '@/shared/models/dtos/destination/updatedestination.dto';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
-import { ResponseOriginCityDTO } from '@/shared/models/dtos/originCity/responseorigincity.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
+import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
+import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
+import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -54,7 +54,6 @@ export class DestinationController {
     description: 'Something went wrong creating the destination.',
   })
   @ApiBody({ type: CreateDestinationDTO })
-  @Public()
   @Post('/create')
   async create(
     @Body() createDestinationDTO: CreateDestinationDTO,
@@ -88,6 +87,7 @@ export class DestinationController {
     description: 'Something went wrong finding the destination.',
   })
   @Get(':id')
+  @Public()
   async findOne(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseDestinationDTO> {

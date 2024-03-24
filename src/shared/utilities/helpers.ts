@@ -29,6 +29,8 @@ export function handleErrorsOnServices(message: string, error: any) {
 
   if (typeof error.code === 'string' && error.code.includes('auth/')) {
     throw new BadRequestException(error.message);
+  } else if (error.code === 11000) {
+    throw new BadRequestException('Duplicate code.');
   } else if (
     error instanceof BadRequestException ||
     error instanceof NotFoundException

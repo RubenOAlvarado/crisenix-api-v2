@@ -23,6 +23,7 @@ import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
 import { DeparturesDTO } from './departures.dto';
+import { CreatePriceDTO } from '../price/createprice.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -213,12 +214,15 @@ export class CreateTourDTO {
 
   @ApiPropertyOptional({
     description: 'Tour price',
-    type: String,
+    type: CreatePriceDTO,
     isArray: true,
   })
   @IsOptional()
-  @IsMongoId({ each: true })
-  price?: Array<string>;
+  @ArrayNotEmpty()
+  @IsDefined()
+  @Type(() => CreatePriceDTO)
+  @ValidateNested({ each: true })
+  price?: Array<CreatePriceDTO>;
 
   constructor(
     destination: string,

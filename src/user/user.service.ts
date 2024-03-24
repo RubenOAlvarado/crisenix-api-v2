@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,19 +8,12 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { EventlogService } from '../eventlog/eventlog.service';
 import { User } from '@/shared/models/schemas/user.schema';
-import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
-import { CreateUserDTO } from '@/shared/models/dtos/user/createuser.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { UpdateUserDTO } from '@/shared/models/dtos/user/updateuser.dto';
-import { WebUserDTO } from '@/shared/models/dtos/user/createwebuser.dto';
-import { UpdateWebUserDTO } from '@/shared/models/dtos/user/updatewebuser.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { RolesService } from '@/roles/roles.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { ResponseWebUserDTO } from '@/shared/models/dtos/user/response-webuser.dto';
-import { ResponseRoleDTO } from '@/shared/models/dtos/role/response-role.dto';
 import { UserLean } from '@/shared/interfaces/user/user.lean.interface';
 import { FirebaseService } from '@/shared/services/firebase.service';
 import { UserRoles } from '@/shared/enums/roles';
@@ -30,8 +22,15 @@ import {
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
 import { UserRecord } from 'firebase-admin/auth';
-import { CreateFbUserDTO } from '@/shared/models/dtos/user/createfbuser.dto';
 import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
+import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
+import { CreateUserDTO } from '@/shared/models/dtos/request/user/createuser.dto';
+import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
+import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.dto';
+import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
+import { ResponseRoleDTO } from '@/shared/models/dtos/response/role/response-role.dto';
+import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
+import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
 
 @Injectable()
 export class UserService {
@@ -63,8 +62,7 @@ export class UserService {
       await this.logService.saveLog(dto);
       this.logger.debug(`${user} ${move} an user`);
     } catch (e) {
-      this.logger.error(`Error saving log: ${e}`);
-      throw new InternalServerErrorException('Error saving log');
+      throw handleErrorsOnServices('Error saving log', e);
     }
   }
 
@@ -86,8 +84,6 @@ export class UserService {
       );
       return dbUser.save();
     } catch (e) {
-      if (createUserDTO?.firebaseUid)
-        this.firebaseService.deleteUser(createUserDTO.firebaseUid);
       throw handleErrorsOnServices(
         'Something went wrong creating the user in database',
         e,
@@ -115,7 +111,6 @@ export class UserService {
 
   async getDbUserById({ id }: UrlValidator): Promise<UserLean> {
     try {
-      this.logger.debug('Looking user profile');
       const profile = await this.userModel
         .findById(id)
         .populate('role', { __v: 0, createdAt: 0 })
@@ -131,7 +126,6 @@ export class UserService {
 
   async getDbUserByFbUid(firebaseUid: string): Promise<UserLean> {
     try {
-      this.logger.debug('Looking user profile by his firebaseid');
       const profile = await this.userModel
         .findOne({ firebaseUid })
         .populate('role', { __v: 0, createdAt: 0 })
@@ -155,7 +149,6 @@ export class UserService {
     limit,
   }: QueryDTO): Promise<PaginateResult<UserLean>> {
     try {
-      this.logger.debug('looking users profiles');
       const docs = await this.userModel
         .find()
         .populate('role', { __v: 0, createdAt: 0 })
@@ -174,7 +167,7 @@ export class UserService {
   async updateDbUser(
     { id }: UrlValidator,
     updateUserDTO: UpdateUserDTO,
-    user: string,
+    user = UserRoles.DEVELOP,
   ): Promise<User> {
     try {
       const dbUpdatedUser = await this.userModel.findByIdAndUpdate(
@@ -284,7 +277,7 @@ export class UserService {
   async updateWebUser(
     param: UrlValidator,
     updateWebUserDTO: UpdateWebUserDTO,
-    managerId: string,
+    managerId = UserRoles.DEVELOP,
   ): Promise<ResponseWebUserDTO> {
     try {
       const updatedDbUser = await this.updateDbUser(

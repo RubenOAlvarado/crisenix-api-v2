@@ -1,8 +1,8 @@
 import { FilerService } from '@/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
 import { CategoryLean } from '@/shared/interfaces/category/category.lean.interface';
-import { CreateCategoryDTO } from '@/shared/models/dtos/category/createcategory.dto';
-import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
+import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
+import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
 import {
   Categories,
   CategoryDocument,
@@ -47,7 +47,6 @@ export class CategoryService {
 
   async findAll(status?: string): Promise<Array<CategoryLean>> {
     try {
-      this.logger.debug(`finding all categories`);
       const query = status ? { status } : {};
       const categories = await this.categoryModel
         .find(query)
@@ -56,9 +55,6 @@ export class CategoryService {
       if (!categories) throw new NotFoundException('No categories registered.');
       return categories;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding all categories: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding all categories',
         error,
@@ -68,14 +64,10 @@ export class CategoryService {
 
   async findOne(id: string): Promise<CategoryLean> {
     try {
-      this.logger.debug(`finding category with id: ${id}`);
       const category = await this.categoryModel.findById(id).lean();
       if (!category) throw new NotFoundException('Category not found.');
       return category;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding category: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding category.',
         error,
@@ -86,18 +78,18 @@ export class CategoryService {
   async update(
     id: string,
     updateCategoryDTO: UpdateCategoryDTO,
-  ): Promise<CategoryLean | null> {
+  ): Promise<CategoryLean> {
     try {
-      this.logger.debug(`updating category with id: ${id}`);
-      const category = await this.findOne(id);
-      if (!category) throw new NotFoundException('Category not found.');
-      return await this.categoryModel.findByIdAndUpdate(id, updateCategoryDTO, {
-        new: true,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Something went wrong while updating category: ${error}`,
+      const updatedCategory = await this.categoryModel.findByIdAndUpdate(
+        id,
+        updateCategoryDTO,
+        {
+          new: true,
+        },
       );
+      if (!updatedCategory) throw new NotFoundException('Category not found.');
+      return updatedCategory;
+    } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while updating category.',
         error,
@@ -107,7 +99,6 @@ export class CategoryService {
 
   async delete(id: string): Promise<void> {
     try {
-      this.logger.debug(`deleting category with id: ${id}`);
       const category = await this.findOne(id);
       if (!category) throw new NotFoundException('Category not found.');
       if (category.status === Status.INACTIVE)
@@ -120,9 +111,6 @@ export class CategoryService {
         },
       );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while deleting category: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while deleting category.',
         error,
@@ -132,7 +120,6 @@ export class CategoryService {
 
   async reactivate(id: string): Promise<void> {
     try {
-      this.logger.debug(`reactivating category with id: ${id}`);
       const category = await this.findOne(id);
       if (!category) throw new NotFoundException('Category not found.');
       if (category.status === Status.ACTIVE)
@@ -145,9 +132,6 @@ export class CategoryService {
         },
       );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while reactivating category: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while reactivating category.',
         error,
@@ -157,7 +141,6 @@ export class CategoryService {
 
   async loadFromExcel(file: Express.Multer.File): Promise<void> {
     try {
-      this.logger.debug(`loading categories from excel`);
       const jsonObject = this.filerService.excelToJson(file.path);
       const categories: CreateCategoryDTO[] =
         this.mapJsonToCategory(jsonObject);
@@ -182,8 +165,6 @@ export class CategoryService {
 
   async mapFromNameToObjectId(names: string[]): Promise<string[] | undefined> {
     try {
-      this.logger.debug(`Mapping from name to object id`);
-
       if (!names.length) {
         return;
       }

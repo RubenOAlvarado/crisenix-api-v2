@@ -16,17 +16,14 @@ import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { OriginCityExcel } from 'src/shared/interfaces/excel/originCity.excel.interface';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
-import { CreateOriginCityDTO } from 'src/shared/models/dtos/originCity/createorigincity.dto';
-import { UpdateOriginCityDTO } from 'src/shared/models/dtos/originCity/updateorigincity.dto';
-import {
-  OriginCity,
-  OriginCityDocument,
-} from 'src/shared/models/schemas/origincity.schema';
+import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
+import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
+import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 
 @Injectable()
 export class OriginCityService {
@@ -41,22 +38,21 @@ export class OriginCityService {
 
   async create(
     createOriginCityDTO: CreateOriginCityDTO,
-  ): Promise<OriginCityDocument> {
+  ): Promise<OriginCityLean> {
     try {
       this.logger.debug(`creating new origin city`);
       const createdOriginCity = new this.originCityModel(createOriginCityDTO);
       return createdOriginCity.save();
     } catch (error) {
-      this.logger.error(
-        `error creating new origin city: ${JSON.stringify(error)}`,
+      throw handleErrorsOnServices(
+        'Something went wrong creating origin city.',
+        error,
       );
-      throw new InternalServerErrorException(`Error creating origin city`);
     }
   }
 
   async findOne({ id }: UrlValidator): Promise<OriginCityLean> {
     try {
-      this.logger.debug(`getting origin city: ${id}`);
       const city = await this.originCityModel
         .findById(id)
         .select({ _id: 0, __v: 0, createdAt: 0 })
@@ -65,7 +61,6 @@ export class OriginCityService {
       if (!city) throw new NotFoundException('Origin city not found.');
       return city;
     } catch (error) {
-      this.logger.error(`error getting origin city: ${JSON.stringify(error)}`);
       throw handleErrorsOnServices(
         'Something went wrong while finding origin city.',
         error,
@@ -79,7 +74,6 @@ export class OriginCityService {
     status,
   }: QueryDTO): Promise<PaginateResult<OriginCityLean>> {
     try {
-      this.logger.debug(`getting all origin cities`);
       const Query = status ? { status } : {};
       const docs = await this.originCityModel
         .find(Query)
@@ -98,9 +92,6 @@ export class OriginCityService {
         limit,
       );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while finding origin cities: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong while finding origin cities.',
         error,
@@ -110,7 +101,6 @@ export class OriginCityService {
 
   private async validateOriginCity(id: string): Promise<boolean> {
     try {
-      this.logger.debug('Validating OriginCity');
       const validOrigin = await this.originCityModel.findById(id).lean();
       if (!validOrigin)
         throw new NotFoundException(`OriginCity ${id} was not found`);
@@ -119,7 +109,6 @@ export class OriginCityService {
 
       return true;
     } catch (e) {
-      this.logger.error(`Something went wrong validating origin city: ${e}`);
       throw handleErrorsOnServices(
         'Something went wrong validating origin city.',
         e,
@@ -144,7 +133,6 @@ export class OriginCityService {
         throw new NotFoundException(`OriginCity ${id} was not found`);
       return updatedOriginCity;
     } catch (error) {
-      this.logger.error(`Something went wrong updating origin city: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong validating origin city.',
         error,
@@ -154,7 +142,6 @@ export class OriginCityService {
 
   async delete({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug('Deleting origin city');
       if (await this.validateOriginCity(id))
         await this.originCityModel.findByIdAndUpdate(
           id,
@@ -162,7 +149,6 @@ export class OriginCityService {
           { new: true },
         );
     } catch (error) {
-      this.logger.error(`Something went wrong deleting origin city: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong validating origin city.',
         error,
@@ -172,7 +158,6 @@ export class OriginCityService {
 
   async reactivate({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug('Reactivating OriginCity');
       if (await this.validateOriginCity(id))
         await this.originCityModel.findByIdAndUpdate(
           id,
@@ -180,9 +165,6 @@ export class OriginCityService {
           { new: true },
         );
     } catch (error) {
-      this.logger.error(
-        `Something went wrong reactivating origin city: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong reactivating origin city.',
         error,
@@ -192,7 +174,6 @@ export class OriginCityService {
 
   async searcher({ word }: SearcherDTO): Promise<Array<OriginCityLean>> {
     try {
-      this.logger.debug(`Searching origin cities: ${word}`);
       const searchResult = await this.originCityModel
         .find({
           $or: [
@@ -207,7 +188,6 @@ export class OriginCityService {
         throw new NotFoundException('Any origin city match your search.');
       return searchResult;
     } catch (error) {
-      this.logger.error(`Error searching origin cities: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong searching origin city.',
         error,
@@ -220,7 +200,6 @@ export class OriginCityService {
     { aboardPoints }: UpdateOriginCityDTO,
   ): Promise<void> {
     try {
-      this.logger.debug(`Adding aboard points to origin city: ${id}`);
       if (await this.validateOriginCity(id))
         await this.originCityModel.findByIdAndUpdate(
           id,
@@ -228,7 +207,6 @@ export class OriginCityService {
           { new: true },
         );
     } catch (error) {
-      this.logger.error(`Error adding aboard points to origin city: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong adding aboard points to origin city.',
         error,
@@ -262,7 +240,6 @@ export class OriginCityService {
 
   async loadFromExcel(filePath: string): Promise<void> {
     try {
-      this.logger.debug(`Loading origin cities from excel`);
       const jsonObject: OriginCityExcel[] =
         this.filerService.excelToJson(filePath);
       const originCitiesDTO = await this.mapToDTO(jsonObject);
@@ -308,9 +285,7 @@ export class OriginCityService {
 
       return mappedCities;
     } catch (error) {
-      const errorMessage = `Error mapping origin cities from destination excel: ${error}`;
-      this.logger.error(errorMessage);
-      throw new InternalServerErrorException(errorMessage);
+      throw handleErrorsOnServices('Error mapping cities from excel', error);
     }
   }
 }

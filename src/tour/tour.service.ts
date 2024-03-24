@@ -10,12 +10,12 @@ import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { User } from '@/shared/interfaces/user/user.interface';
-import { CreateEventLogDTO } from '@/shared/models/dtos/eventlog/eventlog.dto';
-import { CreateTourDTO } from '@/shared/models/dtos/tour/createtour.dto';
-import { GetTourCatalogDTO } from '@/shared/models/dtos/tour/getTourCatalog.dto';
-import { PaginatedTourDTO } from '@/shared/models/dtos/tour/paginatedTour.dto';
-import { UpdateTourCatalogDTO } from '@/shared/models/dtos/tour/updateTourCatalog.dto';
-import { UpdateTourDTO } from '@/shared/models/dtos/tour/updatetour.dto';
+import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
+import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
+import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
+import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
+import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
 import {
   createPaginatedObject,
@@ -30,7 +30,6 @@ import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -65,14 +64,13 @@ export class TourService {
       await this.eventLogService.saveLog(createEventLogDTO);
       this.logger.debug(`${user} ${move} a tour`);
     } catch (error) {
-      this.logger.error(`Error saving log in database: ${error}`);
-      throw error;
+      throw handleErrorsOnServices('Error saving log in database.', error);
     }
   }
 
   async createTour(
     tour: CreateTourDTO,
-    user = UserRoles.ADMIN,
+    user = UserRoles.DEVELOP,
   ): Promise<Tours> {
     try {
       const newTour = new this.tourModel(tour);
@@ -85,14 +83,10 @@ export class TourService {
       });
       return newTour;
     } catch (error: any) {
-      if (error.code === 11000) {
-        throw new BadRequestException('Tour code already exists.');
-      } else {
-        this.logger.error(`Error creating tour: ${error}`);
-        throw new InternalServerErrorException(
-          'Something went wrong while creating tour.',
-        );
-      }
+      throw handleErrorsOnServices(
+        'Something went wrong creating tour.',
+        error,
+      );
     }
   }
 
@@ -139,7 +133,6 @@ export class TourService {
 
       return createPaginatedObject<Tours>(docs, totalDocs, page, limit);
     } catch (error) {
-      this.logger.error(`Something went wrong getting all tours.: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong getting all tours.',
         error,
@@ -193,7 +186,6 @@ export class TourService {
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;
     } catch (error) {
-      this.logger.error(`Something went wrong getting tour by id: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong getting tour by id.',
         error,
@@ -247,9 +239,6 @@ export class TourService {
       }
       return {} as TourLean;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong getting last registered tour: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong getting last registered tour.',
         error,
@@ -260,7 +249,7 @@ export class TourService {
   async updateTour(
     { id }: UrlValidator,
     updateTourDTO: UpdateTourDTO,
-    user: string,
+    user = UserRoles.DEVELOP,
   ) {
     try {
       const updatedTour = await this.tourModel.findByIdAndUpdate(
@@ -279,7 +268,6 @@ export class TourService {
       });
       return updatedTour;
     } catch (error) {
-      this.logger.error(`Something went wrong updating tour: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong updating tour.',
         error,
@@ -317,7 +305,6 @@ export class TourService {
 
       return updatedTour;
     } catch (error) {
-      this.logger.error(`Something went wrong changing tour status: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong changing tour status.',
         error,
@@ -380,7 +367,6 @@ export class TourService {
       if (!tourPOJO) throw new NotFoundException('Tour not found.');
       return tourPOJO;
     } catch (error) {
-      this.logger.error(`Error getting POJO tour by id: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong getting POJO tour by id.',
         error,
@@ -399,7 +385,6 @@ export class TourService {
         throw new BadRequestException('There are not enough seats available.');
       return tour;
     } catch (error) {
-      this.logger.error(`Something went wrong validating saled tour: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong validating saled tour.',
         error,
@@ -454,7 +439,6 @@ export class TourService {
         registry: updatedTour,
       });
     } catch (error) {
-      this.logger.error(`Error updating seats: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong updating seats.',
         error,
@@ -482,7 +466,6 @@ export class TourService {
 
       return catalogData;
     } catch (error) {
-      this.logger.error(`Error finding tour catalog: ${error}`);
       throw handleErrorsOnServices('Error finding tour catalog.', error);
     }
   }
@@ -503,7 +486,6 @@ export class TourService {
         registry: tour,
       });
     } catch (error) {
-      this.logger.error(`Something went wrong deleting tour: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong deleting tour.',
         error,
@@ -525,7 +507,6 @@ export class TourService {
         );
       return createPaginatedObject<TourLean>(docs, totalDocs, page, limit);
     } catch (error) {
-      this.logger.error(`Error searching tours: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong while searching tours.',
         error,
@@ -558,7 +539,6 @@ export class TourService {
 
       return updatedTour;
     } catch (error) {
-      this.logger.error(`Error updating tour catalog: ${error}`);
       throw handleErrorsOnServices(
         `Something went wrong updating tour catalog ${catalogName}.`,
         error,

@@ -22,15 +22,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CaptionsService } from './captions.service';
-import { ResponseAboardPointDTO } from '@/shared/models/dtos/aboardpoint/responseaboardpoint.dto';
-import { CreateCaptionDTO } from '@/shared/models/dtos/captions/createcaption.dto';
 import { Captions } from '@/shared/models/schemas/captions.schema';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { excelFileFilter } from '@/filer/filer.utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { Public } from '@/auth/public.decorator';
-import { ResponseCaptionsDTO } from '@/shared/models/dtos/captions/responseCaptions.dto';
+import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
+import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
+import { ResponseCaptionsDTO } from '@/shared/models/dtos/response/captions/responseCaptions.dto';
+import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
 
 @ApiTags('Captions')
 @ApiBearerAuth()
@@ -47,7 +48,7 @@ export class CaptionsController {
   })
   @Post('create')
   @ApiBody({
-    description: 'Caption object',
+    description: 'Caption creation object',
     type: CreateCaptionDTO,
   })
   async create(@Body() createCaptionDTO: CreateCaptionDTO): Promise<Captions> {
@@ -94,9 +95,13 @@ export class CaptionsController {
     description: 'Caption not found.',
   })
   @Put(':id')
+  @ApiBody({
+    description: 'Caption update object',
+    type: UpdateCaptionDTO,
+  })
   async update(
     @Param() params: UrlValidator,
-    @Body() updateCaptionDTO: CreateCaptionDTO,
+    @Body() updateCaptionDTO: UpdateCaptionDTO,
   ) {
     return await this.captionService.update(params, updateCaptionDTO);
   }

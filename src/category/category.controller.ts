@@ -23,14 +23,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
-import { CreateCategoryDTO } from '@/shared/models/dtos/category/createcategory.dto';
-import { ResponseCategoryDTO } from '@/shared/models/dtos/category/responsecategory.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { UpdateCategoryDTO } from '@/shared/models/dtos/category/updatecategory.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/filer/filer.utils';
 import { Public } from '@/auth/public.decorator';
+import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
+import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
+import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
 
 @ApiTags('Category')
 @ApiBearerAuth()
