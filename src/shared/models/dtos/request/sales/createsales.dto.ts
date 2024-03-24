@@ -10,7 +10,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SalesStatus } from '../../../enums/sales/salesstatus.enum';
+import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 
 export class CreateSaleDTO {
   @ApiProperty({
