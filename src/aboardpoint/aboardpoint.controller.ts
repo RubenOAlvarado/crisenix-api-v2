@@ -25,6 +25,7 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Aboard Point')
 @ApiBearerAuth()
@@ -44,8 +45,11 @@ export class AboardPointController {
     description: 'Aboard point object',
     type: CreateAboardPointDTO,
   })
-  async create(@Body() createAboardPointDTO: CreateAboardPointDTO) {
-    return await this.service.create(createAboardPointDTO);
+  async create(
+    @Body() createAboardPointDTO: CreateAboardPointDTO,
+  ): Promise<ResponseAboardPointDTO> {
+    const aboardPoint = await this.service.create(createAboardPointDTO);
+    return plainToInstance(ResponseAboardPointDTO, aboardPoint);
   }
 
   @ApiOkResponse({
@@ -59,8 +63,9 @@ export class AboardPointController {
     description: 'No aboard points registered.',
   })
   @Get()
-  async findAll(@Query() query: StatusDTO) {
-    return await this.service.findAll(query);
+  async findAll(@Query() query: StatusDTO): Promise<ResponseAboardPointDTO[]> {
+    const aboardPoints = await this.service.findAll(query);
+    return plainToInstance(ResponseAboardPointDTO, aboardPoints);
   }
 
   @ApiOkResponse({
@@ -75,12 +80,14 @@ export class AboardPointController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() param: UrlValidator) {
-    return await this.service.findOne(param);
+  async findOne(@Param() param: UrlValidator): Promise<ResponseAboardPointDTO> {
+    const aboardPoint = await this.service.findOne(param);
+    return plainToInstance(ResponseAboardPointDTO, aboardPoint);
   }
 
   @ApiOkResponse({
     description: 'The aboard point has been successfully updated.',
+    type: ResponseAboardPointDTO,
   })
   @ApiNotFoundResponse({
     description: 'Aboard point not found.',
@@ -96,12 +103,17 @@ export class AboardPointController {
   async update(
     @Param() param: UrlValidator,
     @Body() updateAboardPointDTO: UpdateAboardPointDTO,
-  ) {
-    return await this.service.update(param, updateAboardPointDTO);
+  ): Promise<ResponseAboardPointDTO> {
+    const updatedaboardpoint = await this.service.update(
+      param,
+      updateAboardPointDTO,
+    );
+    return plainToInstance(ResponseAboardPointDTO, updatedaboardpoint);
   }
 
   @ApiOkResponse({
     description: 'The aboard point has been successfully deleted.',
+    type: String,
   })
   @ApiNotFoundResponse({
     description: 'Aboard point not found.',
@@ -110,12 +122,14 @@ export class AboardPointController {
     description: 'Something went wrong deleting the aboard point.',
   })
   @Delete(':id/delete')
-  async delete(@Param() param: UrlValidator) {
+  async delete(@Param() param: UrlValidator): Promise<string> {
     await this.service.delete(param);
+    return 'The aboard point has been successfully deleted.';
   }
 
   @ApiOkResponse({
     description: 'The aboard point has been successfully reactivated.',
+    type: String,
   })
   @ApiNotFoundResponse({
     description: 'Aboard point not found.',
@@ -124,7 +138,8 @@ export class AboardPointController {
     description: 'Something went wrong reactivating the aboard point.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() param: UrlValidator) {
+  async reactivate(@Param() param: UrlValidator): Promise<string> {
     await this.service.reactivate(param);
+    return 'The aboard point has been successfully reactivated.';
   }
 }

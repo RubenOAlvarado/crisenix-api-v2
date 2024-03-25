@@ -1,74 +1,72 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ResponseCategoryDTO } from '../category/responsecategory.dto';
 import { CategoryTransformers } from '@/shared/utilities/transformers/category.transformer';
 import { OriginCityTransformers } from '@/shared/utilities/transformers/origincity.transformer';
 import { ResponseTranslationTypeDTO } from '../translationType/responseTranslationType.dto';
 import { TranslationTypeTransformers } from '@/shared/utilities/transformers/translationtype.transformer';
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseDestinationDTO {
-  @ApiProperty({
-    type: String,
-    description: 'Destination code',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   code: string;
 
-  @ApiProperty({
-    type: String,
-    description: 'Destination name',
-  })
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiPropertyOptional({
-    type: String,
-    description: 'Destination description',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   description?: string;
 
-  @ApiPropertyOptional({ type: ResponseCategoryDTO, isArray: true })
+  @ApiPropertyOptional({
+    type: ResponseCategoryDTO,
+    isArray: true,
+  })
+  @Expose()
   @CategoryTransformers()
   category?: ResponseCategoryDTO[];
 
-  @ApiPropertyOptional({ type: ResponseOriginCityDTO, isArray: true })
+  @ApiPropertyOptional({
+    type: ResponseOriginCityDTO,
+    isArray: true,
+  })
+  @Expose()
   @OriginCityTransformers()
   originCity?: ResponseOriginCityDTO[];
 
-  @ApiPropertyOptional({
-    description: 'Destination tentative dates',
-    type: String,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   tentativeDates?: string;
 
-  @ApiPropertyOptional({
-    description: 'Destination passport indicator',
-    type: Boolean,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   passport?: boolean;
 
-  @ApiProperty({
-    description: 'Destination visa indicator',
-    type: String,
-  })
+  @ApiProperty()
+  @Expose()
   visa: string;
 
   @ApiPropertyOptional({
     type: ResponseTranslationTypeDTO,
     isArray: true,
   })
+  @Expose()
   @TranslationTypeTransformers()
   translationType?: ResponseTranslationTypeDTO[];
 
-  @ApiPropertyOptional({
-    type: String,
-    description: 'Destination translation route',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   translationRoute?: string;
 
-  @ApiPropertyOptional({
-    type: String,
-    isArray: true,
-    description: 'Destination photos',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   photos?: string[];
 
   constructor(

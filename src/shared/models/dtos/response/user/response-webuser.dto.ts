@@ -1,41 +1,60 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 import { ResponseRoleDTO } from '../role/response-role.dto';
+import { Expose, Type } from 'class-transformer';
+import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 
 export class ResponseWebUserDTO {
   @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiPropertyOptional()
+  @Expose()
   emailVerified?: boolean;
 
   @ApiPropertyOptional()
+  @Expose()
   phoneNumber?: string;
 
   @ApiPropertyOptional()
+  @Expose()
   displayName?: string;
 
   @ApiPropertyOptional()
+  @Expose()
   photoUrl?: string;
 
   @ApiPropertyOptional()
+  @Expose()
   disabled?: boolean;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @Expose()
   email?: string;
 
   @ApiProperty()
+  @Expose()
   firebaseUid: string;
 
   @ApiProperty()
+  @Expose()
   name: string;
 
   @ApiProperty()
+  @Expose()
   lastName: string;
 
   @ApiPropertyOptional()
+  @Expose()
   secondLast?: string;
 
   @ApiPropertyOptional()
+  @Expose()
   phone?: string;
 
   @ApiProperty()
+  @Type(() => ResponseRoleDTO)
+  @Expose()
   role: ResponseRoleDTO;
 
   constructor(

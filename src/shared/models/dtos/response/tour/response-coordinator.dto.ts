@@ -1,22 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class ResponseCoordinatorDto {
-  @ApiProperty({
-    description: 'Transport',
-    example: 'Bus',
-  })
+  @ApiProperty()
+  @Expose()
   transport: string;
 
-  @ApiProperty({
-    description: 'Coordinator name',
-    example: 'Juan Perez',
-  })
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiProperty({
-    description: 'Coordinator phone number',
-    example: '9999999999',
-  })
+  @ApiProperty()
+  @Expose()
   phone: string;
 
   constructor(transport: string, name: string, phone: string) {

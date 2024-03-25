@@ -1,9 +1,11 @@
-import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
-export class ResponseAboardPointDTO {
-  constructor(name: string, status: string) {
+
+export class ResponseClassificationDTO {
+  constructor(name: string, description: string, status: string) {
     this.name = name;
+    this.description = description;
     this.status = status;
   }
 
@@ -14,6 +16,10 @@ export class ResponseAboardPointDTO {
   @ApiProperty()
   @Expose()
   name: string;
+
+  @ApiPropertyOptional()
+  @Expose()
+  description?: string;
 
   @ApiProperty()
   @Expose()

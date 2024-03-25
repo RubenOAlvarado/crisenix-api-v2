@@ -1,80 +1,64 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
+import { Expose, Type } from 'class-transformer';
+import { Types } from 'mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponsePassengerDTO {
-  @ApiProperty({
-    description: 'Passenger id',
-    example: '123',
-  })
-  _id: string;
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
 
-  @ApiProperty({
-    description: 'Passenger room number',
-    example: '123',
-  })
+  @ApiProperty()
+  @Expose()
   room: string;
 
-  @ApiProperty({
-    description: 'Passenger name',
-    example: 'John',
-  })
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiProperty({
-    description: 'Passenger last name',
-    example: 'Doe',
-  })
+  @ApiProperty()
+  @Expose()
   lastName: string;
 
-  @ApiPropertyOptional({
-    description: 'Passenger second last name',
-    example: 'Doe',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   secondLastName?: string;
 
-  @ApiProperty({
-    description: 'Passenger origin city',
-  })
+  @ApiProperty()
+  @Type(() => ResponseOriginCityDTO)
+  @Expose()
   originCity: ResponseOriginCityDTO;
 
-  @ApiProperty({
-    description: 'Passenger aboard point',
-  })
+  @ApiProperty()
+  @Type(() => ResponseAboardPointDTO)
+  @Expose()
   aboardPoint: ResponseAboardPointDTO;
 
-  @ApiProperty({
-    description: 'Payed price by the passenger',
-  })
-  // TODO: create response price dto
-  price: string;
+  @ApiProperty()
+  @Expose()
+  price: number;
 
-  @ApiPropertyOptional({
-    description: 'Passenger passport photo url if required',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   passportPhotoUrl?: string;
 
-  @ApiPropertyOptional({
-    description: 'Passenger visa photo url if required',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   visaPhoto?: string;
 
-  @ApiPropertyOptional({
-    description: 'Passenger seat number if required',
-    example: '1A',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   seat?: string;
 
   constructor(
-    _id: string,
     name: string,
     lastName: string,
     originCity: ResponseOriginCityDTO,
     aboardPoint: ResponseAboardPointDTO,
-    price: string,
+    price: number,
     room: string,
   ) {
-    this._id = _id;
     this.name = name;
     this.lastName = lastName;
     this.originCity = originCity;

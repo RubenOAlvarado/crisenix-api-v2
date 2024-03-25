@@ -31,6 +31,7 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Category')
 @ApiBearerAuth()
@@ -47,8 +48,11 @@ export class CategoryController {
   })
   @Post('create')
   @ApiBody({ description: 'Category object', type: CreateCategoryDTO })
-  async create(@Body() createCategoryDTO: CreateCategoryDTO) {
-    return await this.categoryService.create(createCategoryDTO);
+  async create(
+    @Body() createCategoryDTO: CreateCategoryDTO,
+  ): Promise<ResponseCategoryDTO> {
+    const newCategory = await this.categoryService.create(createCategoryDTO);
+    return plainToInstance(ResponseCategoryDTO, newCategory);
   }
 
   @ApiOkResponse({
@@ -64,8 +68,9 @@ export class CategoryController {
   })
   @Public()
   @Get()
-  async findAll(@Query() { status }: QueryDTO) {
-    return await this.categoryService.findAll(status);
+  async findAll(@Query() { status }: QueryDTO): Promise<ResponseCategoryDTO[]> {
+    const categories = await this.categoryService.findAll(status);
+    return plainToInstance(ResponseCategoryDTO, categories);
   }
 
   @ApiOkResponse({
@@ -79,12 +84,14 @@ export class CategoryController {
     description: 'Category not found.',
   })
   @Get(':id')
-  async findOne(@Param() { id }: UrlValidator) {
-    return await this.categoryService.findOne(id);
+  async findOne(@Param() { id }: UrlValidator): Promise<ResponseCategoryDTO> {
+    const category = await this.categoryService.findOne(id);
+    return plainToInstance(ResponseCategoryDTO, category);
   }
 
   @ApiOkResponse({
     description: 'Category updated successfully.',
+    type: ResponseCategoryDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong updating category.',
@@ -97,12 +104,17 @@ export class CategoryController {
   async update(
     @Param() { id }: UrlValidator,
     @Body() updateCategoryDTO: UpdateCategoryDTO,
-  ) {
-    return await this.categoryService.update(id, updateCategoryDTO);
+  ): Promise<ResponseCategoryDTO> {
+    const updatedCategory = await this.categoryService.update(
+      id,
+      updateCategoryDTO,
+    );
+    return plainToInstance(ResponseCategoryDTO, updatedCategory);
   }
 
   @ApiOkResponse({
-    description: 'Category deleted successfully.',
+    description: 'The category was deleted successfully.',
+    type: String,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting category.',
@@ -114,12 +126,14 @@ export class CategoryController {
     description: 'Category already deleted.',
   })
   @Delete(':id')
-  async delete(@Param() { id }: UrlValidator) {
+  async delete(@Param() { id }: UrlValidator): Promise<string> {
     await this.categoryService.delete(id);
+    return 'The category was deleted successfully.';
   }
 
   @ApiOkResponse({
-    description: 'Category activated successfully.',
+    description: 'The category was reactivated successfully.',
+    type: String,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong activating category.',
@@ -131,8 +145,9 @@ export class CategoryController {
     description: 'Category already active.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: UrlValidator) {
+  async reactivate(@Param() { id }: UrlValidator): Promise<string> {
     await this.categoryService.reactivate(id);
+    return 'The category was reactivated successfully.';
   }
 
   @ApiExcludeEndpoint()

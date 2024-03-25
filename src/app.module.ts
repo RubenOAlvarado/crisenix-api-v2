@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { AboardpointModule } from './aboardpoint/aboardpoint.module';
 import { CaptionsModule } from './captions/captions.module';
 import { CategoryModule } from './category/category.module';
-import { ClasificationModule } from './clasification/clasification.module';
+import { ClassificationModule } from './classification/classification.module';
 import { IncludedModule } from './included/included.module';
 import { OrigincityModule } from './origincity/origincity.module';
 import { PassengerModule } from './passenger/passenger.module';
@@ -48,7 +48,7 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     AboardpointModule,
     CaptionsModule,
     CategoryModule,
-    ClasificationModule,
+    ClassificationModule,
     IncludedModule,
     OrigincityModule,
     PassengerModule,

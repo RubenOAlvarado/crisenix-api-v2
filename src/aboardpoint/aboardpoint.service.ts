@@ -4,8 +4,6 @@ import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/u
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   Injectable,
-  Logger,
-  InternalServerErrorException,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
@@ -25,18 +23,17 @@ export class AboardpointService {
     private readonly aboardPointModel: Model<AboardPoints>,
   ) {}
 
-  private readonly logger = new Logger(AboardpointService.name);
-
   async create(
     aboardPoint: CreateAboardPointDTO,
   ): Promise<AboardPointDocument> {
-    this.logger.debug(`creating new aboard point`);
     try {
       const newAboardPoint = new this.aboardPointModel(aboardPoint);
       return await newAboardPoint.save();
     } catch (error) {
-      this.logger.error(`Error creating an aboard point: ${error}`);
-      throw new InternalServerErrorException('Error creating an aboard point');
+      throw handleErrorsOnServices(
+        'Something went wrong creating aboard point.',
+        error,
+      );
     }
   }
 
@@ -49,7 +46,6 @@ export class AboardpointService {
       if (!aboardPoint) throw new NotFoundException('Aboard point not found.');
       return aboardPoint;
     } catch (error) {
-      this.logger.error(`Error getting aboard point: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong getting aboard point.',
         error,
@@ -58,7 +54,6 @@ export class AboardpointService {
   }
 
   async findAll({ status }: StatusDTO): Promise<Array<AboardPointLean>> {
-    this.logger.debug(`getting all aboard points`);
     try {
       const query = status ? { status } : {};
       const aboardPoints = await this.aboardPointModel
@@ -69,9 +64,6 @@ export class AboardpointService {
         throw new NotFoundException('No aboard points found');
       return aboardPoints;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong getting all aboard points: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong getting all aboard points',
         error,
@@ -84,10 +76,7 @@ export class AboardpointService {
     updateAboardPointDTO: UpdateAboardPointDTO,
   ): Promise<AboardPointLean | null> {
     try {
-      this.logger.debug(`Updating aboard point`);
-
       if (!(await this.validateAboardPoint({ id }))) {
-        // Returning null as an indication of unsuccessful validation
         return null;
       }
 
@@ -99,7 +88,6 @@ export class AboardpointService {
 
       return updatedAboardPoint;
     } catch (error) {
-      this.logger.error(`Something went wrong updating aboard point: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong updating aboard point.',
         error,
@@ -108,7 +96,6 @@ export class AboardpointService {
   }
 
   async delete({ id }: UrlValidator) {
-    this.logger.debug(`deleting aboard point ${id}`);
     try {
       if (!(await this.validateAboardPoint({ id }))) return;
       await this.aboardPointModel.findByIdAndUpdate(
@@ -117,7 +104,6 @@ export class AboardpointService {
         { new: true },
       );
     } catch (error) {
-      this.logger.error(`Something went wrong deleting aboard point: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong deleting aboard point.',
         error,
@@ -127,8 +113,6 @@ export class AboardpointService {
 
   async reactivate({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug(`Reactivating aboard point ${id}`);
-
       const inactiveAboardPoint = await this.findOne({ id });
 
       if (!inactiveAboardPoint) {
@@ -145,7 +129,6 @@ export class AboardpointService {
         .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
         .exec();
     } catch (error) {
-      this.logger.error(`Error reactivating aboard point: ${error}`);
       throw handleErrorsOnServices(
         'Something went wrong reactivating aboard point.',
         error,
@@ -155,8 +138,6 @@ export class AboardpointService {
 
   private async validateAboardPoint({ id }: UrlValidator): Promise<boolean> {
     try {
-      this.logger.debug(`Validating aboard point`);
-
       const foundAboardPoint = await this.aboardPointModel.findById(id).lean();
 
       if (!foundAboardPoint) {
@@ -169,9 +150,6 @@ export class AboardpointService {
 
       return true;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong validating aboard point: ${error}`,
-      );
       throw handleErrorsOnServices(
         'Something went wrong validating aboard point.',
         error,
@@ -183,8 +161,6 @@ export class AboardpointService {
     aboardPoints?: string[],
   ): Promise<string[] | undefined> {
     try {
-      this.logger.debug(`Mapping aboard points`);
-
       if (!aboardPoints && aboardPoints !== null) {
         return;
       }
@@ -210,8 +186,10 @@ export class AboardpointService {
 
       return mappedAboardPoints;
     } catch (error) {
-      this.logger.error(`Error mapping aboard points: ${error}`);
-      throw new InternalServerErrorException('Error mapping aboard points');
+      throw handleErrorsOnServices(
+        'Something went wrong mapping aboard points.',
+        error,
+      );
     }
   }
 }

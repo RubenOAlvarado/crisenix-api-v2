@@ -118,11 +118,15 @@ export class SalesService {
           this.logger.debug(`Sale approved, sending email to client`);
           this.logger.debug(`Sale approved, updating status`);
 
-          const updateSale = await this.salesModel.findByIdAndUpdate(
-            sale,
-            { status: SalesStatus.CHECKED },
-            { new: true },
-          );
+          const updateSale = await this.salesModel
+            .findByIdAndUpdate(
+              sale,
+              { status: SalesStatus.CHECKED },
+              { new: true },
+            )
+            .lean();
+
+          if (!updateSale) throw new NotFoundException(`Sale not found.`);
 
           return {
             sale: updateSale,
@@ -140,11 +144,15 @@ export class SalesService {
             SalesMove.DELETE,
           );
 
-          const updatedSale = await this.salesModel.findByIdAndUpdate(
-            sale,
-            { status: SalesStatus.DECLINED, failureReason, state },
-            { new: true },
-          );
+          const updatedSale = await this.salesModel
+            .findByIdAndUpdate(
+              sale,
+              { status: SalesStatus.DECLINED, failureReason, state },
+              { new: true },
+            )
+            .lean();
+
+          if (!updatedSale) throw new NotFoundException(`Sale not found.`);
 
           return {
             sale: updatedSale,

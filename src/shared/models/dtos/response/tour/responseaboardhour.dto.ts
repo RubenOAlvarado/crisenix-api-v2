@@ -1,17 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
+import { Expose } from 'class-transformer';
 
 export class ResponseAboardHourDTO {
-  @ApiProperty({
-    description: 'Aboard hour',
-    type: String,
-  })
+  @ApiProperty()
+  @Expose()
   hour: string;
 
-  @ApiProperty({
-    description: 'Aboard point',
-    type: ResponseAboardPointDTO,
-  })
+  @ApiProperty()
+  @Expose()
   aboardPoint: ResponseAboardPointDTO;
 
   constructor(hour: string, aboardPoint: ResponseAboardPointDTO) {

@@ -22,16 +22,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CaptionsService } from './captions.service';
-import { Captions } from '@/shared/models/schemas/captions.schema';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { excelFileFilter } from '@/filer/filer.utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { Public } from '@/auth/public.decorator';
-import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
 import { ResponseCaptionsDTO } from '@/shared/models/dtos/response/captions/responseCaptions.dto';
 import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Captions')
 @ApiBearerAuth()
@@ -41,7 +40,7 @@ export class CaptionsController {
 
   @ApiCreatedResponse({
     description: 'The caption has been successfully created.',
-    type: ResponseAboardPointDTO,
+    type: ResponseCaptionsDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the caption.',
@@ -51,12 +50,17 @@ export class CaptionsController {
     description: 'Caption creation object',
     type: CreateCaptionDTO,
   })
-  async create(@Body() createCaptionDTO: CreateCaptionDTO): Promise<Captions> {
-    return await this.captionService.create(createCaptionDTO);
+  async create(
+    @Body() createCaptionDTO: CreateCaptionDTO,
+  ): Promise<ResponseCaptionsDTO> {
+    const newCaption = await this.captionService.create(createCaptionDTO);
+    return plainToInstance(ResponseCaptionsDTO, newCaption);
   }
 
   @ApiOkResponse({
     description: 'All captions found.',
+    type: ResponseCaptionsDTO,
+    isArray: true,
   })
   @ApiNotFoundResponse({
     description: 'No captions registered.',
@@ -66,8 +70,9 @@ export class CaptionsController {
   })
   @Public()
   @Get()
-  async findAll(@Query() query: StatusDTO) {
-    return await this.captionService.findAll(query);
+  async findAll(@Query() query: StatusDTO): Promise<ResponseCaptionsDTO[]> {
+    const captions = await this.captionService.findAll(query);
+    return plainToInstance(ResponseCaptionsDTO, captions);
   }
 
   @ApiOkResponse({
@@ -80,13 +85,16 @@ export class CaptionsController {
   @ApiNotFoundResponse({
     description: 'Caption not found.',
   })
+  @Public()
   @Get(':id')
-  async findOne(@Param() params: UrlValidator) {
-    return await this.captionService.findOne(params);
+  async findOne(@Param() params: UrlValidator): Promise<ResponseCaptionsDTO> {
+    const caption = await this.captionService.findOne(params);
+    return plainToInstance(ResponseCaptionsDTO, caption);
   }
 
   @ApiOkResponse({
     description: 'Caption updated.',
+    type: ResponseCaptionsDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong updating the caption.',
@@ -102,12 +110,17 @@ export class CaptionsController {
   async update(
     @Param() params: UrlValidator,
     @Body() updateCaptionDTO: UpdateCaptionDTO,
-  ) {
-    return await this.captionService.update(params, updateCaptionDTO);
+  ): Promise<ResponseCaptionsDTO> {
+    const updatedCaption = await this.captionService.update(
+      params,
+      updateCaptionDTO,
+    );
+    return plainToInstance(ResponseCaptionsDTO, updatedCaption);
   }
 
   @ApiOkResponse({
-    description: 'Caption deleted.',
+    description: 'The caption has been successfully deleted.',
+    type: String,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting the caption.',
@@ -116,12 +129,14 @@ export class CaptionsController {
     description: 'Caption not found.',
   })
   @Delete(':id')
-  async delete(@Param() params: UrlValidator) {
+  async delete(@Param() params: UrlValidator): Promise<string> {
     await this.captionService.delete(params);
+    return 'The caption has been successfully deleted.';
   }
 
   @ApiOkResponse({
-    description: 'Caption activated.',
+    description: 'The caption has been successfully deactivated.',
+    type: String,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong activating the caption.',
@@ -133,8 +148,9 @@ export class CaptionsController {
     description: 'Caption already active.',
   })
   @Put('reactivate/:id')
-  async activate(@Param() params: UrlValidator) {
+  async activate(@Param() params: UrlValidator): Promise<string> {
     await this.captionService.reactivate(params);
+    return 'The caption has been successfully reactivated.';
   }
 
   @ApiExcludeEndpoint()

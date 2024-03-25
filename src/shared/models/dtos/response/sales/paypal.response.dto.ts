@@ -1,38 +1,23 @@
-import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { State } from 'src/shared/enums/sales/state.enum';
 import { FailureReason } from 'src/shared/enums/sales/failureReason.enum';
+import { Expose } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PaypalResponse {
-  @ApiProperty({
-    description: 'Sale id',
-    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
-  })
-  @IsNotEmpty()
-  @IsMongoId()
+  @ApiProperty()
+  @Expose()
   sale: string;
 
-  @ApiPropertyOptional({
-    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
-  })
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional()
+  @Expose()
   operationId?: string;
 
-  @ApiProperty({
-    description: 'Sale state',
-    example: State.APPROVED,
-    enum: State,
-  })
-  @IsNotEmpty()
+  @ApiProperty()
+  @Expose()
   state: State;
 
-  @ApiProperty({
-    description: 'Sale failure reason if presented',
-    example: FailureReason.INVALID_PAYMENT_METHOD,
-    enum: FailureReason,
-  })
-  @IsNotEmpty()
+  @ApiProperty()
+  @Expose()
   failureReason: FailureReason;
 
   constructor(sale: string, state: State, failureReason: FailureReason) {

@@ -1,8 +1,9 @@
 import { AboardPoints } from '@/shared/models/schemas/aboarpoint.schema';
 import { TransformerInterface } from './transformer.interface';
 import { applyDecorators } from '@nestjs/common';
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export const aboardPointsTransformer: TransformerInterface<AboardPoints[]> = ({
   value,
@@ -14,4 +15,8 @@ export const aboardPointsTransformer: TransformerInterface<AboardPoints[]> = ({
   });
 };
 export const AboardPointsTransformer = () =>
-  applyDecorators(Transform(aboardPointsTransformer));
+  applyDecorators(
+    ApiPropertyOptional(),
+    Expose(),
+    Transform(aboardPointsTransformer),
+  );

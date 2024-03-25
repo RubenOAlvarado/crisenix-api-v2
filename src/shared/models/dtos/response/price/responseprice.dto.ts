@@ -1,51 +1,48 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
+import { Expose, Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponsePriceDTO {
-  @ApiProperty({
-    description: 'City.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Type(() => ResponseOriginCityDTO)
+  @Expose()
   city: ResponseOriginCityDTO;
 
-  @ApiProperty({
-    description: 'Price currency.',
-    example: 'MX',
-  })
+  @ApiProperty()
+  @Expose()
   currency: string;
 
-  @ApiPropertyOptional({
-    description: 'General price (not base applied).',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   general?: number;
 
-  @ApiPropertyOptional({
-    description: 'Single base price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   singleBase?: number;
 
-  @ApiPropertyOptional({
-    description: 'Double base price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   doubleBase?: number;
 
-  @ApiPropertyOptional({
-    description: 'Triple base price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   tripleBase?: number;
 
-  @ApiPropertyOptional({
-    description: 'Quadruple base price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   quadrupleBase?: number;
 
-  @ApiPropertyOptional({
-    description: 'Child price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   minor?: number;
 
-  @ApiPropertyOptional({
-    description: 'Old people price.',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   inapam?: number;
 
   constructor(city: ResponseOriginCityDTO, currency: string) {

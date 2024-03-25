@@ -1,22 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class ResponseCatalogDTO {
-  @ApiProperty({
-    description: 'Name of the catalog item',
-    example: 'Catalog item name',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiProperty({
-    description: 'Description of the catalog item',
-    example: 'Catalog item description',
-  })
+  @ApiProperty()
+  @Expose()
   description: string;
 
-  @ApiProperty({
-    description: 'Status of the catalog item',
-    example: 'Catalog item status',
-  })
+  @ApiProperty()
+  @Expose()
   status: string;
 
   constructor(name: string, description: string, status: string) {

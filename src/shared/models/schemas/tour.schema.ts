@@ -6,7 +6,7 @@ import { AboardPoints } from './aboarpoint.schema';
 import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
-import { Clasifications } from './clasification.schema';
+import { Classifications } from './classification.schema';
 
 @Schema()
 export class Tours {
@@ -111,7 +111,7 @@ export class Tours {
   @Prop({ type: Array })
   itinerary?: Array<{
     dayNumber: number;
-    clasification: Clasifications;
+    clasification: Classifications;
     name: string;
     additionalCost: number;
     initDate: Date;
@@ -124,7 +124,7 @@ export class Tours {
     order: number;
   }>;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prices' }] })
+  @Prop({ type: Array<Prices> })
   price?: Array<Prices>;
 
   @Prop({ type: Date, default: Date.now })

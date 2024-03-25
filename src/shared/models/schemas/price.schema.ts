@@ -1,8 +1,7 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { Prop } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 import { OriginCity } from './origincity.schema';
 
-@Schema()
 export class Prices {
   // ref: 'OriginCity'
   @Prop({
@@ -66,6 +65,3 @@ export class Prices {
     this.status = status;
   }
 }
-
-export type PriceDocument = HydratedDocument<Prices>;
-export const PriceSchema = SchemaFactory.createForClass(Prices);

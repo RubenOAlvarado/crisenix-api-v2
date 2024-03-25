@@ -8,8 +8,6 @@ import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
@@ -27,24 +25,20 @@ export class CaptionsService {
     private filer: FilerService,
   ) {}
 
-  private readonly logger = new Logger(CaptionsService.name);
-
   async create(createCaptionDTO: CreateCaptionDTO): Promise<CaptionDocument> {
     try {
-      this.logger.debug(`Creating caption ${createCaptionDTO.name}`);
       const caption = new this.captionModel(createCaptionDTO);
       return await caption.save();
     } catch (error) {
-      this.logger.error('Something went wrong creating the caption', error);
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong creating the caption',
+        error,
       );
     }
   }
 
   async findAll({ status }: StatusDTO): Promise<Array<CaptionsLean>> {
     try {
-      this.logger.debug('Finding all captions');
       const query = status ? { status } : {};
       const captions = await this.captionModel
         .find(query)
@@ -62,7 +56,6 @@ export class CaptionsService {
 
   async findOne({ id }: UrlValidator): Promise<CaptionsLean> {
     try {
-      this.logger.debug(`Finding caption ${id}`);
       const caption = await this.captionModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
@@ -79,7 +72,6 @@ export class CaptionsService {
 
   async update({ id }: UrlValidator, updateCaptionDTO: UpdateCaptionDTO) {
     try {
-      this.logger.debug(`Updating caption ${id}`);
       const caption = await this.captionModel.findByIdAndUpdate(
         id,
         updateCaptionDTO,
@@ -97,7 +89,6 @@ export class CaptionsService {
 
   async delete({ id }: UrlValidator): Promise<void> {
     try {
-      this.logger.debug(`Deleting caption ${id}`);
       const caption = await this.captionModel.findByIdAndDelete(id);
       if (!caption) throw new NotFoundException(`Caption ${id} not found`);
     } catch (error) {
@@ -133,9 +124,9 @@ export class CaptionsService {
       const captions: CreateCaptionDTO[] = this.mapJsonToDTO(jsonObject);
       await this.captionModel.insertMany(captions);
     } catch (error) {
-      this.logger.error('Something went wrong loading the captions', error);
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong loading the captions',
+        error,
       );
     }
   }

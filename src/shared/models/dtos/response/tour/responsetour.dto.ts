@@ -1,4 +1,3 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ResponseDestinationDTO } from '../destination/responsedestination.dto';
 import { ResponseAboardHourDTO } from './responseaboardhour.dto';
 import { AboardHourTransformer } from '@/shared/utilities/transformers/aboardhour.transformer';
@@ -10,139 +9,121 @@ import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
+import { Expose, Type } from 'class-transformer';
+import { Types } from 'mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseTourDTO {
-  @ApiProperty({
-    description: 'Destination',
-    type: ResponseDestinationDTO,
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Type(() => ResponseDestinationDTO)
+  @Expose()
   destination: ResponseDestinationDTO;
 
-  @ApiPropertyOptional({
-    description: 'Box lunch indicator',
-    type: String,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   boxLunch?: string;
 
-  @ApiProperty({
-    description: 'Tour code',
-    type: String,
-  })
+  @ApiProperty()
+  @Expose()
   code: string;
 
-  @ApiProperty({
-    description: 'Tour seats number',
-    type: Number,
-  })
+  @ApiProperty()
+  @Expose()
   seating: number;
 
-  @ApiPropertyOptional({
-    description: 'Available seats',
-    type: Number,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   availableSeat?: number;
 
-  @ApiPropertyOptional({
-    description: 'Ocuppied seats',
-    type: Number,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   ocuppiedSeat?: number;
 
-  @ApiProperty({
-    description: 'Tour initial date',
-    type: Date,
-  })
+  @ApiProperty()
+  @Expose()
   initDate: Date;
 
   @ApiPropertyOptional({
     type: ResponseAboardHourDTO,
     isArray: true,
   })
+  @Expose()
+  @Type(() => ResponseAboardHourDTO)
   @AboardHourTransformer()
   aboardHour?: ResponseAboardHourDTO[];
 
-  @ApiPropertyOptional({
-    description: 'Tour days long',
-    type: Number,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   days?: number;
 
-  @ApiPropertyOptional({
-    description: 'Tour nights long',
-    type: Number,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   nights?: number;
 
-  @ApiProperty({
-    description: 'Tour transport',
-    type: ResponseTransportsDTO,
-  })
+  @ApiProperty()
+  @Type(() => ResponseTransportsDTO)
+  @Expose()
   transport: ResponseTransportsDTO;
 
-  @ApiProperty({
-    description: 'Tour return date',
-    type: Date,
-  })
+  @ApiProperty()
+  @Expose()
   returnDate: Date;
 
-  @ApiPropertyOptional({
-    description: 'Tour return hour',
-    type: ResponseAboardHourDTO,
-  })
+  @ApiPropertyOptional()
+  @Type(() => ResponseAboardHourDTO)
+  @Expose()
   returnHour?: ResponseAboardHourDTO;
 
-  @ApiPropertyOptional({
-    description: 'Tour departure',
-    type: String,
-    isArray: true,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   departure?: string[];
 
-  @ApiPropertyOptional({
-    description: 'Coordinator/s assigned to tour',
-    type: ResponseCoordinatorDto,
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  @Type(() => ResponseCoordinatorDto)
   coordinator?: ResponseCoordinatorDto;
 
-  @ApiPropertyOptional({
-    description: 'Tour front image',
-    type: String,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   front?: string;
 
-  @ApiPropertyOptional({
-    description: 'Tour recommendations',
-    type: String,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   recommendations?: string;
 
-  @ApiProperty({
-    description: 'Tour type',
-    type: ResponseTourTypeDTO,
-  })
+  @ApiProperty()
+  @Type(() => ResponseTourTypeDTO)
+  @Expose()
   tourType: ResponseTourTypeDTO;
 
   @ApiPropertyOptional({
-    description: 'Tour included services',
     type: ResponseIncludedDTO,
     isArray: true,
   })
+  @Expose()
+  @Type(() => ResponseIncludedDTO)
   @IncludedTransformers()
   included?: ResponseIncludedDTO[];
 
   @ApiPropertyOptional({
-    description: 'Tour itinerary, day by day',
     type: ResponseItineraryDTO,
     isArray: true,
   })
+  @Expose()
+  @Type(() => ResponseItineraryDTO)
   @ItineraryTransformers()
   itinerary?: ResponseItineraryDTO[];
 
   @ApiPropertyOptional({
-    description: 'Tour price',
     type: ResponsePriceDTO,
     isArray: true,
   })
+  @Type(() => ResponsePriceDTO)
+  @Expose()
   price?: ResponsePriceDTO[];
 
   constructor(

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClasificationController } from './clasification.controller';
-import { ClasificationService } from './clasification.service';
+import { ClasificationController } from './classification.controller';
+import { ClasificationService } from './classification.service';
 
 describe('ClasificationController', () => {
   let controller: ClasificationController;

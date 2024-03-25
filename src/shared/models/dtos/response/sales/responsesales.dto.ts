@@ -1,77 +1,74 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ResponseWebUserDTO } from '../user/response-webuser.dto';
 import { ResponsePassengerDTO } from '../passenger/response-passenger.dto';
 import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
-import { ResponseTourDTO } from '../tour/responsetour.dto';
+import { Expose, Type } from 'class-transformer';
+import { Types } from 'mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseSalesDTO {
-  @ApiProperty({
-    description: 'Sale tour',
-  })
-  tour: ResponseTourDTO;
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
 
-  @ApiProperty({
-    description: 'Sale status',
-  })
+  @ApiProperty()
+  @Expose()
+  tour: string;
+
+  @ApiProperty()
+  @Expose()
   status: SalesStatus;
 
-  @ApiProperty({
-    description: 'Client name',
-  })
+  @ApiProperty()
+  @Expose()
   clientName: string;
 
-  @ApiProperty({
-    description: 'Client last name',
-  })
+  @ApiProperty()
+  @Expose()
   clientLastName: string;
 
-  @ApiPropertyOptional({
-    description: 'Client mother last name',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   clientMotherLastName?: string;
 
-  @ApiProperty({
-    description: 'Client email',
-  })
+  @ApiProperty()
+  @Expose()
   email: string;
 
-  @ApiProperty({
-    description: 'Reserved seats',
-  })
-  reservedSeats: number;
+  @ApiProperty()
+  @Expose()
+  reservedSeat: number;
 
-  @ApiProperty({
-    description: 'Reservation date',
-  })
+  @ApiProperty()
+  @Expose()
   reservationDate: Date;
 
-  @ApiPropertyOptional({
-    description: 'Pay date',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   payDate?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Total payed',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   totalPayedMount?: number;
 
   @ApiPropertyOptional({
-    description: 'List of passengers',
+    type: ResponsePassengerDTO,
+    isArray: true,
   })
+  @Expose()
   passengers?: ResponsePassengerDTO[];
 
-  @ApiPropertyOptional({
-    description: 'User if registered',
-  })
+  @ApiPropertyOptional()
+  @Type(() => ResponseWebUserDTO)
+  @Expose()
   user?: ResponseWebUserDTO;
 
   constructor(
-    tour: ResponseTourDTO,
+    tour: string,
     status: SalesStatus,
     clientName: string,
     clientLastName: string,
     email: string,
-    reservedSeats: number,
+    reservedSeat: number,
     reservationDate: Date,
     payDate: Date,
     totalPayedMount: number,
@@ -83,7 +80,7 @@ export class ResponseSalesDTO {
     this.clientName = clientName;
     this.clientLastName = clientLastName;
     this.email = email;
-    this.reservedSeats = reservedSeats;
+    this.reservedSeat = reservedSeat;
     this.reservationDate = reservationDate;
     this.payDate = payDate;
     this.totalPayedMount = totalPayedMount;

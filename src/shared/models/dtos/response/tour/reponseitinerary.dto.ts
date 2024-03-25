@@ -1,70 +1,49 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class ResponseItineraryDTO {
-  @ApiProperty({
-    description: 'Day number',
-    example: 1,
-  })
+  @ApiProperty()
+  @Expose()
   dayNumber: number;
 
-  @ApiProperty({
-    description: 'Clasification of the activity',
-    example: 'camping',
-  })
+  @ApiProperty()
+  @Expose()
   clasification: string;
 
-  @ApiPropertyOptional({
-    description: 'Activity additional cost (optional)',
-    example: 100,
-  })
+  @ApiProperty()
+  @Expose()
   additionalCost?: number;
 
-  @ApiPropertyOptional({
-    description: 'Activity initial date (optional)',
-    example: '2020-10-30T05:00:00.000Z',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   initDate?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Activity initial hour (optional)',
-    example: '10:00',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   initHour?: string;
 
-  @ApiPropertyOptional({
-    description: 'Activity finish date (optional)',
-    example: '2020-10-30T05:00:00.000Z',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   finishDate?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Activity finish hour (optional)',
-    example: '10:00',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   finishHour?: string;
 
-  @ApiPropertyOptional({
-    description: 'Activity aeroline (optional)',
-    example: 'Aeromexico',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   aeroline?: string;
 
-  @ApiPropertyOptional({
-    description: 'Flight number (optional)',
-    example: 'AM-123',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   flightNumber?: string;
 
-  @ApiPropertyOptional({
-    description: 'Activity route (optional)',
-    example: 'CDMX - Cancun',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   route?: string;
 
-  @ApiProperty({
-    description: 'Activity order to be displayed',
-    example: 1,
-  })
+  @ApiProperty()
+  @Expose()
   order: number;
 
   constructor(dayNumber: number, clasification: string, order: number) {

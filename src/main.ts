@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { OPENAPI_DOCS_PATH } from './configs/open-api.config';
 import { buildSwaggerModule } from './shared/utilities/swagger-builder';
@@ -26,6 +26,12 @@ async function bootstrap() {
       forbidNonWhitelisted: false,
       forbidUnknownValues: true,
       transform: true,
+    }),
+  );
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      strategy: 'excludeAll',
+      excludeExtraneousValues: true,
     }),
   );
 

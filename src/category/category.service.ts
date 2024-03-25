@@ -11,8 +11,6 @@ import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -26,21 +24,16 @@ export class CategoryService {
     private filerService: FilerService,
   ) {}
 
-  private readonly logger = new Logger(CategoryService.name);
-
   async create(
     createCategoryDTO: CreateCategoryDTO,
   ): Promise<CategoryDocument> {
     try {
-      this.logger.debug(`creating new category`);
       const category = new this.categoryModel(createCategoryDTO);
       return await category.save();
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while creating new category: ${error}`,
-      );
-      throw new InternalServerErrorException(
-        'Something went wrong while creating new category',
+      throw handleErrorsOnServices(
+        'Something went wrong while creating category.',
+        error,
       );
     }
   }
@@ -146,9 +139,9 @@ export class CategoryService {
         this.mapJsonToCategory(jsonObject);
       await this.categoryModel.insertMany(categories);
     } catch (error) {
-      this.logger.error(`Something went wrong while loading categories`);
-      throw new InternalServerErrorException(
-        'Something went wrong while loading categories',
+      throw handleErrorsOnServices(
+        'Something went wrong while loading the categories.',
+        error,
       );
     }
   }
@@ -190,9 +183,9 @@ export class CategoryService {
 
       return mappedCategories;
     } catch (error) {
-      this.logger.error(`Error mapping from name to object id: ${error}`);
-      throw new InternalServerErrorException(
-        'Error mapping from name to object id',
+      throw handleErrorsOnServices(
+        'Something went wrong mapping categories',
+        error,
       );
     }
   }

@@ -1,6 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 import { AboardPointsTransformer } from '@/shared/utilities/transformers/aboardpoint.transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class ResponseOriginCityDTO {
   constructor(
@@ -15,16 +17,27 @@ export class ResponseOriginCityDTO {
     this.status = status;
   }
 
-  @ApiProperty({ type: String })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   state: string;
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiPropertyOptional({ type: ResponseAboardPointDTO, isArray: true })
+  @ApiProperty({
+    type: ResponseAboardPointDTO,
+    isArray: true,
+  })
+  @Expose()
   @AboardPointsTransformer()
-  aboardPoints?: Array<ResponseAboardPointDTO>;
+  aboardPoints?: ResponseAboardPointDTO[];
 
-  @ApiProperty({ type: String })
+  @ApiProperty()
+  @Expose()
   status: string;
 }

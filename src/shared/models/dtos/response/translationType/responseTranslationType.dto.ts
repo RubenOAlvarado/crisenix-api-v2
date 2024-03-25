@@ -1,14 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class ResponseTranslationTypeDTO {
-  @ApiProperty({
-    description: 'Translation type name',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   name: string;
 
-  @ApiProperty({
-    description: 'Translation type status',
-  })
+  @ApiProperty()
+  @Expose()
   status: string;
 
   constructor(name: string, status: string) {

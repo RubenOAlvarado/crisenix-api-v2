@@ -1,4 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class ResponseCategoryDTO {
   constructor(label: string, status: string, main?: string) {
@@ -7,24 +9,19 @@ export class ResponseCategoryDTO {
     this.status = status;
   }
 
-  @ApiProperty({
-    description: 'Category label',
-    type: String,
-    example: 'Category 1',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   label: string;
 
-  @ApiPropertyOptional({
-    description: 'Main category if exists',
-    type: String,
-    example: 'Category 1',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   main?: string;
 
-  @ApiProperty({
-    description: 'Category status',
-    type: String,
-    example: 'Active',
-  })
+  @ApiProperty()
+  @Expose()
   status: string;
 }

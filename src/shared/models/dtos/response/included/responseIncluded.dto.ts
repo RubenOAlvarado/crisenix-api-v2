@@ -1,128 +1,92 @@
 import { Entry } from '@/shared/enums/entry.enum';
 import { HotelStatus } from '@/shared/enums/hotelstatus.enum';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class ResponseIncludedDTO {
-  @ApiProperty({
-    description: 'Service concept',
-    example: 'Desayno completo',
-  })
+  @ApiPropertyOptional()
+  @Expose()
+  _id?: Types.ObjectId;
+
+  @ApiProperty()
+  @Expose()
   concept: string;
 
-  @ApiProperty({
-    description: 'Included indicator',
-    example: 'SI',
-  })
+  @ApiProperty()
+  @Expose()
   included: string;
 
-  @ApiProperty({
-    description: 'Publish indicator',
-    example: 'SI',
-  })
+  @ApiProperty()
+  @Expose()
   publish: string;
 
-  @ApiProperty({
-    description: 'Entry indicator',
-    example: Entry.HOSPEDAJE,
-    enum: Entry,
-  })
+  @ApiProperty()
+  @Expose()
   entry: Entry;
 
-  @ApiProperty({
-    description: 'Service status',
-    example: 'ACTIVO',
-  })
+  @ApiProperty()
+  @Expose()
   status: string;
 
-  @ApiPropertyOptional({
-    description: `City name, if entry is ${Entry.HOSPEDAJE}`,
-    example: 'Ciudad de México',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   city?: string;
 
-  @ApiPropertyOptional({
-    description: `Hotel name, if entry is ${Entry.HOSPEDAJE}`,
-    example: 'Fiesta Inn',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   hotel?: string;
 
-  @ApiPropertyOptional({
-    enum: HotelStatus,
-    description: `Hotel status, if entry is ${Entry.HOSPEDAJE}`,
-    example: HotelStatus.TENTATIVO,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   hotelStatus?: HotelStatus;
 
-  @ApiPropertyOptional({
-    description: `Hotel address, if entry is ${Entry.HOSPEDAJE}`,
-    example: 'Av. Insurgentes Sur 553, Roma Sur, 06760 Cuauhtémoc, CDMX',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   hotelAddress?: string;
 
-  @ApiPropertyOptional({
-    description: `Hotel phone, if entry is ${Entry.HOSPEDAJE}`,
-    example: '55 1234 5678',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   phone?: string;
 
-  @ApiPropertyOptional({
-    description: `Reserved nights, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   nights?: number;
 
-  @ApiPropertyOptional({
-    description: `Check in date, if entry is ${Entry.HOSPEDAJE}`,
-    example: '2020-10-30T05:00:00.000Z',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   checkIn?: Date;
 
-  @ApiPropertyOptional({
-    description: `Check out date, if entry is ${Entry.HOSPEDAJE}`,
-    example: '2020-10-30T05:00:00.000Z',
-  })
+  @ApiPropertyOptional()
+  @Expose()
   checkOut?: Date;
 
-  @ApiPropertyOptional({
-    description: `Single room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   single?: number;
 
-  @ApiPropertyOptional({
-    description: `Single base room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   singleBase?: number;
 
-  @ApiPropertyOptional({
-    description: `Double base room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   doubleBase?: number;
 
-  @ApiPropertyOptional({
-    description: `Triple base room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   tripleBase?: number;
 
-  @ApiPropertyOptional({
-    description: `Quadruple base room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   quadrupleBase?: number;
 
-  @ApiPropertyOptional({
-    description: `Child base room price, if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   minor?: number;
 
-  @ApiPropertyOptional({
-    description: `Inpam room price (adults + 60 years old), if entry is ${Entry.HOSPEDAJE}`,
-    example: 2000,
-  })
+  @ApiPropertyOptional()
+  @Expose()
   inpam?: number;
 
   constructor(
