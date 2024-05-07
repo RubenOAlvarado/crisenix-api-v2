@@ -10,7 +10,6 @@ import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -22,8 +21,6 @@ export class CategoryService {
     @InjectModel(Categories.name)
     private readonly categoryModel: Model<Categories>,
   ) {}
-
-  private logger = new Logger(CategoryService.name);
 
   async create(
     createCategoryDTO: CreateCategoryDTO,
