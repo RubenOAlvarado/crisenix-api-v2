@@ -6,9 +6,8 @@ import {
   DestinationSchema,
   Destinations,
 } from '@/shared/models/schemas/destination.schema';
-import { FilerModule } from '@/filer/filer.module';
 import { CategoryModule } from '@/category/category.module';
-import { TranslationtypeModule } from '@/translationtype/translationtype.module';
+import { TransfertypeModule } from '@/transfertype/transfertype.module';
 import { OrigincityModule } from '@/origincity/origincity.module';
 
 @Module({
@@ -16,9 +15,8 @@ import { OrigincityModule } from '@/origincity/origincity.module';
     MongooseModule.forFeature([
       { name: Destinations.name, schema: DestinationSchema },
     ]),
-    FilerModule,
     CategoryModule,
-    TranslationtypeModule,
+    TransfertypeModule,
     OrigincityModule,
   ],
   controllers: [DestinationController],

@@ -1,5 +1,4 @@
 import { CategoryService } from '@/category/category.service';
-import { FilerService } from '@/filer/filer.service';
 import { OriginCityService } from '@/origincity/origincity.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
@@ -21,11 +20,10 @@ import {
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { TranslationtypeService } from '@/translationtype/translationtype.service';
+import { TransfertypeService } from '@/transfertype/transfertype.service';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -37,10 +35,9 @@ export class DestinationService {
   constructor(
     @InjectModel(Destinations.name)
     private readonly destinationModel: Model<Destinations>,
-    private readonly filerService: FilerService,
     private readonly categoryService: CategoryService,
-    private readonly translationTypeService: TranslationtypeService,
     private readonly originCityService: OriginCityService,
+    private readonly transferTypeService: TransfertypeService,
   ) {}
 
   private readonly logger = new Logger(DestinationService.name);
@@ -54,8 +51,9 @@ export class DestinationService {
       ).save();
       return destination.toObject();
     } catch (error: any) {
-      throw new InternalServerErrorException(
+      throw handleErrorsOnServices(
         'Something went wrong while creating destination.',
+        error,
       );
     }
   }
@@ -274,80 +272,64 @@ export class DestinationService {
         throw new NotFoundException('Destination not found.');
       }
 
-      const { originCity } = destination;
+      const { originCities } = destination;
 
-      if (!originCity?.length) {
+      if (!originCities?.length) {
         throw new NotFoundException('Destination cities not found.');
       }
 
-      return originCity as unknown as OriginCityLean;
+      return originCities as unknown as OriginCityLean;
     } catch (error) {
       throw handleErrorsOnServices('Error finding destination cities.', error);
     }
   }
 
-  async loadCatalog(filePath: string): Promise<void> {
+  async insertDestinationsBunch(
+    jsonObject: DestinationsExcel[],
+  ): Promise<void> {
     try {
-      const jsonObject: DestinationsExcel[] =
-        this.filerService.excelToJson(filePath);
-      if (!jsonObject.length) throw new BadRequestException('Empty file.');
-      const destinations = this.mapToDTO(jsonObject);
-      await this.destinationModel.insertMany(destinations);
+      const mappedDTO = await this.mapToDTOSequentially(jsonObject);
+      await this.destinationModel.insertMany(mappedDTO);
     } catch (error) {
-      this.logger.error(`Something went wrong loading destinations: ${error}`);
-      throw new InternalServerErrorException(
-        'Something went wrong loading destinations.',
-      );
+      throw handleErrorsOnServices('Error inserting destinations.', error);
     }
   }
 
-  private async mapToDTO(
+  private async mapToDTOSequentially(
     jsonObject: DestinationsExcel[],
   ): Promise<CreateDestinationDTO[]> {
-    const mappedDTO = await Promise.all(
-      jsonObject.map(async (destination) => {
-        const {
-          codigo,
-          nombre,
-          descripcion,
-          categorias,
-          estatus,
-          ciudadDeOrigen,
-          fechasProgramadas,
-          pasaporte,
-          visa,
-          tipoDeTraslado,
-          traslado,
-        } = destination;
+    const mappedDTO: CreateDestinationDTO[] = [];
+    for (const destination of jsonObject) {
+      const { categorias, ciudadDeOrigen, tipoDeTraslado, ...rest } =
+        destination;
 
-        const category = await this.categoryService.mapFromNameToObjectId(
-          categorias?.split(','),
-        );
+      const categories = await this.categoryService.mapFromNameToObjectId(
+        categorias?.split(','),
+      );
 
-        const originCity = await this.originCityService.mapFromDestinationExcel(
-          ciudadDeOrigen,
-        );
+      const originCities = await this.originCityService.mapFromDestinationExcel(
+        ciudadDeOrigen?.split('|'),
+      );
 
-        const translationType =
-          await this.translationTypeService.mapTranslationTypeNames(
-            tipoDeTraslado?.split(','),
-          );
+      const transferTypes = await this.transferTypeService.mapTransferTypeNames(
+        tipoDeTraslado?.split(','),
+      );
 
-        return {
-          code: codigo,
-          name: nombre,
-          description: descripcion,
-          category,
-          status: estatus as Status,
-          originCity,
-          scheduledDates: fechasProgramadas,
-          passport: pasaporte === 'Si',
-          visa: visa as Visa,
-          translationType,
-          translation: traslado,
-        } as CreateDestinationDTO;
-      }),
-    );
+      const destinationDTO: CreateDestinationDTO = {
+        categories,
+        originCities,
+        transferTypes,
+        passport: rest.pasaporte === 'Si',
+        visa: rest.visa as Visa,
+        code: rest.codigo,
+        name: rest.nombre,
+        description: rest.descripcion,
+        tentativeDates: rest.fechasProgramadas,
+        transfer: rest.traslado,
+      };
+
+      mappedDTO.push(destinationDTO);
+    }
 
     return mappedDTO;
   }

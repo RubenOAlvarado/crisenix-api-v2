@@ -6,7 +6,6 @@ import {
   OriginCity,
   OriginCitySchema,
 } from 'src/shared/models/schemas/origincity.schema';
-import { FilerModule } from '@/filer/filer.module';
 import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 
 @Module({
@@ -14,7 +13,6 @@ import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
     MongooseModule.forFeature([
       { name: OriginCity.name, schema: OriginCitySchema },
     ]),
-    FilerModule,
     AboardpointModule,
   ],
   controllers: [OriginCityController],

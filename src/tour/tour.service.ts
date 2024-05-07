@@ -6,14 +6,16 @@ import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
+import { BoxLunch } from '@/shared/enums/tour/boxlunch.enum';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
+import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { User } from '@/shared/interfaces/user/user.interface';
 import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
+import { AboardHourDTO } from '@/shared/models/dtos/request/tour/aboardhour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
-import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
@@ -514,9 +516,78 @@ export class TourService {
     }
   }
 
-  async updateTourCatalog(
+  async insertToursBunch(jsonObject: TourExcel[]) {
+    try {
+      const tours = this.mapToDto(jsonObject);
+      await this.tourModel.insertMany(tours);
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting tours bunch.', error);
+    }
+  }
+
+  private mapToDto(excelTours: TourExcel[]): Array<CreateTourDTO> {
+    try {
+      return excelTours.map((tour) => {
+        const {
+          destino,
+          transporte,
+          tipo,
+          horaDeAbordaje,
+          horaDeRegreso,
+          portada,
+          dias,
+          noches,
+          boxLunch,
+          lugares,
+          lugaresLibres,
+          lugaresOcupados,
+          fechaInicio,
+          fechaRegreso,
+          recomendaciones,
+          codigo,
+        } = tour;
+        return {
+          destination: destino ?? '',
+          transport: transporte ?? '',
+          tourType: tipo ?? '',
+          aboardHour: this.mapAboardHourAndReturnHour(horaDeAbordaje),
+          returnHour: this.mapAboardHourAndReturnHour(horaDeRegreso),
+          front: portada ?? '',
+          days: dias ?? 1,
+          nights: noches ?? 0,
+          boxLunch: (boxLunch ?? BoxLunch.NO) as BoxLunch,
+          seating: lugares ?? 0,
+          availableSeat: lugaresLibres ?? 0,
+          ocuppiedSeat: lugaresOcupados ?? 0,
+          initDate: new Date(fechaInicio ?? ''),
+          returnDate: new Date(fechaRegreso ?? ''),
+          recommendations: recomendaciones ?? '',
+          code: codigo ?? '',
+        };
+      });
+    } catch (error) {
+      throw handleErrorsOnServices('Error mapping tours to DTO.', error);
+    }
+  }
+
+  private mapAboardHourAndReturnHour(aboardTime: string): AboardHourDTO[] {
+    try {
+      const times = aboardTime.split(',');
+      return times.map((time) => {
+        const [hour, aboardPoint] = time.split(' ');
+        return new AboardHourDTO(hour ?? '', aboardPoint ?? '');
+      });
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Error mapping aboard hour and return hour.',
+        error,
+      );
+    }
+  }
+
+  /* async updateTourCatalog(
     { id }: UrlValidator,
-    { catalogName, values }: UpdateTourCatalogDTO,
+    { catalogName }: UpdateTourCatalogDTO,
     user: string,
   ): Promise<TourLean> {
     try {
@@ -544,5 +615,5 @@ export class TourService {
         error,
       );
     }
-  }
+  } */
 }

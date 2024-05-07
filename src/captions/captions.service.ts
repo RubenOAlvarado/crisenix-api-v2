@@ -1,4 +1,3 @@
-import { FilerService } from 'src/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
 import {
   CaptionDocument,
@@ -22,7 +21,6 @@ import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updateca
 export class CaptionsService {
   constructor(
     @InjectModel(Captions.name) private readonly captionModel: Model<Captions>,
-    private filer: FilerService,
   ) {}
 
   async create(createCaptionDTO: CreateCaptionDTO): Promise<CaptionDocument> {
@@ -118,7 +116,7 @@ export class CaptionsService {
     }
   }
 
-  async loadFromExcel(file: Express.Multer.File): Promise<void> {
+  /* async loadFromExcel(file: Express.Multer.File): Promise<void> {
     try {
       const jsonObject = this.filer.excelToJson(file.path);
       const captions: CreateCaptionDTO[] = this.mapJsonToDTO(jsonObject);
@@ -129,14 +127,14 @@ export class CaptionsService {
         error,
       );
     }
-  }
+  } */
 
-  private mapJsonToDTO(jsonObject: any): CreateCaptionDTO[] {
+  /* private mapJsonToDTO(jsonObject: any): CreateCaptionDTO[] {
     return jsonObject.map((caption: Captions) => {
       return {
         name: caption.name,
         status: caption.status,
       };
     });
-  }
+  } */
 }

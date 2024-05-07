@@ -12,11 +12,9 @@ import { PassengerModule } from './passenger/passenger.module';
 import { RolesModule } from './roles/roles.module';
 import { TemplatesModule } from './templates/templates.module';
 import { TourtypeModule } from './tourtype/tourtype.module';
-import { TranslationtypeModule } from './translationtype/translationtype.module';
 import { TransportsModule } from './transports/transports.module';
 import { DestinationModule } from './destination/destination.module';
 import { EventlogModule } from './eventlog/eventlog.module';
-import { FilerModule } from './filer/filer.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PrivatetourModule } from './privatetour/privatetour.module';
 import { SalesModule } from './sales/sales.module';
@@ -29,6 +27,8 @@ import configuration from './configs/configuration';
 import { MulterModule } from '@nestjs/platform-express';
 import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
+import { FileManagerModule } from './file-manager/file-manager.module';
+import { TransfertypeModule } from './transfertype/transfertype.module';
 
 @Module({
   imports: [
@@ -55,16 +55,16 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
     RolesModule,
     TemplatesModule,
     TourtypeModule,
-    TranslationtypeModule,
+    TransfertypeModule,
     TransportsModule,
     DestinationModule,
     EventlogModule,
-    FilerModule,
     MailerModule,
     PrivatetourModule,
     SalesModule,
     TourModule,
     UserModule,
+    FileManagerModule,
   ],
   controllers: [AppController],
   providers: [

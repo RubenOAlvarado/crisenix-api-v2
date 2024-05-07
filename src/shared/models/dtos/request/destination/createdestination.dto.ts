@@ -47,7 +47,7 @@ export class CreateDestinationDTO {
   @IsArray()
   @ArrayNotEmpty()
   @IsMongoId({ each: true, message: 'Should have at least one category' })
-  category?: Array<string>;
+  categories?: Array<string>;
 
   @ApiPropertyOptional({
     description: 'Destination origin city/ies',
@@ -57,7 +57,7 @@ export class CreateDestinationDTO {
   @IsArray()
   @ArrayNotEmpty()
   @IsMongoId({ each: true, message: 'Should have at least one originCity' })
-  originCity?: Array<string>;
+  originCities?: Array<string>;
 
   @ApiPropertyOptional({
     description: 'Destination tentative dates',
@@ -95,7 +95,7 @@ export class CreateDestinationDTO {
     each: true,
     message: 'Should have at least one translationType',
   })
-  translationType?: Array<string>;
+  transferTypes?: Array<string>;
 
   @ApiPropertyOptional({
     description: 'Destination translation route',
@@ -103,7 +103,7 @@ export class CreateDestinationDTO {
   })
   @IsOptional()
   @IsNotEmpty()
-  translationRoute?: string;
+  transfer?: string;
 
   @ApiPropertyOptional({
     description: 'Destination photos',

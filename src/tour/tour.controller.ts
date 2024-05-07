@@ -31,7 +31,6 @@ import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto'
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
-import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -188,7 +187,7 @@ export class TourController {
     return await this.tourService.changeTourStatus(param, 'dev');
   }
 
-  @ApiOkResponse({
+  /*  @ApiOkResponse({
     description: 'Tour updated successfully.',
     type: ResponseTourDTO,
   })
@@ -213,5 +212,5 @@ export class TourController {
   ) {
     // TODO: Implement user role validation
     return await this.tourService.updateTourCatalog(param, body, 'dev');
-  }
+  } */
 }

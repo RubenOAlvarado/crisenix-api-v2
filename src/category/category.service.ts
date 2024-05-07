@@ -1,4 +1,3 @@
-import { FilerService } from '@/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
 import { CategoryLean } from '@/shared/interfaces/category/category.lean.interface';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
@@ -11,6 +10,7 @@ import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -21,8 +21,9 @@ export class CategoryService {
   constructor(
     @InjectModel(Categories.name)
     private readonly categoryModel: Model<Categories>,
-    private filerService: FilerService,
   ) {}
+
+  private logger = new Logger(CategoryService.name);
 
   async create(
     createCategoryDTO: CreateCategoryDTO,
@@ -132,45 +133,23 @@ export class CategoryService {
     }
   }
 
-  async loadFromExcel(file: Express.Multer.File): Promise<void> {
+  async mapFromNameToObjectId(labels: string[]): Promise<string[] | undefined> {
     try {
-      const jsonObject = this.filerService.excelToJson(file.path);
-      const categories: CreateCategoryDTO[] =
-        this.mapJsonToCategory(jsonObject);
-      await this.categoryModel.insertMany(categories);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while loading the categories.',
-        error,
-      );
-    }
-  }
-
-  private mapJsonToCategory(json: any): CreateCategoryDTO[] {
-    return json.map((category: Categories) => {
-      return {
-        label: category.label,
-        main: category.main,
-        status: category.status,
-      };
-    });
-  }
-
-  async mapFromNameToObjectId(names: string[]): Promise<string[] | undefined> {
-    try {
-      if (!names.length) {
+      if (!labels?.length) {
         return;
       }
 
-      const mappedCategories = await Promise.all(
-        names.map(async (name) => {
+      const mappedCategoriesIds = await Promise.all(
+        labels.map(async (label) => {
+          const sanitizedLabel = label.trim();
           const category = await this.categoryModel
-            .findOne({ label: name })
-            .lean();
+            .findOne({ label: sanitizedLabel })
+            .lean()
+            .exec();
 
           if (!category) {
             const createdCategory = await this.create({
-              label: name,
+              label: sanitizedLabel,
               status: Status.ACTIVE,
             });
 
@@ -181,7 +160,7 @@ export class CategoryService {
         }),
       );
 
-      return mappedCategories;
+      return mappedCategoriesIds;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong mapping categories',

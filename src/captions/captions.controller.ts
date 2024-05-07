@@ -7,15 +7,12 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -23,8 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { CaptionsService } from './captions.service';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { excelFileFilter } from '@/filer/filer.utils';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { Public } from '@/auth/public.decorator';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
@@ -153,7 +148,7 @@ export class CaptionsController {
     return 'The caption has been successfully reactivated.';
   }
 
-  @ApiExcludeEndpoint()
+  /* @ApiExcludeEndpoint()
   @Post('load')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -163,5 +158,5 @@ export class CaptionsController {
   )
   async load(@UploadedFile() file: Express.Multer.File): Promise<void> {
     await this.captionService.loadFromExcel(file);
-  }
+  } */
 }

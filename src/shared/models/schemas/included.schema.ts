@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { Lodging } from './lodging.schema';
 
 @Schema()
 export class Includeds {
@@ -29,52 +30,7 @@ export class Includeds {
   entry: string;
 
   @Prop()
-  city?: string;
-
-  @Prop()
-  hotel?: string;
-
-  @Prop({
-    enum: ['Tentativo', 'Previsto', 'Definitivo'],
-    index: true,
-  })
-  hotelStatus?: string;
-
-  @Prop()
-  address?: string;
-
-  @Prop()
-  phone?: string;
-
-  @Prop()
-  nights?: number;
-
-  @Prop()
-  checkIn?: Date;
-
-  @Prop()
-  checkOut?: Date;
-
-  @Prop()
-  single?: number;
-
-  @Prop()
-  singleBase?: number;
-
-  @Prop()
-  doubleBase?: number;
-
-  @Prop()
-  tripleBase?: number;
-
-  @Prop()
-  quadrupleBase?: number;
-
-  @Prop()
-  minor?: number;
-
-  @Prop()
-  inapam?: number;
+  lodging?: Lodging;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;

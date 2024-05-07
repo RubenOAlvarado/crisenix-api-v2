@@ -6,12 +6,10 @@ import {
   Captions,
   CaptionSchema,
 } from '@/shared/models/schemas/captions.schema';
-import { FilerModule } from '@/filer/filer.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Captions.name, schema: CaptionSchema }]),
-    FilerModule,
   ],
   controllers: [CaptionsController],
   providers: [CaptionsService],

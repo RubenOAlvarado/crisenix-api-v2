@@ -8,15 +8,12 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -25,8 +22,6 @@ import {
 import { CategoryService } from './category.service';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { excelFileFilter } from '@/filer/filer.utils';
 import { Public } from '@/auth/public.decorator';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
@@ -148,17 +143,5 @@ export class CategoryController {
   async reactivate(@Param() { id }: UrlValidator): Promise<string> {
     await this.categoryService.reactivate(id);
     return 'The category was reactivated successfully.';
-  }
-
-  @ApiExcludeEndpoint()
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async load(@UploadedFile() file: Express.Multer.File) {
-    return await this.categoryService.loadFromExcel(file);
   }
 }

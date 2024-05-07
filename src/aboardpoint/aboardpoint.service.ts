@@ -160,27 +160,17 @@ export class AboardpointService {
   async mapFromNameToObjectId(
     aboardPoints?: string[],
   ): Promise<string[] | undefined> {
-    try {
-      if (!aboardPoints && aboardPoints !== null) {
-        return;
-      }
+    if (!aboardPoints?.length && aboardPoints !== null) {
+      return;
+    }
 
+    try {
       const mappedAboardPoints = await Promise.all(
         aboardPoints.map(async (aboardPoint) => {
-          const foundAboardPoint = await this.aboardPointModel
-            .findOne({ name: aboardPoint })
-            .lean();
-
-          if (foundAboardPoint) {
-            return foundAboardPoint._id.toString();
-          } else {
-            const newAboardPoint = await this.create({
-              name: aboardPoint,
-              status: Status.ACTIVE,
-            });
-
-            return newAboardPoint._id.toString();
-          }
+          const foundAboardPoint = await this.findOrCreateAboardPoint(
+            aboardPoint,
+          );
+          return foundAboardPoint._id.toString();
         }),
       );
 
@@ -190,6 +180,22 @@ export class AboardpointService {
         'Something went wrong mapping aboard points.',
         error,
       );
+    }
+  }
+
+  private async findOrCreateAboardPoint(aboardPoint: string) {
+    const foundAboardPoint = await this.aboardPointModel
+      .findOne({ name: aboardPoint })
+      .lean();
+
+    if (foundAboardPoint) {
+      return foundAboardPoint;
+    } else {
+      const newAboardPoint = await this.create({
+        name: aboardPoint,
+        status: Status.ACTIVE,
+      });
+      return newAboardPoint;
     }
   }
 }

@@ -15,4 +15,26 @@ export class AppController {
   getHello(): string {
     return 'Hello World!';
   }
+
+  @Get('health-check')
+  @Public()
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'No Content.',
+    type: String,
+  })
+  getHealthCheck(): string {
+    return 'Health Check!';
+  }
+
+  @Get()
+  @Public()
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'No Content.',
+    type: String,
+  })
+  getRoot(): string {
+    return 'You forgot which endpoint are looking for?';
+  }
 }

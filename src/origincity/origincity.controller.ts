@@ -2,7 +2,6 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -20,16 +19,12 @@ import {
   Post,
   Put,
   Query,
-  UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
 import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
@@ -194,7 +189,7 @@ export class OriginCityController {
     return 'The aboard point/s has been successfully added to the origin city.';
   }
 
-  @ApiExcludeEndpoint()
+  /* @ApiExcludeEndpoint()
   @Post('load')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -207,5 +202,5 @@ export class OriginCityController {
   ): Promise<string> {
     await this.originCityService.loadFromExcel(file.path);
     return 'The origin cities has been successfully loaded.';
-  }
+  } */
 }

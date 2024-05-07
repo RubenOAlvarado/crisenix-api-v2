@@ -8,15 +8,12 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -24,10 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { ClassificationService } from './classification.service';
 import { Public } from '@/auth/public.decorator';
-import { excelFileFilter } from '@/filer/filer.utils';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToInstance } from 'class-transformer';
 import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
@@ -162,7 +157,7 @@ export class ClassificationController {
     return 'The classification was reactivated successfully.';
   }
 
-  @ApiExcludeEndpoint()
+  /* @ApiExcludeEndpoint()
   @Post('load')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -172,5 +167,5 @@ export class ClassificationController {
   )
   async load(@UploadedFile() file: Express.Multer.File) {
     return await this.classificationService.loadFromExcel(file);
-  }
+  } */
 }

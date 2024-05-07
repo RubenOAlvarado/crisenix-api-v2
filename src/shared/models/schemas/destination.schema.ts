@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Categories } from './category.schema';
 import { OriginCity } from './origincity.schema';
-import { TranslationTypes } from './translationtype.schema';
+import { TransferTypes } from './transfertype.schema';
 
 @Schema()
 export class Destinations {
@@ -16,13 +16,13 @@ export class Destinations {
   description?: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Categories' }] })
-  category?: Array<Categories>;
+  categories?: Array<Categories>;
 
   @Prop({ type: String, enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OriginCity' }] })
-  originCity?: Array<OriginCity>;
+  originCities?: Array<OriginCity>;
 
   @Prop({ type: String })
   tentativeDates?: string;
@@ -34,12 +34,12 @@ export class Destinations {
   visa: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TranslationTypes' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TransferTypes' }],
   })
-  translationType?: Array<TranslationTypes>;
+  transferTypes?: Array<TransferTypes>;
 
   @Prop({ type: String })
-  translationRoute?: string;
+  transfer?: string;
 
   @Prop({ type: Array })
   photos?: Array<string>;

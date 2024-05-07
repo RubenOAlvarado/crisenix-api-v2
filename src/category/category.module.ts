@@ -6,14 +6,12 @@ import {
   Categories,
   CategorySchema,
 } from '@/shared/models/schemas/category.schema';
-import { FilerModule } from '@/filer/filer.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Categories.name, schema: CategorySchema },
     ]),
-    FilerModule,
   ],
   controllers: [CategoryController],
   providers: [CategoryService],

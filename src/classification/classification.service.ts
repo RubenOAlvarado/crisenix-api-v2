@@ -1,4 +1,3 @@
-import { FilerService } from '@/filer/filer.service';
 import { Status } from '@/shared/enums/status.enum';
 import { ClassificationLean } from '@/shared/interfaces/classification/classification.lean.interface';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
@@ -19,7 +18,6 @@ export class ClassificationService {
   constructor(
     @InjectModel(Classifications.name)
     private readonly classificationModel: Model<Classifications>,
-    private filerService: FilerService,
   ) {}
 
   async create(
@@ -138,7 +136,7 @@ export class ClassificationService {
     }
   }
 
-  async loadFromExcel(file: Express.Multer.File): Promise<void> {
+  /* async loadFromExcel(file: Express.Multer.File): Promise<void> {
     try {
       const jsonObject = this.filerService.excelToJson(file.path);
       const Classifications: CreateClassificationDTO[] =
@@ -150,9 +148,9 @@ export class ClassificationService {
         error,
       );
     }
-  }
+  } */
 
-  private mapJsonToclassification(json: any): CreateClassificationDTO[] {
+  /* private mapJsonToclassification(json: any): CreateClassificationDTO[] {
     return json.map((classification: Classifications) => {
       return {
         name: classification.name,
@@ -194,5 +192,5 @@ export class ClassificationService {
         error,
       );
     }
-  }
+  } */
 }

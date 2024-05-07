@@ -10,14 +10,11 @@ import {
   Put,
   Delete,
   Patch,
-  UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -31,8 +28,6 @@ import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { excelFileFilter } from '@/filer/filer.utils';
 import 'multer';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
@@ -224,7 +219,7 @@ export class DestinationController {
     return await this.destinationService.findCities(urlValidator);
   }
 
-  @ApiExcludeEndpoint()
+  /* @ApiExcludeEndpoint()
   @Post('load')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -235,5 +230,5 @@ export class DestinationController {
   async load(@UploadedFile() file: Express.Multer.File): Promise<string> {
     await this.destinationService.loadCatalog(file.path);
     return 'The destination catalog was successfully created.';
-  }
+  } */
 }
