@@ -353,4 +353,22 @@ export class DestinationService {
       throw handleErrorsOnServices('Error validating destination.', error);
     }
   }
+
+  async validateFromTourExcel(code: string): Promise<string> {
+    try {
+      if (!code) throw new BadRequestException('Destination code is required.');
+      const destination = await this.destinationModel
+        .findOne({
+          code,
+        })
+        .lean()
+        .exec();
+
+      if (!destination) throw new NotFoundException('Destination not found.');
+
+      return destination._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices('Error validating destination.', error);
+    }
+  }
 }

@@ -15,5 +15,6 @@ import {
   ],
   controllers: [TourtypeController],
   providers: [TourtypeService],
+  exports: [TourtypeService],
 })
 export class TourtypeModule {}

@@ -2,7 +2,7 @@
 import { DestinationService } from '@/destination/destination.service';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { TourService } from '@/tour/tour.service';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { WorkBook, WorkSheet, readFile, utils } from 'xlsx';
 const { sheet_to_json } = utils;
 
@@ -20,7 +20,6 @@ export class FileManagerService {
     ),
     Tours: this.tourService.insertToursBunch.bind(this.tourService),
   };
-  private logger = new Logger(FileManagerService.name);
 
   private isValidSheetName(names: string[]): boolean {
     return names.every((name) => this.validSheetName.includes(name));
@@ -32,20 +31,35 @@ export class FileManagerService {
       const sheetNames = workbook.SheetNames;
       if (!this.isValidSheetName(sheetNames))
         throw new BadRequestException('Invalid sheet name.');
-      const destinationSheetName = sheetNames.find(
-        (sheetName) => sheetName === 'Destinos',
-      );
-      this.logger.debug('Sheet name: ' + destinationSheetName);
-      //const tourSheet = sheetNames.find((sheetName) => sheetName === 'Tours');
-      const destinationSheet = workbook.Sheets[destinationSheetName!];
-      const destinationSheetData = this.transformSheet(destinationSheet);
-      this.logger.debug('Sheet data: ' + !!destinationSheetData);
-      //const tourSheetData = this.transformSheet(workbook.Sheets[tourSheet!]);
-      await this.loadDocument(destinationSheetData, 'Destinos');
-      //await this.loadDocument(tourSheetData, 'Tours');
+      await this.loadDestinationDocument(sheetNames, workbook);
+      await this.loadTourDocument(sheetNames, workbook);
     } catch (error) {
       throw handleErrorsOnServices('Error loading catalogs.', error);
     }
+  }
+
+  private async loadDestinationDocument(
+    sheetNames: string[],
+    workBook: WorkBook,
+  ): Promise<void> {
+    const name = 'Destinos';
+    const destinationSheetName = sheetNames.find(
+      (sheetName) => sheetName === name,
+    );
+    const destinationSheet = workBook.Sheets[destinationSheetName!];
+    const destinationSheetData = this.transformSheet(destinationSheet);
+    await this.loadDocument(destinationSheetData, name);
+  }
+
+  private async loadTourDocument(
+    sheetNames: string[],
+    workBook: WorkBook,
+  ): Promise<void> {
+    const name = 'Tours';
+    const tourSheetName = sheetNames.find((sheetName) => sheetName === name);
+    const tourSheet = workBook.Sheets[tourSheetName!];
+    const tourSheetData = this.transformSheet(tourSheet);
+    await this.loadDocument(tourSheetData, name);
   }
 
   transformSheet(sheet: WorkSheet | undefined): any {
@@ -54,7 +68,6 @@ export class FileManagerService {
 
   async loadDocument(jsonObject: any, name: string): Promise<void> {
     try {
-      this.logger.debug('Loading document: ' + name);
       if (this.services[name]) {
         const serviceFunction = this.services[name];
         if (typeof serviceFunction === 'function') {
@@ -66,7 +79,7 @@ export class FileManagerService {
         throw new BadRequestException('Invalid service name.');
       }
     } catch (error) {
-      throw handleErrorsOnServices(`Error loading ${name}.`, error);
+      throw handleErrorsOnServices(`Error loading ${name} document.`, error);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
-import { ResponseTranslationTypeDTO } from '../translationType/responseTranslationType.dto';
+import { ResponseTransferTypeDTO } from '../translationType/responseTranslationType.dto';
 import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
@@ -13,12 +13,12 @@ export class ResponseTransportsDTO {
   name: string;
 
   @ApiProperty()
-  @Type(() => ResponseTranslationTypeDTO)
+  @Type(() => ResponseTransferTypeDTO)
   @Expose()
-  translationType: ResponseTranslationTypeDTO;
+  transferType?: ResponseTransferTypeDTO;
 
-  constructor(name: string, translationType: ResponseTranslationTypeDTO) {
+  constructor(name: string, transferType: ResponseTransferTypeDTO) {
     this.name = name;
-    this.translationType = translationType;
+    this.transferType = transferType;
   }
 }

@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   Transports,
   TransportsSchema,
-} from '@/shared/models/schemas/transporst.schema';
+} from '@/shared/models/schemas/transports.schema';
 
 @Module({
   imports: [
@@ -18,5 +18,6 @@ import {
   ],
   controllers: [TransportsController],
   providers: [TransportsService],
+  exports: [TransportsService],
 })
 export class TransportsModule {}

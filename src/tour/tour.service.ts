@@ -29,6 +29,8 @@ import {
 } from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { TourtypeService } from '@/tourtype/tourtype.service';
+import { TransportsService } from '@/transports/transports.service';
 import {
   BadRequestException,
   Injectable,
@@ -43,7 +45,9 @@ export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
     private eventLogService: EventlogService,
-    private destinationService: DestinationService, // @Inject(forwardRef(() => SalesService)) // private salesService: SalesService, // private filerService: FilerService,
+    private destinationService: DestinationService,
+    private transportService: TransportsService,
+    private tourTypeService: TourtypeService,
   ) {}
 
   private readonly logger = new Logger(TourService.name);
@@ -518,16 +522,17 @@ export class TourService {
 
   async insertToursBunch(jsonObject: TourExcel[]) {
     try {
-      const tours = this.mapToDto(jsonObject);
+      const tours = await this.mapToDto(jsonObject);
       await this.tourModel.insertMany(tours);
     } catch (error) {
       throw handleErrorsOnServices('Error inserting tours bunch.', error);
     }
   }
 
-  private mapToDto(excelTours: TourExcel[]): Array<CreateTourDTO> {
+  private async mapToDto(excelTours: TourExcel[]): Promise<CreateTourDTO[]> {
     try {
-      return excelTours.map((tour) => {
+      const mappedDTO: CreateTourDTO[] = [];
+      for (const tour of excelTours) {
         const {
           destino,
           transporte,
@@ -545,11 +550,19 @@ export class TourService {
           fechaRegreso,
           recomendaciones,
           codigo,
+          estatus,
         } = tour;
-        return {
-          destination: destino ?? '',
-          transport: transporte ?? '',
-          tourType: tipo ?? '',
+        const destination = await this.destinationService.validateFromTourExcel(
+          destino,
+        );
+        const transport = await this.transportService.validateFromTourExcel(
+          transporte,
+        );
+        const tourType = await this.tourTypeService.validateFromTourExcel(tipo);
+        const tourDto = {
+          destination,
+          transport,
+          tourType,
           aboardHour: this.mapAboardHourAndReturnHour(horaDeAbordaje),
           returnHour: this.mapAboardHourAndReturnHour(horaDeRegreso),
           front: portada ?? '',
@@ -563,8 +576,11 @@ export class TourService {
           returnDate: new Date(fechaRegreso ?? ''),
           recommendations: recomendaciones ?? '',
           code: codigo ?? '',
+          status: estatus ?? TourStatus.INACTIVE,
         };
-      });
+        mappedDTO.push(tourDto);
+      }
+      return mappedDTO;
     } catch (error) {
       throw handleErrorsOnServices('Error mapping tours to DTO.', error);
     }
@@ -572,9 +588,9 @@ export class TourService {
 
   private mapAboardHourAndReturnHour(aboardTime: string): AboardHourDTO[] {
     try {
-      const times = aboardTime.split(',');
+      const times = aboardTime.split('|');
       return times.map((time) => {
-        const [hour, aboardPoint] = time.split(' ');
+        const [hour, aboardPoint] = time.split(',');
         return new AboardHourDTO(hour ?? '', aboardPoint ?? '');
       });
     } catch (error) {

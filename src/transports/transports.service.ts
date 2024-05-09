@@ -1,10 +1,10 @@
-import { Transports } from '@/shared/models/schemas/transporst.schema';
+import { Transports } from '@/shared/models/schemas/transports.schema';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import {
   Injectable,
-  Logger,
   NotFoundException,
-  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,30 +16,33 @@ export class TransportsService {
     private readonly transportModel: Model<Transports>,
   ) {}
 
-  private logger = new Logger(TransportsService.name);
-
   async getTransport({ id }: UrlValidator): Promise<Transports> {
     try {
-      this.logger.debug(`Getting transport with id: ${id}`);
       const transport = await this.transportModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!transport) {
-        this.logger.error(`Transport with id: ${id} not found.`);
         throw new NotFoundException('Transport not found.');
       }
       return transport;
     } catch (error) {
-      this.logger.error(
-        `Something went wrong getting transport with id: ${id}`,
-      );
-      if (error instanceof NotFoundException) {
-        throw error;
+      throw handleErrorsOnServices('Error getting transport.', error);
+    }
+  }
+
+  async validateFromTourExcel(name?: string): Promise<string> {
+    try {
+      if (!name) {
+        throw new BadRequestException('Transport name is required');
       }
-      throw new InternalServerErrorException(
-        'Something went wrong getting transport.',
-      );
+      const transport = await this.transportModel.findOne({ name });
+      if (!transport) {
+        throw new NotFoundException('Transport not found.');
+      }
+      return transport._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices('Error validating transport.', error);
     }
   }
 }

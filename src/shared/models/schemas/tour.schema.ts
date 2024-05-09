@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
-import { Transports } from './transporst.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Prices } from './price.schema';
 import { Classifications } from './classification.schema';
+import { Transports } from './transports.schema';
 
 @Schema()
 export class Tours {

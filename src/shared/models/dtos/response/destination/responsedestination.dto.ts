@@ -1,7 +1,7 @@
 import { ResponseCategoryDTO } from '../category/responsecategory.dto';
 import { CategoryTransformers } from '@/shared/utilities/transformers/category.transformer';
 import { OriginCityTransformers } from '@/shared/utilities/transformers/origincity.transformer';
-import { ResponseTranslationTypeDTO } from '../translationType/responseTranslationType.dto';
+import { ResponseTransferTypeDTO } from '../translationType/responseTranslationType.dto';
 import { TranslationTypeTransformers } from '@/shared/utilities/transformers/translationtype.transformer';
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
 import { Expose } from 'class-transformer';
@@ -54,12 +54,12 @@ export class ResponseDestinationDTO {
   visa: string;
 
   @ApiPropertyOptional({
-    type: ResponseTranslationTypeDTO,
+    type: ResponseTransferTypeDTO,
     isArray: true,
   })
   @Expose()
   @TranslationTypeTransformers()
-  translationType?: ResponseTranslationTypeDTO[];
+  translationType?: ResponseTransferTypeDTO[];
 
   @ApiPropertyOptional()
   @Expose()

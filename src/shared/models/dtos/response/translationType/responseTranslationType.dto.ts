@@ -2,7 +2,7 @@ import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 
-export class ResponseTranslationTypeDTO {
+export class ResponseTransferTypeDTO {
   @ApiPropertyOptional()
   @Expose()
   _id?: Types.ObjectId;

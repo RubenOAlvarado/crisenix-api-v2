@@ -9,10 +9,10 @@ export class Transports {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'TranslationTypes',
+    ref: 'TransferTypes',
     required: true,
   })
-  translationType: TransferTypes;
+  transferType: TransferTypes;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -20,9 +20,9 @@ export class Transports {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(name: string, translationType: TransferTypes, status: string) {
+  constructor(name: string, transferType: TransferTypes, status: string) {
     this.name = name;
-    this.translationType = translationType;
+    this.transferType = transferType;
     this.status = status;
   }
 }
