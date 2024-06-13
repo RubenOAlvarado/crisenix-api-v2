@@ -553,12 +553,14 @@ export class TourService {
           estatus,
         } = tour;
         const destination = await this.destinationService.validateFromTourExcel(
-          destino,
+          destino.trim(),
         );
         const transport = await this.transportService.validateFromTourExcel(
-          transporte,
+          transporte?.trim(),
         );
-        const tourType = await this.tourTypeService.validateFromTourExcel(tipo);
+        const tourType = await this.tourTypeService.validateFromTourExcel(
+          tipo.trim(),
+        );
         const tourDto = {
           destination,
           transport,

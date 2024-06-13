@@ -6,6 +6,7 @@ import {
   Categories,
   CategoryDocument,
 } from '@/shared/models/schemas/category.schema';
+import { SubCategories } from '@/shared/models/schemas/subCategory.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
@@ -20,6 +21,8 @@ export class CategoryService {
   constructor(
     @InjectModel(Categories.name)
     private readonly categoryModel: Model<Categories>,
+    @InjectModel(SubCategories.name)
+    private readonly subCategoryModel: Model<SubCategories>,
   ) {}
 
   async create(
@@ -164,5 +167,9 @@ export class CategoryService {
         error,
       );
     }
+  }
+
+  async insertCategoriesBunch(): Promise<void> {
+    // This method is not implemented yet.
   }
 }

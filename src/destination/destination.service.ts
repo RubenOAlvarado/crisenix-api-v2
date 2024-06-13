@@ -364,7 +364,10 @@ export class DestinationService {
         .lean()
         .exec();
 
-      if (!destination) throw new NotFoundException('Destination not found.');
+      if (!destination)
+        throw new NotFoundException(
+          'Destination not found, needs to be registered before insert tours.',
+        );
 
       return destination._id.toString();
     } catch (error) {

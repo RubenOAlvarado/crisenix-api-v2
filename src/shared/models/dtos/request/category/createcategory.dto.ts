@@ -13,15 +13,6 @@ export class CreateCategoryDTO {
   label: string;
 
   @ApiProperty({
-    description: 'Category main',
-    example: '3 dias',
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(150)
-  main?: string;
-
-  @ApiProperty({
     enum: Status,
     default: Status.ACTIVE,
     example: Status.ACTIVE,

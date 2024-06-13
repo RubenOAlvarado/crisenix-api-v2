@@ -12,6 +12,28 @@ export class TransfertypeService {
     private readonly transferModel: Model<TransferTypes>,
   ) {}
 
+  async getOrCreateTransferType(name: string): Promise<string> {
+    try {
+      const transferType = await this.transferModel.findOne({ name });
+
+      if (!transferType) {
+        const createdTransferType = await this.transferModel.create({
+          name,
+          status: Status.ACTIVE,
+        });
+
+        return createdTransferType._id.toString();
+      }
+
+      return transferType._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Error getting or creating transfer type.',
+        error,
+      );
+    }
+  }
+
   async mapTransferTypeNames(names: string[]): Promise<string[]> {
     try {
       if (!names.length) return [];
@@ -37,6 +59,16 @@ export class TransfertypeService {
       return mappedTransferTypes;
     } catch (error) {
       throw handleErrorsOnServices('Error mapping transfer types.', error);
+    }
+  }
+
+  async insertTransferTypesBunch(transferTypes: string[]): Promise<void> {
+    try {
+      await this.transferModel.insertMany(
+        transferTypes.map((name) => ({ name, status: Status.ACTIVE })),
+      );
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting transfer types.', error);
     }
   }
 }

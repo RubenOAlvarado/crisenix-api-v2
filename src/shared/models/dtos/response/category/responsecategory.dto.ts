@@ -3,9 +3,8 @@ import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export class ResponseCategoryDTO {
-  constructor(label: string, status: string, main?: string) {
+  constructor(label: string, status: string) {
     this.label = label;
-    this.main = main;
     this.status = status;
   }
 
@@ -16,10 +15,6 @@ export class ResponseCategoryDTO {
   @ApiProperty()
   @Expose()
   label: string;
-
-  @ApiPropertyOptional()
-  @Expose()
-  main?: string;
 
   @ApiProperty()
   @Expose()

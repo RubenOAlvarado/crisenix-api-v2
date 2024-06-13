@@ -11,7 +11,7 @@ export interface TourExcel {
   fechaInicio: string;
   transporte?: string;
   fechaRegreso: string;
-  coordinador: string;
+  coordinadores: string;
   portada: string;
   recomendaciones: string;
   salida: string;

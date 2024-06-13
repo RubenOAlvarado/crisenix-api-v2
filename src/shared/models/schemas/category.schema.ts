@@ -1,13 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { SubCategories } from './subCategory.schema';
 
 @Schema()
 export class Categories {
   @Prop({ required: true, index: true })
   label: string;
 
-  @Prop()
-  main?: string;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SubCategories' }],
+  })
+  subCategories: Array<SubCategories>;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -15,9 +18,14 @@ export class Categories {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(label: string, status: string) {
+  constructor(
+    label: string,
+    status: string,
+    subCategories: Array<SubCategories>,
+  ) {
     this.label = label;
     this.status = status;
+    this.subCategories = subCategories;
   }
 }
 

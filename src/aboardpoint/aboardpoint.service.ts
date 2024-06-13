@@ -1,4 +1,5 @@
 import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
+import { AboardPointExcel } from '@/shared/interfaces/excel/aboardPoint.excel.interface';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
@@ -167,10 +168,15 @@ export class AboardpointService {
     try {
       const mappedAboardPoints = await Promise.all(
         aboardPoints.map(async (aboardPoint) => {
-          const foundAboardPoint = await this.findOrCreateAboardPoint(
-            aboardPoint,
-          );
-          return foundAboardPoint._id.toString();
+          const foundAboardPoint = await this.aboardPointModel
+            .findOne({ name: aboardPoint })
+            .lean();
+          if (!foundAboardPoint) {
+            throw new NotFoundException(
+              `Aboard point ${aboardPoint} not found.`,
+            );
+          }
+          return foundAboardPoint?._id?.toString();
         }),
       );
 
@@ -183,19 +189,22 @@ export class AboardpointService {
     }
   }
 
-  private async findOrCreateAboardPoint(aboardPoint: string) {
-    const foundAboardPoint = await this.aboardPointModel
-      .findOne({ name: aboardPoint })
-      .lean();
-
-    if (foundAboardPoint) {
-      return foundAboardPoint;
-    } else {
-      const newAboardPoint = await this.create({
-        name: aboardPoint,
-        status: Status.ACTIVE,
-      });
-      return newAboardPoint;
+  async insertAboardPointBunch(
+    aboardPoints: AboardPointExcel[],
+  ): Promise<void> {
+    try {
+      const mappedAboardPoints: CreateAboardPointDTO[] = aboardPoints.map(
+        (aboardPoint) => ({
+          name: aboardPoint.nombre,
+          status: (aboardPoint.status as Status) ?? Status.ACTIVE,
+        }),
+      );
+      await this.aboardPointModel.insertMany(mappedAboardPoints);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong inserting aboard points.',
+        error,
+      );
     }
   }
 }

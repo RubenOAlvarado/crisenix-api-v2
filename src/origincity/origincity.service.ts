@@ -18,12 +18,15 @@ import {
 } from '@/shared/utilities/helpers';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
+import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
+import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 
 @Injectable()
 export class OriginCityService {
   constructor(
     @InjectModel(OriginCity.name)
     private readonly originCityModel: Model<OriginCity>,
+    private readonly aboardPointService: AboardpointService,
   ) {}
 
   async create(
@@ -203,54 +206,36 @@ export class OriginCityService {
     }
   }
 
-  mapCitiesToDTO(cities: string[]): CreateOriginCityDTO[] {
-    const result: CreateOriginCityDTO[] = [];
-
-    cities.forEach((city) => {
-      const [name, state] = city.split(',');
-      result.push({ state: state?.trim() ?? '', name: name?.trim() ?? '' });
-    });
-
-    return result;
-  }
-
-  async mapFromDestinationExcel(originCities: string[]): Promise<string[]> {
+  async insertOriginCityBunch(jsonObject: OriginCityExcel[]): Promise<void> {
     try {
-      if (!originCities.length) return [];
-      const mappedCitiesFromExcel = this.mapCitiesToDTO(originCities);
-
-      const mappedCities = mappedCitiesFromExcel.map(
-        async (city: { name: string; state: string }) => {
-          const existingCity = await this.findOrCreateOriginCity({
-            state: city.state,
-            name: city.name,
-          });
-
-          return existingCity._id.toString();
-        },
-      );
-
-      return await Promise.all(mappedCities);
+      const originCityDTO = await this.mapToDto(jsonObject);
+      await this.originCityModel.insertMany(originCityDTO);
     } catch (error) {
-      throw handleErrorsOnServices('Error mapping cities from excel', error);
+      throw handleErrorsOnServices('Error inserting origin cities.', error);
     }
   }
 
-  private async findOrCreateOriginCity({
-    name,
-    state,
-  }: CreateOriginCityDTO): Promise<OriginCityLean> {
-    const existingCity = await this.originCityModel.findOne({ name }).lean();
-
-    if (!existingCity) {
-      const createdOriginCity = await this.create({
-        state,
-        name,
-      });
-
-      return createdOriginCity;
+  private async mapToDto(
+    jsonObject: OriginCityExcel[],
+  ): Promise<CreateOriginCityDTO[]> {
+    try {
+      const mappedDTO: CreateOriginCityDTO[] = [];
+      for (const { nombre, estado, puntosDeAscenso } of jsonObject) {
+        const aboardPoints = puntosDeAscenso
+          ? await this.aboardPointService.mapFromNameToObjectId(
+              puntosDeAscenso.split(','),
+            )
+          : undefined;
+        const dto: CreateOriginCityDTO = {
+          name: nombre,
+          state: estado ?? '',
+          aboardPoints,
+        };
+        mappedDTO.push(dto);
+      }
+      return mappedDTO;
+    } catch (error) {
+      throw handleErrorsOnServices('Error mapping origin cities.', error);
     }
-
-    return existingCity;
   }
 }

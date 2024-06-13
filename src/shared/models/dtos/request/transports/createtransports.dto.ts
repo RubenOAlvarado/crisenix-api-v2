@@ -19,11 +19,11 @@ export class CreateTransportsDTO {
   name: string;
 
   @ApiProperty({
-    description: 'Translation type of the transport.',
+    description: 'Transfer type for the transport.',
   })
   @IsNotEmpty()
   @IsMongoId()
-  translationType: string;
+  transferType: string;
 
   @ApiProperty({
     enum: Status,
@@ -34,8 +34,8 @@ export class CreateTransportsDTO {
   @IsString()
   status?: Status;
 
-  constructor(name: string, translationType: string) {
+  constructor(name: string, transferType: string) {
     this.name = name;
-    this.translationType = translationType;
+    this.transferType = transferType;
   }
 }
