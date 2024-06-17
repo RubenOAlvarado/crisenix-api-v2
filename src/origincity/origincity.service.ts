@@ -206,6 +206,21 @@ export class OriginCityService {
     }
   }
 
+  async validateFromPriceExcel(name?: string): Promise<string> {
+    try {
+      if (!name) throw new BadRequestException('No origin city provided.');
+      const sanitizedCity = name.trim();
+      const originCity = await this.originCityModel
+        .findOne({ name: sanitizedCity })
+        .select({ _id: 1 })
+        .lean();
+      if (!originCity) throw new NotFoundException('Origin city not found.');
+      return originCity._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices('Error validating origin city.', error);
+    }
+  }
+
   async insertOriginCityBunch(jsonObject: OriginCityExcel[]): Promise<void> {
     try {
       const originCityDTO = await this.mapToDto(jsonObject);
@@ -236,6 +251,27 @@ export class OriginCityService {
       return mappedDTO;
     } catch (error) {
       throw handleErrorsOnServices('Error mapping origin cities.', error);
+    }
+  }
+
+  async mapFromDestinationExcel(names: string[]): Promise<string[]> {
+    try {
+      if (!names?.length) {
+        throw new BadRequestException('No origin cities provided.');
+      }
+      const cities = [];
+      for (const name of names) {
+        const sanitizedCity = name.trim();
+        const originCity = await this.originCityModel
+          .findOne({ name: sanitizedCity })
+          .select({ _id: 1 })
+          .lean();
+        if (!originCity) throw new NotFoundException('Origin city not found.');
+        cities.push(originCity._id.toString());
+      }
+      return cities;
+    } catch (error) {
+      throw handleErrorsOnServices('Error validating origin city.', error);
     }
   }
 }

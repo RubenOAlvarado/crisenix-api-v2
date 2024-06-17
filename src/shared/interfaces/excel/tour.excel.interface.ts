@@ -19,4 +19,5 @@ export interface TourExcel {
   horaDeRegreso: string;
   horaDeAbordaje: string;
   estatus: string;
+  precio: string;
 }

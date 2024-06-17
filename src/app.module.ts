@@ -29,6 +29,7 @@ import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { TransfertypeModule } from './transfertype/transfertype.module';
+import { PricesModule } from './prices/prices.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { TransfertypeModule } from './transfertype/transfertype.module';
     TourModule,
     UserModule,
     FileManagerModule,
+    PricesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,5 @@
 export interface PricesExcel {
+  destino: string;
   ciudad: string;
   moneda: string;
   general?: number;

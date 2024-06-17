@@ -1,12 +1,12 @@
 import { Status } from '@/shared/enums/status.enum';
 import { CategoryLean } from '@/shared/interfaces/category/category.lean.interface';
+import { CategoryExcel } from '@/shared/interfaces/excel/category.excel.interface';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
 import {
   Categories,
   CategoryDocument,
 } from '@/shared/models/schemas/category.schema';
-import { SubCategories } from '@/shared/models/schemas/subCategory.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
   BadRequestException,
@@ -21,8 +21,6 @@ export class CategoryService {
   constructor(
     @InjectModel(Categories.name)
     private readonly categoryModel: Model<Categories>,
-    @InjectModel(SubCategories.name)
-    private readonly subCategoryModel: Model<SubCategories>,
   ) {}
 
   async create(
@@ -133,34 +131,23 @@ export class CategoryService {
     }
   }
 
-  async mapFromNameToObjectId(labels: string[]): Promise<string[] | undefined> {
+  async mapFromNameToObjectId(labels: string[]): Promise<string[]> {
     try {
       if (!labels?.length) {
-        return;
+        throw new BadRequestException('No categories provided.');
       }
-
-      const mappedCategoriesIds = await Promise.all(
-        labels.map(async (label) => {
-          const sanitizedLabel = label.trim();
-          const category = await this.categoryModel
-            .findOne({ label: sanitizedLabel })
-            .lean()
-            .exec();
-
-          if (!category) {
-            const createdCategory = await this.create({
-              label: sanitizedLabel,
-              status: Status.ACTIVE,
-            });
-
-            return createdCategory._id.toString();
-          }
-
-          return category._id.toString();
-        }),
-      );
-
-      return mappedCategoriesIds;
+      const categories = [];
+      for (const label of labels) {
+        const category = await this.categoryModel
+          .findOne({ label })
+          .select({ _id: 1 })
+          .lean();
+        if (!category) {
+          throw new NotFoundException(`Category ${label} not found.`);
+        }
+        categories.push(category._id.toString());
+      }
+      return categories;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong mapping categories',
@@ -169,7 +156,36 @@ export class CategoryService {
     }
   }
 
-  async insertCategoriesBunch(): Promise<void> {
-    // This method is not implemented yet.
+  async insertCategoriesBunch(categorias: CategoryExcel[]): Promise<void> {
+    try {
+      const categoriesDTO: CreateCategoryDTO[] = this.mapDTO(categorias);
+      await this.categoryModel.insertMany(categoriesDTO);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inserting categories.',
+        error,
+      );
+    }
+  }
+
+  private mapDTO(categories: CategoryExcel[]): CreateCategoryDTO[] {
+    return categories.flatMap(({ nombre, subCategorias }) => {
+      const label = nombre.trim();
+      const subCategories = subCategorias
+        ? this.mapSubCategories(label, subCategorias)
+        : [];
+      return [...subCategories, { label, status: Status.ACTIVE }];
+    });
+  }
+
+  private mapSubCategories(
+    main: string,
+    subCategories: string,
+  ): CreateCategoryDTO[] {
+    return subCategories.split(',').map((subCategory) => ({
+      label: subCategory.trim(),
+      main,
+      status: Status.ACTIVE,
+    }));
   }
 }

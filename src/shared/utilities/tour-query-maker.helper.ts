@@ -283,7 +283,7 @@ export function createQueryForCatalog(catalog: string) {
         },
         departurePopulate,
       ];
-    case TourCatalogs.PRICE:
+    case TourCatalogs.PRICES:
       return [
         {
           path: catalog,

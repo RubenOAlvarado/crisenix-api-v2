@@ -23,7 +23,7 @@ import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
 import { DeparturesDTO } from './departures.dto';
-import { CreatePriceDTO } from '../price/createprice.dto';
+import { CreateTourPriceDTO } from '../price/createtourprice.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -212,17 +212,16 @@ export class CreateTourDTO {
   @ValidateNested({ each: true })
   itinerary?: Array<ItineraryDTO>;
 
-  @ApiPropertyOptional({
-    description: 'Tour price',
-    type: CreatePriceDTO,
+  @ApiProperty({
+    description: 'Tour prices',
+    type: CreateTourPriceDTO,
     isArray: true,
   })
-  @IsOptional()
   @ArrayNotEmpty()
   @IsDefined()
-  @Type(() => CreatePriceDTO)
+  @Type(() => CreateTourPriceDTO)
   @ValidateNested({ each: true })
-  price?: Array<CreatePriceDTO>;
+  prices: Array<CreateTourPriceDTO>;
 
   constructor(
     destination: string,
@@ -232,6 +231,7 @@ export class CreateTourDTO {
     transport: string,
     returnDate: Date,
     tourType: string,
+    prices: Array<CreateTourPriceDTO>,
   ) {
     this.destination = destination;
     this.code = code;
@@ -240,5 +240,6 @@ export class CreateTourDTO {
     this.transport = transport;
     this.returnDate = returnDate;
     this.tourType = tourType;
+    this.prices = prices;
   }
 }

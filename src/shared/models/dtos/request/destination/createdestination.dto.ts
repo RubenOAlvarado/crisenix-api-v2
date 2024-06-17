@@ -85,7 +85,7 @@ export class CreateDestinationDTO {
   visa: Visa;
 
   @ApiPropertyOptional({
-    description: 'Destination translation type/s',
+    description: 'Destination transfer type/s',
     example: ['5f9d7b9b9d3e4b2b1c1b1c1b'],
   })
   @IsOptional()
@@ -93,7 +93,7 @@ export class CreateDestinationDTO {
   @ArrayNotEmpty()
   @IsMongoId({
     each: true,
-    message: 'Should have at least one translationType',
+    message: 'Should have at least one transferTypes',
   })
   transferTypes?: Array<string>;
 

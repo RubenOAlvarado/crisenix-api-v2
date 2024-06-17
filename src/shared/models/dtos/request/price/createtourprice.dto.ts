@@ -1,33 +1,14 @@
+import { Currency } from '@/shared/enums/currency.enum';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsIn,
-  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Currency } from 'src/shared/enums/currency.enum';
 
-export class CreatePriceDTO {
-  @ApiProperty({
-    description: 'Destination id that this price belongs to.',
-    example: '60f1b2b3e6b2f1b2b3e6b2f1',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsMongoId()
-  destination: string;
-
-  @ApiProperty({
-    description: 'City id that this price belongs to.',
-    example: '60f1b2b3e6b2f1b2b3e6b2f1',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsMongoId()
-  city: string;
-
+export class CreateTourPriceDTO {
   @ApiProperty({
     enum: Currency,
     description: 'Currency of the price.',
@@ -86,7 +67,7 @@ export class CreatePriceDTO {
   @IsNumber()
   minor?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Inapam base price (just for old people).',
     example: 100,
   })
@@ -94,9 +75,23 @@ export class CreatePriceDTO {
   @IsNumber()
   inapam?: number;
 
-  constructor(destination: string, city: string, currency: Currency) {
-    this.destination = destination;
-    this.city = city;
+  constructor(
+    currency: Currency,
+    general?: number,
+    singleBase?: number,
+    doubleBase?: number,
+    tripleBase?: number,
+    quadrupleBase?: number,
+    minor?: number,
+    inapam?: number,
+  ) {
     this.currency = currency;
+    this.general = general;
+    this.singleBase = singleBase;
+    this.doubleBase = doubleBase;
+    this.tripleBase = tripleBase;
+    this.quadrupleBase = quadrupleBase;
+    this.minor = minor;
+    this.inapam = inapam;
   }
 }

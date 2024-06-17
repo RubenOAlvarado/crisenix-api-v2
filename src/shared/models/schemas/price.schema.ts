@@ -1,8 +1,15 @@
-import { Prop } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { OriginCity } from './origincity.schema';
+import { Destinations } from './destination.schema';
 
 export class Prices {
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Destinations',
+    required: true,
+  })
+  destination: Destinations;
   // ref: 'OriginCity'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -42,6 +49,7 @@ export class Prices {
   createdAt?: Date;
 
   constructor(
+    destination: Destinations,
     city: OriginCity,
     currency: string,
     general: number,
@@ -53,6 +61,7 @@ export class Prices {
     inapam: number,
     status: string,
   ) {
+    this.destination = destination;
     this.city = city;
     this.currency = currency;
     this.general = general;
@@ -65,3 +74,6 @@ export class Prices {
     this.status = status;
   }
 }
+
+export type PricesDocument = HydratedDocument<Prices>;
+export const PricesSchema = SchemaFactory.createForClass(Prices);

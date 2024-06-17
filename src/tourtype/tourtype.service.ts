@@ -32,16 +32,14 @@ export class TourtypeService {
 
   async insertTourTypeBunch(jsonObject: TourTypeExcel[]): Promise<void> {
     try {
-      const tourTypeDTO = await this.mapToDto(jsonObject);
+      const tourTypeDTO = this.mapToDto(jsonObject);
       await this.tourTypeModel.insertMany(tourTypeDTO);
     } catch (error) {
       throw handleErrorsOnServices('Error inserting tour types.', error);
     }
   }
 
-  private async mapToDto(
-    jsonObject: TourTypeExcel[],
-  ): Promise<CreateTourTypeDTO[]> {
+  private mapToDto(jsonObject: TourTypeExcel[]): CreateTourTypeDTO[] {
     try {
       const mappedDTO: CreateTourTypeDTO[] = [];
       for (const { nombre, descripcion } of jsonObject) {

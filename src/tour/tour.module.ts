@@ -8,6 +8,7 @@ import { EventlogModule } from '@/eventlog/eventlog.module';
 import { DestinationModule } from '@/destination/destination.module';
 import { TransportsModule } from '@/transports/transports.module';
 import { TourtypeModule } from '@/tourtype/tourtype.module';
+import { PricesModule } from '@/prices/prices.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TourtypeModule } from '@/tourtype/tourtype.module';
     DestinationModule,
     TransportsModule,
     TourtypeModule,
+    PricesModule,
   ],
   controllers: [TourController],
   providers: [TourService],

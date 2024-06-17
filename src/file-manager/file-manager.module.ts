@@ -10,6 +10,7 @@ import { OrigincityModule } from '@/origincity/origincity.module';
 import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 import { CategoryModule } from '@/category/category.module';
 import { TransfertypeModule } from '@/transfertype/transfertype.module';
+import { PricesModule } from '@/prices/prices.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TransfertypeModule } from '@/transfertype/transfertype.module';
     AboardpointModule,
     CategoryModule,
     TransfertypeModule,
+    PricesModule,
   ],
   controllers: [FileManagerController],
   providers: [FileManagerService, CatalogManagerService],

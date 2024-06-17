@@ -1,5 +1,6 @@
 import { DestinationService } from '@/destination/destination.service';
 import { EventlogService } from '@/eventlog/eventlog.service';
+import { PricesService } from '@/prices/prices.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { MOVES } from '@/shared/enums/moves.enum';
 import { UserRoles } from '@/shared/enums/roles';
@@ -44,10 +45,11 @@ import { Model } from 'mongoose';
 export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
-    private eventLogService: EventlogService,
-    private destinationService: DestinationService,
-    private transportService: TransportsService,
-    private tourTypeService: TourtypeService,
+    private readonly eventLogService: EventlogService,
+    private readonly destinationService: DestinationService,
+    private readonly transportService: TransportsService,
+    private readonly tourTypeService: TourtypeService,
+    private readonly priceService: PricesService,
   ) {}
 
   private readonly logger = new Logger(TourService.name);
@@ -113,7 +115,6 @@ export class TourService {
           'tourType',
           'included',
           'itinerary',
-          'price',
         ])
         .populate({
           path: 'aboardHour.aboardPoint',
@@ -155,7 +156,6 @@ export class TourService {
           'tourType',
           'included',
           'itinerary',
-          'price',
           'departure',
         ])
         .populate({
@@ -216,7 +216,6 @@ export class TourService {
             'tourType',
             'included',
             'itinerary',
-            'price',
             'departure',
           ])
           .populate({
@@ -551,6 +550,7 @@ export class TourService {
           recomendaciones,
           codigo,
           estatus,
+          precio,
         } = tour;
         const destination = await this.destinationService.validateFromTourExcel(
           destino.trim(),
@@ -560,6 +560,9 @@ export class TourService {
         );
         const tourType = await this.tourTypeService.validateFromTourExcel(
           tipo.trim(),
+        );
+        const prices = await this.priceService.validateFromTourExcel(
+          precio.trim(),
         );
         const tourDto = {
           destination,
@@ -579,6 +582,7 @@ export class TourService {
           recommendations: recomendaciones ?? '',
           code: codigo ?? '',
           status: estatus ?? TourStatus.INACTIVE,
+          prices,
         };
         mappedDTO.push(tourDto);
       }

@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import mongoose, { CallbackError, HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
-import { Prices } from './price.schema';
 import { Classifications } from './classification.schema';
 import { Transports } from './transports.schema';
+import { CreateTourPriceDTO } from '../dtos/request/price/createtourprice.dto';
 
 @Schema()
 export class Tours {
@@ -124,8 +125,8 @@ export class Tours {
     order: number;
   }>;
 
-  @Prop({ type: Array<Prices> })
-  price?: Array<Prices>;
+  @Prop({ type: Array })
+  prices: Array<CreateTourPriceDTO>;
 
   @Prop({ type: Date, default: Date.now })
   createdAt?: Date;
@@ -142,6 +143,7 @@ export class Tours {
     transport: Transports,
     returnDate: Date,
     tourType: TourTypes,
+    prices: Array<CreateTourPriceDTO>,
   ) {
     this.destination = destination;
     this.code = code;
@@ -154,8 +156,42 @@ export class Tours {
     this.transport = transport;
     this.returnDate = returnDate;
     this.tourType = tourType;
+    this.prices = prices;
   }
 }
 
 export type TourDocument = HydratedDocument<Tours>;
 export const TourSchema = SchemaFactory.createForClass(Tours);
+
+TourSchema.pre('save', async function (next) {
+  const tour = this as TourDocument;
+
+  if (!tour.prices) {
+    return next();
+  }
+
+  try {
+    const { prices } = tour;
+    for (const price of prices) {
+      if (tour.days === 1) {
+        // For one-day tours, only general, minor, and INAPAM prices are required.
+        if (
+          price.singleBase ||
+          price.doubleBase ||
+          price.tripleBase ||
+          price.quadrupleBase
+        ) {
+          return next(
+            new Error(
+              'For one-day tours, only general, minor, and INAPAM prices are required.',
+            ),
+          );
+        }
+      }
+    }
+
+    next();
+  } catch (err: CallbackError | any) {
+    next(err);
+  }
+});

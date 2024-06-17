@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from 'src/shared/enums/status.enum';
 
 export class CreateCategoryDTO {
@@ -11,6 +11,14 @@ export class CreateCategoryDTO {
   @IsString()
   @MaxLength(150)
   label: string;
+
+  @ApiPropertyOptional({
+    description: 'Main category',
+    example: 'Playas',
+  })
+  @IsOptional()
+  @IsString()
+  main?: string;
 
   @ApiProperty({
     enum: Status,

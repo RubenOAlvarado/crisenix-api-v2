@@ -308,7 +308,7 @@ export class DestinationService {
       );
 
       const originCities = await this.originCityService.mapFromDestinationExcel(
-        ciudadDeOrigen?.split('|'),
+        ciudadDeOrigen?.split(','),
       );
 
       const transferTypes = await this.transferTypeService.mapTransferTypeNames(
@@ -354,7 +354,7 @@ export class DestinationService {
     }
   }
 
-  async validateFromTourExcel(code: string): Promise<string> {
+  async validateFromTourExcel(code?: string): Promise<string> {
     try {
       if (!code) throw new BadRequestException('Destination code is required.');
       const destination = await this.destinationModel

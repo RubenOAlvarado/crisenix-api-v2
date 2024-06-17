@@ -6,7 +6,6 @@ import { ResponseCoordinatorDto } from './response-coordinator.dto';
 import { ResponseTourTypeDTO } from '../tourType/responseTourType.dto';
 import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
 import { ResponseItineraryDTO } from './reponseitinerary.dto';
-import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
 import { Expose, Type } from 'class-transformer';
@@ -117,14 +116,6 @@ export class ResponseTourDTO {
   @Type(() => ResponseItineraryDTO)
   @ItineraryTransformers()
   itinerary?: ResponseItineraryDTO[];
-
-  @ApiPropertyOptional({
-    type: ResponsePriceDTO,
-    isArray: true,
-  })
-  @Type(() => ResponsePriceDTO)
-  @Expose()
-  price?: ResponsePriceDTO[];
 
   constructor(
     destination: ResponseDestinationDTO,

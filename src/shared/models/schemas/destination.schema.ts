@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Categories } from './category.schema';
 import { OriginCity } from './origincity.schema';
 import { TransferTypes } from './transfertype.schema';
+import { Prices } from './price.schema';
 
 @Schema()
 export class Destinations {
@@ -44,14 +45,28 @@ export class Destinations {
   @Prop({ type: Array })
   photos?: Array<string>;
 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Prices',
+    required: true,
+  })
+  price: Prices;
+
   @Prop({ type: Date, default: Date.now })
   createdAt?: Date;
 
-  constructor(code: string, name: string, status: string, visa: string) {
+  constructor(
+    code: string,
+    name: string,
+    status: string,
+    visa: string,
+    price: Prices,
+  ) {
     this.code = code;
     this.name = name;
     this.status = status;
     this.visa = visa;
+    this.price = price;
   }
 }
 

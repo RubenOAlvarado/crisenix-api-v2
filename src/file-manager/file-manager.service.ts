@@ -9,20 +9,23 @@ import {
   transformSheet,
   validateSheetNames,
 } from './file-manager.utils';
+import { PricesService } from '@/prices/prices.service';
 
 @Injectable()
 export class FileManagerService {
   constructor(
     private destinationService: DestinationService,
     private tourService: TourService,
+    private priceService: PricesService,
   ) {}
 
-  validSheetName = ['Destinos', 'Tours'];
+  validSheetName = ['Destinos', 'Tours', 'Precios'];
   services: { [key: string]: (jsonObject: any) => Promise<void> } = {
     Destinos: this.destinationService.insertDestinationsBunch.bind(
       this.destinationService,
     ),
     Tours: this.tourService.insertToursBunch.bind(this.tourService),
+    Precios: this.priceService.insertPricesBunch.bind(this.priceService),
   };
 
   async loadToursAndDestinations(filePath: string): Promise<void> {
@@ -30,10 +33,14 @@ export class FileManagerService {
       const workbook: WorkBook = readFile(filePath);
       const sheetNames = workbook.SheetNames;
       validateSheetNames(sheetNames, this.validSheetName);
-      await Promise.all([
-        this.loadDestinationDocument(sheetNames, workbook),
-        this.loadTourDocument(sheetNames, workbook),
-      ]);
+      // first load destinations
+      await this.loadDestinationDocument(sheetNames, workbook);
+
+      // then load prices
+      await this.loadPriceDocument(sheetNames, workbook);
+
+      // finally load tours
+      await this.loadTourDocument(sheetNames, workbook);
     } catch (error) {
       throw handleErrorsOnServices('Error loading catalogs.', error);
     }
@@ -61,5 +68,16 @@ export class FileManagerService {
     const tourSheet = workBook.Sheets[tourSheetName!];
     const tourSheetData = transformSheet(tourSheet);
     await loadDocument(tourSheetData, name, this.services);
+  }
+
+  private async loadPriceDocument(
+    sheetNames: string[],
+    workBook: WorkBook,
+  ): Promise<void> {
+    const name = 'Precios';
+    const priceSheetName = sheetNames.find((sheetName) => sheetName === name);
+    const priceSheet = workBook.Sheets[priceSheetName!];
+    const priceSheetData = transformSheet(priceSheet);
+    await loadDocument(priceSheetData, name, this.services);
   }
 }
