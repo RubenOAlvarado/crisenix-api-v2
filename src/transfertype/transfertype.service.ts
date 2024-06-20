@@ -1,4 +1,5 @@
 import { Status } from '@/shared/enums/status.enum';
+import { TransferTypeExcel } from '@/shared/interfaces/excel/transferType.excel.interface';
 import { TransferTypes } from '@/shared/models/schemas/transfertype.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
@@ -34,6 +35,18 @@ export class TransfertypeService {
     }
   }
 
+  async getTransferTypeByName(name: string): Promise<string> {
+    try {
+      const transferType = await this.transferModel.findOne({ name }).exec();
+      if (!transferType) {
+        throw new NotFoundException('Transfer type not found.');
+      }
+      return transferType._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices('Error getting transfer type.', error);
+    }
+  }
+
   async mapTransferTypeNames(names: string[]): Promise<string[]> {
     try {
       if (!names.length) {
@@ -41,14 +54,11 @@ export class TransfertypeService {
       }
       const transferTypes = [];
       for (const name of names) {
-        const transferType = await this.transferModel
-          .findOne({ name })
-          .select({ _id: 1 })
-          .lean();
+        const transferType = await this.getTransferTypeByName(name);
         if (!transferType) {
           throw new NotFoundException(`Transfer type ${name} not found.`);
         }
-        transferTypes.push(transferType._id.toString());
+        transferTypes.push(transferType);
       }
       return transferTypes;
     } catch (error) {
@@ -56,11 +66,15 @@ export class TransfertypeService {
     }
   }
 
-  async insertTransferTypesBunch(transferTypes: string[]): Promise<void> {
+  async insertTransferTypesBunch(
+    transferTypes: TransferTypeExcel[],
+  ): Promise<void> {
     try {
-      await this.transferModel.insertMany(
-        transferTypes.map((name) => ({ name, status: Status.ACTIVE })),
-      );
+      const mappedTransferTypes = transferTypes.map(({ nombre }) => ({
+        name: nombre,
+        status: Status.ACTIVE,
+      }));
+      await this.transferModel.insertMany(mappedTransferTypes);
     } catch (error) {
       throw handleErrorsOnServices('Error inserting transfer types.', error);
     }

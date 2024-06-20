@@ -65,12 +65,11 @@ export class TransportsService {
     try {
       const mappedDTO: CreateTransportsDTO[] = [];
       for (const { nombre, tipoDeTraslado } of jsonObject) {
-        const transferType = await this.transferTypeService.getTransferType({
-          id: tipoDeTraslado,
-        });
+        const transferType =
+          await this.transferTypeService.getTransferTypeByName(tipoDeTraslado);
         mappedDTO.push({
           name: nombre.trim(),
-          transferType: transferType?._id?.toString(),
+          transferType,
         });
       }
       return mappedDTO;

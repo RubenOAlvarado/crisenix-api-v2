@@ -61,14 +61,16 @@ export class CatalogManagerService {
       validateSheetNames(sheetNames, this.validSheetName);
       // first we load non dependant documents
       await Promise.all([
-        this.loadTransportsDocument(sheetNames, workbook),
         this.loadTourTypeDocument(sheetNames, workbook),
         this.loadAboardPointDocument(sheetNames, workbook),
         this.loadCategories(sheetNames, workbook),
         this.loadTransferTypeDocument(sheetNames, workbook),
       ]);
       // then we load dependant documents
-      await Promise.all([this.loadOriginCityDocument(sheetNames, workbook)]);
+      await Promise.all([
+        this.loadTransportsDocument(sheetNames, workbook),
+        this.loadOriginCityDocument(sheetNames, workbook),
+      ]);
     } catch (error) {
       throw handleErrorsOnServices('Error loading catalogs.', error);
     }

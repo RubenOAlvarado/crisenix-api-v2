@@ -166,20 +166,16 @@ export class AboardpointService {
     }
 
     try {
-      const mappedAboardPoints = await Promise.all(
-        aboardPoints.map(async (aboardPoint) => {
-          const foundAboardPoint = await this.aboardPointModel
-            .findOne({ name: aboardPoint })
-            .lean();
-          if (!foundAboardPoint) {
-            throw new NotFoundException(
-              `Aboard point ${aboardPoint} not found.`,
-            );
-          }
-          return foundAboardPoint?._id?.toString();
-        }),
-      );
-
+      const mappedAboardPoints: string[] = [];
+      for (const aboardPoint of aboardPoints) {
+        const foundAboardPoint = await this.aboardPointModel
+          .findOne({ name: aboardPoint.trim() })
+          .exec();
+        if (!foundAboardPoint) {
+          throw new NotFoundException(`Aboard point ${aboardPoint} not found.`);
+        }
+        mappedAboardPoints.push(foundAboardPoint?._id?.toString());
+      }
       return mappedAboardPoints;
     } catch (error) {
       throw handleErrorsOnServices(
