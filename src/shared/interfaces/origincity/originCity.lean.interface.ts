@@ -1,4 +1,4 @@
 import { Types } from 'mongoose';
-import { OriginCity } from '../../models/schemas/origincity.schema';
+import { OriginCities } from '../../models/schemas/origincity.schema';
 
-export type OriginCityLean = OriginCity & { _id: Types.ObjectId };
+export type OriginCityLean = OriginCities & { _id: Types.ObjectId };

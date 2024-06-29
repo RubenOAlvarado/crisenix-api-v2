@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { AboardPoints } from './aboarpoint.schema';
 
 @Schema()
-export class OriginCity {
+export class OriginCities {
   @Prop({ required: true, index: true })
   state: string;
 
@@ -29,5 +29,5 @@ export class OriginCity {
   }
 }
 
-export type OriginCityDocument = HydratedDocument<OriginCity>;
-export const OriginCitySchema = SchemaFactory.createForClass(OriginCity);
+export type OriginCityDocument = HydratedDocument<OriginCities>;
+export const OriginCitySchema = SchemaFactory.createForClass(OriginCities);

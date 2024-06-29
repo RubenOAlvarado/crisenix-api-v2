@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import mongoose, { CallbackError, HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { TourTypes } from './tourtype.schema';
@@ -162,36 +161,3 @@ export class Tours {
 
 export type TourDocument = HydratedDocument<Tours>;
 export const TourSchema = SchemaFactory.createForClass(Tours);
-
-TourSchema.pre('save', async function (next) {
-  const tour = this as TourDocument;
-
-  if (!tour.prices) {
-    return next();
-  }
-
-  try {
-    const { prices } = tour;
-    for (const price of prices) {
-      if (tour.days === 1) {
-        // For one-day tours, only general, minor, and INAPAM prices are required.
-        if (
-          price.singleBase ||
-          price.doubleBase ||
-          price.tripleBase ||
-          price.quadrupleBase
-        ) {
-          return next(
-            new Error(
-              'For one-day tours, only general, minor, and INAPAM prices are required.',
-            ),
-          );
-        }
-      }
-    }
-
-    next();
-  } catch (err: CallbackError | any) {
-    next(err);
-  }
-});

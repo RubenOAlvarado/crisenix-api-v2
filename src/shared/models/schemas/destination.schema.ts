@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Categories } from './category.schema';
-import { OriginCity } from './origincity.schema';
+import { OriginCities } from './origincity.schema';
 import { TransferTypes } from './transfertype.schema';
-import { Prices } from './price.schema';
 
 @Schema()
 export class Destinations {
@@ -22,8 +21,10 @@ export class Destinations {
   @Prop({ type: String, enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OriginCity' }] })
-  originCities?: Array<OriginCity>;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OriginCities' }],
+  })
+  originCities?: Array<OriginCities>;
 
   @Prop({ type: String })
   tentativeDates?: string;
@@ -45,28 +46,14 @@ export class Destinations {
   @Prop({ type: Array })
   photos?: Array<string>;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Prices',
-    required: true,
-  })
-  price: Prices;
-
   @Prop({ type: Date, default: Date.now })
   createdAt?: Date;
 
-  constructor(
-    code: string,
-    name: string,
-    status: string,
-    visa: string,
-    price: Prices,
-  ) {
+  constructor(code: string, name: string, status: string, visa: string) {
     this.code = code;
     this.name = name;
     this.status = status;
     this.visa = visa;
-    this.price = price;
   }
 }
 

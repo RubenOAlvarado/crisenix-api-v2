@@ -66,7 +66,7 @@ export class PricesService {
         };
         mappedDTO.push(dto);
       }
-      return mappedDTO;
+      return Promise.all(mappedDTO);
     } catch (error) {
       throw handleErrorsOnServices('Error mapping prices.', error);
     }
@@ -79,14 +79,18 @@ export class PricesService {
       for (const price of prices) {
         const [destination, city] = price.split('-');
         const destinationId =
-          await this.destinationService.validateFromTourExcel(destination);
+          await this.destinationService.validateFromTourExcel(
+            destination?.trim(),
+          );
         const cityId = await this.originCityService.validateFromPriceExcel(
-          city,
+          city?.trim(),
         );
-        const priceExists = await this.priceModel.findOne({
-          destination: destinationId,
-          city: cityId,
-        });
+        const priceExists = await this.priceModel
+          .findOne({
+            destination: destinationId,
+            city: cityId,
+          })
+          .exec();
         if (!priceExists) {
           throw new Error('Price not found.');
         }

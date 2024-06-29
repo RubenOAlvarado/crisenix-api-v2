@@ -1,5 +1,5 @@
 import {
-  IsIn,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -34,8 +34,7 @@ export class CreatePriceDTO {
     example: Currency.MX,
   })
   @IsNotEmpty()
-  @IsIn([Currency.MX, Currency.USA])
-  @IsString()
+  @IsEnum(Currency)
   currency: Currency;
 
   @ApiPropertyOptional({
@@ -86,7 +85,7 @@ export class CreatePriceDTO {
   @IsNumber()
   minor?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Inapam base price (just for old people).',
     example: 100,
   })

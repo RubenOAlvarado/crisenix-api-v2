@@ -162,7 +162,7 @@ export class TourService {
           path: 'destination',
           populate: {
             path: 'originCity',
-            model: 'OriginCity',
+            model: 'OriginCities',
             populate: {
               path: 'aboardPoints',
               model: 'AboardPoints',

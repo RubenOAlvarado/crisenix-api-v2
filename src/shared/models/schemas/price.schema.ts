@@ -1,7 +1,7 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { OriginCity } from './origincity.schema';
 import { Destinations } from './destination.schema';
+import { OriginCities } from './origincity.schema';
 
 export class Prices {
   @Prop({
@@ -13,10 +13,10 @@ export class Prices {
   // ref: 'OriginCity'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'OriginCity',
+    ref: 'OriginCities',
     required: true,
   })
-  city: OriginCity;
+  city: OriginCities;
 
   @Prop({ required: true, enum: ['MXN', 'USD'], default: 'MXN' })
   currency: string;
@@ -43,37 +43,18 @@ export class Prices {
   inapam?: number;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  status?: string;
 
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(
-    destination: Destinations,
-    city: OriginCity,
-    currency: string,
-    general: number,
-    singleBase: number,
-    doubleBase: number,
-    tripleBase: number,
-    quadrupleBase: number,
-    minor: number,
-    inapam: number,
-    status: string,
-  ) {
+  constructor(destination: Destinations, city: OriginCities, currency: string) {
     this.destination = destination;
     this.city = city;
     this.currency = currency;
-    this.general = general;
-    this.singleBase = singleBase;
-    this.doubleBase = doubleBase;
-    this.tripleBase = tripleBase;
-    this.quadrupleBase = quadrupleBase;
-    this.minor = minor;
-    this.inapam = inapam;
-    this.status = status;
   }
 }
 
 export type PricesDocument = HydratedDocument<Prices>;
 export const PricesSchema = SchemaFactory.createForClass(Prices);
+PricesSchema.set('strict', false);

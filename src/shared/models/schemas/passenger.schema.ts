@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { AboardPoints } from './aboarpoint.schema';
-import { OriginCity } from './origincity.schema';
+import { OriginCities } from './origincity.schema';
 import { Prices } from './price.schema';
 
 @Schema()
@@ -21,15 +21,15 @@ export class Passengers {
   // ref: 'OriginCity'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'OriginCity',
+    ref: 'OriginCities',
     required: true,
   })
-  originCity: OriginCity;
+  originCity: OriginCities;
 
   // ref: 'AboardPoint'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'AboardPoint',
+    ref: 'AboardPoints',
     required: true,
   })
   aboardPoint: AboardPoints;
@@ -55,7 +55,7 @@ export class Passengers {
     name: string,
     lastName: string,
     secondLastName: string,
-    originCity: OriginCity,
+    originCity: OriginCities,
     aboardPoint: AboardPoints,
     price: Prices,
   ) {

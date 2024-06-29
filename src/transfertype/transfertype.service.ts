@@ -54,7 +54,7 @@ export class TransfertypeService {
       }
       const transferTypes = [];
       for (const name of names) {
-        const transferType = await this.getTransferTypeByName(name);
+        const transferType = await this.getTransferTypeByName(name.trim());
         if (!transferType) {
           throw new NotFoundException(`Transfer type ${name} not found.`);
         }

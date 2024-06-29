@@ -10,7 +10,7 @@ import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
-import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
+import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import {
   createPaginatedObject,
@@ -24,8 +24,8 @@ import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 @Injectable()
 export class OriginCityService {
   constructor(
-    @InjectModel(OriginCity.name)
-    private readonly originCityModel: Model<OriginCity>,
+    @InjectModel(OriginCities.name)
+    private readonly originCityModel: Model<OriginCities>,
     private readonly aboardPointService: AboardpointService,
   ) {}
 

@@ -138,8 +138,9 @@ export class CategoryService {
       }
       const categories = [];
       for (const label of labels) {
+        const sanitizedLabel = label.trim();
         const category = await this.categoryModel
-          .findOne({ label })
+          .findOne({ label: sanitizedLabel })
           .select({ _id: 1 })
           .lean();
         if (!category) {

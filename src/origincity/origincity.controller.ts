@@ -20,7 +20,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { OriginCity } from 'src/shared/models/schemas/origincity.schema';
+import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
@@ -86,7 +86,7 @@ export class OriginCityController {
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
-  ): Promise<PaginateResult<OriginCity>> {
+  ): Promise<PaginateResult<OriginCities>> {
     return await this.originCityService.findAll(queryDTO);
   }
 
@@ -161,7 +161,7 @@ export class OriginCityController {
     description: 'Searcher object',
     type: SearcherDTO,
   })
-  async search(@Body() searcherDTO: SearcherDTO): Promise<Array<OriginCity>> {
+  async search(@Body() searcherDTO: SearcherDTO): Promise<Array<OriginCities>> {
     return await this.originCityService.searcher(searcherDTO);
   }
 
@@ -188,19 +188,4 @@ export class OriginCityController {
     await this.originCityService.addAboardPoints(urlValidator, aboardPointsDTO);
     return 'The aboard point/s has been successfully added to the origin city.';
   }
-
-  /* @ApiExcludeEndpoint()
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async loadCatalog(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<string> {
-    await this.originCityService.loadFromExcel(file.path);
-    return 'The origin cities has been successfully loaded.';
-  } */
 }
