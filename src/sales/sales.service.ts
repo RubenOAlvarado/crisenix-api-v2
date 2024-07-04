@@ -98,10 +98,11 @@ export class SalesService {
     }
   }
 
-  async paypalResponse(
-    { state, sale, failureReason }: PaypalResponse,
-    user: any,
-  ): Promise<ResponseSavedPaypalResponse> {
+  async paypalResponse({
+    state,
+    sale,
+    failureReason,
+  }: PaypalResponse): Promise<ResponseSavedPaypalResponse> {
     try {
       const validatedSale = await this.validateSaleForPayment(sale);
       const tour = await this.tourService.validateSaledTour(
@@ -140,7 +141,6 @@ export class SalesService {
           await this.tourService.updateTourSeats(
             validatedSale.tour,
             validatedSale.reservedSeat,
-            user,
             SalesMove.DELETE,
           );
 

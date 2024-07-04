@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param, Query, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -16,7 +16,6 @@ import { Public } from '@/auth/public.decorator';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
-import type { UserRequest } from '@/shared/interfaces/userRequest.interface';
 import { ResponseSalesDTO } from '@/shared/models/dtos/response/sales/responsesales.dto';
 import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dto';
 import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/response/sales/response-paypal.response.dto';
@@ -85,8 +84,7 @@ export class SalesController {
   @Post('result')
   async paypalResult(
     @Body() paypalResponse: PaypalResponse,
-    @Req() req: UserRequest,
   ): Promise<ResponseSavedPaypalResponse> {
-    return await this.salesService.paypalResponse(paypalResponse, req.user);
+    return await this.salesService.paypalResponse(paypalResponse);
   }
 }

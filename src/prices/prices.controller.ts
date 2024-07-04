@@ -1,14 +1,31 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
-import { PricesService } from './prices.service';
+import {
+  // Body,
+  Controller,
+  /* Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query, */
+} from '@nestjs/common';
+/* import { PricesService } from './prices.service';
 import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
+import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto'; */
 @Controller('prices')
 export class PricesController {
-  constructor(private pricesService: PricesService) {}
+  /* constructor(private pricesService: PricesService) {}
 
   @ApiCreatedResponse({
     type: ResponsePriceDTO,
@@ -20,7 +37,7 @@ export class PricesController {
   @Post('create')
   @ApiBody({ type: CreatePriceDTO })
   async createPrice(@Body() createPriceDTO: CreatePriceDTO) {
-    return await this.pricesService.createPrice(createPriceDTO);
+    // return await this.pricesService.createPrice(createPriceDTO);
   }
 
   @ApiOkResponse({
@@ -96,5 +113,5 @@ export class PricesController {
     await this.pricesService.reactivePrice(params);
 
     return 'Price reactivated successfully.';
-  }
+  } */
 }
