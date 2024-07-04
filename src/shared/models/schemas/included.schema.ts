@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Lodging } from './lodging.schema';
 
 @Schema()
 export class Includeds {
@@ -15,8 +14,6 @@ export class Includeds {
 
   @Prop({
     enum: [
-      'Transporte Aéreo',
-      'Hospedaje',
       'Alimentos',
       'Actividades',
       'Gastos',
@@ -28,9 +25,6 @@ export class Includeds {
     required: true,
   })
   entry: string;
-
-  @Prop()
-  lodging?: Lodging;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;

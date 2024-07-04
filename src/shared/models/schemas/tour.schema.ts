@@ -67,24 +67,6 @@ export class Tours {
   @Prop({ type: Array, default: [] })
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
-  @Prop({ type: Array, default: [] })
-  departure?: Array<{
-    start: {
-      aeroline: string;
-      door: string;
-      gate: string;
-      flightNumber: string;
-      date: Date;
-    };
-    end: {
-      aeroline: string;
-      door: string;
-      gate: string;
-      flightNumber: string;
-      date: Date;
-    };
-  }>;
-
   @Prop({ type: Array })
   coordinator?: Array<{
     transport: string;
@@ -118,9 +100,6 @@ export class Tours {
     initHour: string;
     finishDate: Date;
     finishHour: string;
-    aeroline?: string;
-    flight?: string;
-    route?: string;
     order: number;
   }>;
 

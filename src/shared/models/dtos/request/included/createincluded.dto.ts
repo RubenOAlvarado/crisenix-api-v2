@@ -1,20 +1,11 @@
-import {
-  IsNotEmpty,
-  IsNotEmptyObject,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import { Entry } from 'src/shared/enums/entry.enum';
-import { CreateLodgingDTO } from './createLodging.dto';
 
 export class CreateIncludedDTO {
   @ApiProperty({
     description: 'Service concept',
-    example: 'Desayno completo',
+    example: 'Desayuno completo',
   })
   @IsNotEmpty()
   @IsString()
@@ -41,21 +32,12 @@ export class CreateIncludedDTO {
 
   @ApiProperty({
     description: 'Entry indicator',
-    example: Entry.HOSPEDAJE,
+    example: Entry.ALIMENTOS,
     enum: Entry,
   })
   @IsNotEmpty()
   @IsString()
   entry: Entry;
-
-  @ApiPropertyOptional({
-    description: 'Service lodging, if entry is Hospedaje',
-  })
-  @ValidateIf((o) => o.entry === Entry.HOSPEDAJE)
-  @IsOptional()
-  @IsNotEmptyObject()
-  @ValidateNested()
-  lodging?: CreateLodgingDTO;
 
   constructor(
     concept: string,

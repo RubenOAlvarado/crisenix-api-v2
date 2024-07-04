@@ -248,8 +248,6 @@ export class DestinationService {
       await this.destinationModel.findByIdAndUpdate(destination, {
         photos: updatedPhotos,
       });
-
-      this.logger.debug('Photo successfully deleted.');
     } catch (error) {
       throw handleErrorsOnServices('Error deleting destination photos.', error);
     }

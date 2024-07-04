@@ -50,7 +50,7 @@ export class UserController {
     type: WebUserDTO,
   })
   async createWebUser(@Body() webUserDTO: WebUserDTO) {
-    return await this.userService.createWebUser(webUserDTO, 'develop');
+    return await this.userService.createWebUser(webUserDTO);
   }
 
   @ApiPaginatedResponse(ResponseWebUserDTO)
@@ -98,7 +98,7 @@ export class UserController {
   })
   @Delete(':id')
   async deleteWebUser(@Param() params: UrlValidator) {
-    await this.userService.deletedWebUser(params, 'develop');
+    await this.userService.deletedWebUser(params);
     return 'The user has been successfully deleted.';
   }
 
@@ -178,7 +178,7 @@ export class UserController {
   })
   @Delete('profile/:id')
   async deleteProfile(@Param() params: UrlValidator) {
-    await this.userService.deleteDbUser(params, 'develop');
+    await this.userService.deleteDbUser(params);
     return 'The user profile has been successfully deleted.';
   }
 

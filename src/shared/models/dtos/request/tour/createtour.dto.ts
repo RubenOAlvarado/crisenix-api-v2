@@ -6,7 +6,6 @@ import {
   IsInt,
   IsMongoId,
   IsNotEmpty,
-  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -22,7 +21,6 @@ import { CoordinatorDTO } from './coordinator.dto';
 import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
-import { DeparturesDTO } from './departures.dto';
 import { CreateTourPriceDTO } from '../price/createtourprice.dto';
 
 export class CreateTourDTO {
@@ -142,17 +140,6 @@ export class CreateTourDTO {
   @Type(() => AboardHourDTO)
   @ValidateNested({ each: true })
   returnHour?: Array<AboardHourDTO>;
-
-  @ApiPropertyOptional({
-    description: 'Tour departure information',
-    type: DeparturesDTO,
-  })
-  @IsOptional()
-  @IsNotEmptyObject()
-  @IsDefined()
-  @Type(() => DeparturesDTO)
-  @ValidateNested()
-  departure?: DeparturesDTO;
 
   @ApiPropertyOptional({
     description: 'Coordinator/s assigned to the tour',

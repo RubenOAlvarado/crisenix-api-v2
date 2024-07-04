@@ -148,7 +148,7 @@ export class TourController {
   })
   @Delete(':id')
   async deleteTour(@Param() param: UrlValidator) {
-    return await this.tourService.deleteTour(param, 'dev');
+    return await this.tourService.deleteTour(param);
   }
 
   @ApiPaginatedResponse(ResponseTourDTO)
@@ -184,7 +184,7 @@ export class TourController {
   @Public()
   @Patch('change-status/:newStatus/:id')
   async changeTourStatus(@Param() param: ChangeTourStatusDTO) {
-    return await this.tourService.changeTourStatus(param, 'dev');
+    return await this.tourService.changeTourStatus(param);
   }
 
   /*  @ApiOkResponse({

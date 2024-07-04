@@ -19,19 +19,8 @@ export class CreateRoleDTO {
   @IsString()
   status: string;
 
-  @ApiPropertyOptional({
-    description: 'Permissions of the role by section.',
-    example: {
-      users: ['create', 'read', 'update', 'delete'],
-      catalogs: ['create', 'read', 'update', 'delete'],
-    },
-  })
-  @IsObject()
-  permissions?: any;
-
-  constructor(description: string, status: string, permissions?: any) {
+  constructor(description: string, status: string) {
     this.description = description;
     this.status = status;
-    this.permissions = permissions;
   }
 }

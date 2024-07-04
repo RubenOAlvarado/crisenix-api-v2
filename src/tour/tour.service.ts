@@ -1,9 +1,6 @@
 import { DestinationService } from '@/destination/destination.service';
-import { EventlogService } from '@/eventlog/eventlog.service';
 import { PricesService } from '@/prices/prices.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { MOVES } from '@/shared/enums/moves.enum';
-import { UserRoles } from '@/shared/enums/roles';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
@@ -12,8 +9,6 @@ import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
-import { User } from '@/shared/interfaces/user/user.interface';
-import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
 import { AboardHourDTO } from '@/shared/models/dtos/request/tour/aboardhour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
@@ -35,7 +30,6 @@ import { TransportsService } from '@/transports/transports.service';
 import {
   BadRequestException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -45,50 +39,16 @@ import { Model } from 'mongoose';
 export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
-    private readonly eventLogService: EventlogService,
     private readonly destinationService: DestinationService,
     private readonly transportService: TransportsService,
     private readonly tourTypeService: TourtypeService,
     private readonly priceService: PricesService,
   ) {}
 
-  private readonly logger = new Logger(TourService.name);
-
-  private async saveLogInDataBase({
-    serviceId,
-    move,
-    user,
-    registry,
-  }: CreateEventLogDTO) {
-    try {
-      const service = TourService.name;
-      const createEventLogDTO = new CreateEventLogDTO(
-        serviceId,
-        service,
-        move,
-        user,
-        registry,
-      );
-      await this.eventLogService.saveLog(createEventLogDTO);
-      this.logger.debug(`${user} ${move} a tour`);
-    } catch (error) {
-      throw handleErrorsOnServices('Error saving log in database.', error);
-    }
-  }
-
-  async createTour(
-    tour: CreateTourDTO,
-    user = UserRoles.DEVELOP,
-  ): Promise<Tours> {
+  async createTour(tour: CreateTourDTO): Promise<Tours> {
     try {
       const newTour = new this.tourModel(tour);
       await newTour.save();
-      await this.saveLogInDataBase({
-        serviceId: newTour._id.toString(),
-        move: MOVES.CREATE,
-        user: user,
-        registry: newTour,
-      });
       return newTour;
     } catch (error: any) {
       throw handleErrorsOnServices(
@@ -123,15 +83,6 @@ export class TourService {
         .populate({
           path: 'returnHour.aboardPoint',
           model: 'AboardPoints',
-        })
-        .populate({
-          path: 'departure',
-          options: {
-            sort: {
-              date: 1,
-              hour: 1,
-            },
-          },
         })
         .exec();
       if (docs.length === 0)
@@ -177,15 +128,6 @@ export class TourService {
           path: 'returnHour.aboardPoint',
           model: 'AboardPoints',
         })
-        .populate({
-          path: 'departure',
-          options: {
-            sort: {
-              date: 1,
-              hour: 1,
-            },
-          },
-        })
         .select({ __v: 0, createdAt: 0 })
         .lean();
 
@@ -216,7 +158,6 @@ export class TourService {
             'tourType',
             'included',
             'itinerary',
-            'departure',
           ])
           .populate({
             path: 'aboardHour.aboardPoint',
@@ -225,15 +166,6 @@ export class TourService {
           .populate({
             path: 'returnHour.aboardPoint',
             model: 'AboardPoints',
-          })
-          .populate({
-            path: 'departure',
-            options: {
-              sort: {
-                date: 1,
-                hour: 1,
-              },
-            },
           })
           .select({ __v: 0, createdAt: 0 })
           .limit(1)
@@ -251,11 +183,7 @@ export class TourService {
     }
   }
 
-  async updateTour(
-    { id }: UrlValidator,
-    updateTourDTO: UpdateTourDTO,
-    user = UserRoles.DEVELOP,
-  ) {
+  async updateTour({ id }: UrlValidator, updateTourDTO: UpdateTourDTO) {
     try {
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         id,
@@ -265,12 +193,6 @@ export class TourService {
         },
       );
       if (!updatedTour) throw new NotFoundException('Tour not found.');
-      await this.saveLogInDataBase({
-        serviceId: updatedTour._id.toString(),
-        move: MOVES.UPDATE,
-        user: user,
-        registry: updatedTour,
-      });
       return updatedTour;
     } catch (error) {
       throw handleErrorsOnServices(
@@ -280,10 +202,10 @@ export class TourService {
     }
   }
 
-  async changeTourStatus(
-    { id, newStatus }: ChangeTourStatusDTO,
-    user: string,
-  ): Promise<TourLean | undefined> {
+  async changeTourStatus({
+    id,
+    newStatus,
+  }: ChangeTourStatusDTO): Promise<TourLean | undefined> {
     try {
       const tour = await this.tourModel.findById(id);
 
@@ -300,13 +222,6 @@ export class TourService {
       if (!updatedTour) {
         throw new NotFoundException('Tour not found after update.');
       }
-
-      await this.saveLogInDataBase({
-        serviceId: tour._id.toString(),
-        move: MOVES.UPDATE,
-        user: user,
-        registry: tour,
-      });
 
       return updatedTour;
     } catch (error) {
@@ -400,7 +315,6 @@ export class TourService {
   async updateTourSeats(
     tour: TourLean,
     soldSeats: number,
-    user: User,
     saleMove: SalesMove,
   ): Promise<void> {
     try {
@@ -431,18 +345,11 @@ export class TourService {
         }
       }
 
-      const updatedTour = await this.tourModel.findByIdAndUpdate(
+      await this.tourModel.findByIdAndUpdate(
         _id,
         { availableSeat: newAvailableSeat, ocuppiedSeat: newOcuppiedSeat },
         { new: true },
       );
-
-      await this.saveLogInDataBase({
-        serviceId: _id.toString(),
-        move: MOVES.UPDATE,
-        user: user.email,
-        registry: updatedTour,
-      });
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong updating seats.',
@@ -475,7 +382,7 @@ export class TourService {
     }
   }
 
-  async deleteTour({ id }: UrlValidator, user: string): Promise<void> {
+  async deleteTour({ id }: UrlValidator): Promise<void> {
     try {
       const tour = await this.tourModel.findById(id);
       if (!tour) throw new NotFoundException('Tour not found.');
@@ -483,12 +390,6 @@ export class TourService {
         throw new BadRequestException('Tour must be active to be deleted.');
       await this.tourModel.findByIdAndUpdate(id, {
         status: TourStatus.INACTIVE,
-      });
-      await this.saveLogInDataBase({
-        serviceId: tour._id.toString(),
-        move: MOVES.DELETE,
-        user: user,
-        registry: tour,
       });
     } catch (error) {
       throw handleErrorsOnServices(

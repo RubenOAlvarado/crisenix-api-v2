@@ -134,21 +134,4 @@ export class RolesController {
   async findRoleByDescription(@Param() params: DescriptionDTO) {
     return await this.rolesService.getRoleByDescription(params);
   }
-
-  /* @ApiResponse({ status: 201 })
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async loadCatalog(@UploadedFile() file, @Res() res) {
-    const loaded = await this.rolesService.loadCatalog(file);
-
-    return res.status(HttpStatus.CREATED).json({
-      message: 'Roles loaded',
-      loaded,
-    });
-  } */
 }

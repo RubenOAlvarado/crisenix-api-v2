@@ -7,9 +7,6 @@ import { Prices } from './price.schema';
 @Schema()
 export class Passengers {
   @Prop({ required: true, index: true })
-  room: string;
-
-  @Prop({ required: true, index: true })
   name: string;
 
   @Prop({ required: true, index: true })
@@ -44,14 +41,10 @@ export class Passengers {
   @Prop()
   visaPhoto?: string;
 
-  @Prop()
-  seat?: string;
-
   @Prop({ default: Date.now })
   createdAt?: Date;
 
   constructor(
-    room: string,
     name: string,
     lastName: string,
     secondLastName: string,
@@ -59,7 +52,6 @@ export class Passengers {
     aboardPoint: AboardPoints,
     price: Prices,
   ) {
-    this.room = room;
     this.name = name;
     this.lastName = lastName;
     this.secondLastName = secondLastName;

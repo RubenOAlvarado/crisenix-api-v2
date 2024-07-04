@@ -84,15 +84,6 @@ export class CreatePassengerDTO {
   @IsUrl()
   visaPhoto?: string;
 
-  @ApiPropertyOptional({
-    description: 'Passenger seat number if required',
-    example: '1A',
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(15)
-  seat?: string;
-
   constructor(
     name: string,
     lastName: string,

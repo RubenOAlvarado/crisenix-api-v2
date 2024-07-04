@@ -1,14 +1,11 @@
 import {
   BadRequestException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { EventlogService } from '../eventlog/eventlog.service';
 import { User } from '@/shared/models/schemas/user.schema';
-import { MOVES } from '@/shared/enums/moves.enum';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { RolesService } from '@/roles/roles.service';
@@ -23,7 +20,6 @@ import {
 } from '@/shared/utilities/helpers';
 import { UserRecord } from 'firebase-admin/auth';
 import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
-import { CreateEventLogDTO } from '@/shared/models/dtos/request/eventlog/eventlog.dto';
 import { CreateUserDTO } from '@/shared/models/dtos/request/user/createuser.dto';
 import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
 import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.dto';
@@ -37,51 +33,17 @@ export class UserService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
-    private logService: EventlogService,
     private roleService: RolesService,
     private firebaseService: FirebaseService,
   ) {}
 
-  private readonly logger = new Logger(UserService.name);
-
-  private async setLogDto(
-    serviceId: string,
-    move: string,
-    registry: any,
-    user: string,
-  ): Promise<void> {
-    try {
-      this.logger.debug('Saving in log');
-      const dto: CreateEventLogDTO = {
-        serviceId,
-        service: UserService.name,
-        move,
-        registry,
-        user,
-      };
-      await this.logService.saveLog(dto);
-      this.logger.debug(`${user} ${move} an user`);
-    } catch (e) {
-      throw handleErrorsOnServices('Error saving log', e);
-    }
-  }
-
   //Database methods
-  async createDbUser(
-    createUserDTO: CreateUserDTO,
-    creatorRoleId: string,
-  ): Promise<UserLean> {
+  async createDbUser(createUserDTO: CreateUserDTO): Promise<UserLean> {
     try {
       const { firebaseUid, role: roleId } = createUserDTO;
 
       await this.setCustomClaims(firebaseUid, roleId);
       const dbUser = new this.userModel(createUserDTO);
-      await this.setLogDto(
-        dbUser._id.toString(),
-        MOVES.CREATE,
-        dbUser,
-        creatorRoleId,
-      );
       return dbUser.save();
     } catch (e) {
       throw handleErrorsOnServices(
@@ -167,7 +129,6 @@ export class UserService {
   async updateDbUser(
     { id }: UrlValidator,
     updateUserDTO: UpdateUserDTO,
-    user = UserRoles.DEVELOP,
   ): Promise<User> {
     try {
       const dbUpdatedUser = await this.userModel.findByIdAndUpdate(
@@ -178,19 +139,13 @@ export class UserService {
 
       if (!dbUpdatedUser)
         throw new NotFoundException('User profile not found.');
-      await this.setLogDto(
-        dbUpdatedUser._id.toString(),
-        MOVES.UPDATE,
-        dbUpdatedUser,
-        user,
-      );
       return dbUpdatedUser;
     } catch (e) {
       throw handleErrorsOnServices('Error updating user profile', e);
     }
   }
 
-  async deleteDbUser({ id }: UrlValidator, user: string): Promise<UserLean> {
+  async deleteDbUser({ id }: UrlValidator): Promise<UserLean> {
     try {
       const deletedAt = new Date();
       const deletedUser = await this.userModel.findByIdAndUpdate(
@@ -199,12 +154,6 @@ export class UserService {
         { new: true },
       );
       if (!deletedUser) throw new NotFoundException('User not found');
-      await this.setLogDto(
-        deletedUser._id.toString(),
-        MOVES.DELETE,
-        deletedUser,
-        user,
-      );
       return deletedUser;
     } catch (e) {
       throw handleErrorsOnServices('Error deleting user profile', e);
@@ -212,21 +161,18 @@ export class UserService {
   }
 
   //WebUsers methods
-  async createWebUser(
-    {
-      email,
-      firebaseUid,
-      password,
-      displayName,
-      name,
-      lastName,
-      secondLast,
-      phone,
-      status,
-      role,
-    }: WebUserDTO,
-    managerId: string,
-  ): Promise<ResponseWebUserDTO | UserLean> {
+  async createWebUser({
+    email,
+    firebaseUid,
+    password,
+    displayName,
+    name,
+    lastName,
+    secondLast,
+    phone,
+    status,
+    role,
+  }: WebUserDTO): Promise<ResponseWebUserDTO | UserLean> {
     try {
       if (!firebaseUid && !password) {
         throw new BadRequestException(
@@ -244,18 +190,15 @@ export class UserService {
         firebaseUser = await this.firebaseService.createUser(fbUserDTO);
       }
 
-      const dbNewUser = await this.createDbUser(
-        {
-          name,
-          lastName,
-          secondLast,
-          phone,
-          status,
-          role,
-          firebaseUid: firebaseUid || firebaseUser?.uid,
-        },
-        managerId,
-      );
+      const dbNewUser = await this.createDbUser({
+        name,
+        lastName,
+        secondLast,
+        phone,
+        status,
+        role,
+        firebaseUid: firebaseUid || firebaseUser?.uid,
+      });
 
       return this.transformUserResponseDTO(dbNewUser, firebaseUser);
     } catch (e) {
@@ -277,14 +220,11 @@ export class UserService {
   async updateWebUser(
     param: UrlValidator,
     updateWebUserDTO: UpdateWebUserDTO,
-    managerId = UserRoles.DEVELOP,
   ): Promise<ResponseWebUserDTO> {
     try {
-      const updatedDbUser = await this.updateDbUser(
-        param,
-        { ...updateWebUserDTO },
-        managerId,
-      );
+      const updatedDbUser = await this.updateDbUser(param, {
+        ...updateWebUserDTO,
+      });
       if (!updatedDbUser) throw new NotFoundException('User not found.');
       const updatedFbUser = await this.firebaseService.updateUser(
         updatedDbUser.firebaseUid,
@@ -298,9 +238,9 @@ export class UserService {
     }
   }
 
-  async deletedWebUser(params: UrlValidator, managerId: string): Promise<void> {
+  async deletedWebUser(params: UrlValidator): Promise<void> {
     try {
-      const deletdDbUser = await this.deleteDbUser(params, managerId);
+      const deletdDbUser = await this.deleteDbUser(params);
       if (!deletdDbUser) throw new NotFoundException('User not found.');
       await this.firebaseService.deleteUser(deletdDbUser.firebaseUid);
     } catch (e) {
@@ -338,13 +278,4 @@ export class UserService {
       disabled: fbUser?.disabled,
     };
   }
-
-  /* async test(uid: string) {
-    try {
-      const user = await this.authService.getFirebaseUser(uid);
-      console.log(user);
-    } catch (e) {
-      console.log(e);
-    }
-  } */
 }

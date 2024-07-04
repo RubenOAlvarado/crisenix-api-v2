@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { EventlogService } from 'src/eventlog/eventlog.service';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -9,15 +8,7 @@ describe('UserController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
-      providers: [
-        UserService,
-        {
-          provide: EventlogService,
-          useValue: {
-            saveLog: jest.fn(),
-          },
-        },
-      ],
+      providers: [UserService],
     }).compile();
 
     controller = module.get<UserController>(UserController);

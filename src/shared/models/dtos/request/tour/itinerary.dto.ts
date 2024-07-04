@@ -72,30 +72,6 @@ export class ItineraryDTO {
   @IsString()
   finishHour?: string;
 
-  @ApiPropertyOptional({
-    description: 'Activity aeroline (optional)',
-    example: 'Aeromexico',
-  })
-  @IsOptional()
-  @IsString()
-  aeroline?: string;
-
-  @ApiPropertyOptional({
-    description: 'Flight number (optional)',
-    example: 'AM-123',
-  })
-  @IsOptional()
-  @IsString()
-  flight?: string;
-
-  @ApiPropertyOptional({
-    description: 'Activity route (optional)',
-    example: 'CDMX - Cancun',
-  })
-  @IsOptional()
-  @IsString()
-  route?: string;
-
   @ApiProperty({
     description: 'Activity order to be displayed',
     example: 1,
