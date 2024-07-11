@@ -1,12 +1,16 @@
 import {
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PriceBase } from '@/shared/enums/priceBase.enum';
+import { Currency } from '@/shared/enums/currency.enum';
 
 export class CreatePassengerDTO {
   @ApiProperty({
@@ -61,10 +65,29 @@ export class CreatePassengerDTO {
 
   @ApiProperty({
     description: 'Price payed by the passenger',
+    example: 100,
   })
   @IsNotEmpty()
-  @IsMongoId()
-  price: string;
+  @IsNumber()
+  price: number;
+
+  @ApiProperty({
+    description: 'Passenger base',
+    example: 'general',
+    enum: PriceBase,
+  })
+  @IsNotEmpty()
+  @IsEnum(PriceBase)
+  base: PriceBase;
+
+  @ApiProperty({
+    description: 'Passenger currency',
+    example: 'MXN',
+    enum: Currency,
+  })
+  @IsNotEmpty()
+  @IsEnum(Currency)
+  currency: Currency;
 
   @ApiPropertyOptional({
     description:
@@ -84,13 +107,24 @@ export class CreatePassengerDTO {
   @IsUrl()
   visaPhoto?: string;
 
+  @ApiProperty({
+    description: 'Tour id',
+    example: '123456789012345678901234',
+  })
+  @IsNotEmpty()
+  @IsMongoId()
+  tour: string;
+
   constructor(
     name: string,
     lastName: string,
     originCity: string,
     aboardPoint: string,
-    price: string,
+    price: number,
+    base: PriceBase,
+    currency: Currency,
     room: string,
+    tour: string,
   ) {
     this.name = name;
     this.lastName = lastName;
@@ -98,5 +132,8 @@ export class CreatePassengerDTO {
     this.aboardPoint = aboardPoint;
     this.price = price;
     this.room = room;
+    this.base = base;
+    this.currency = currency;
+    this.tour = tour;
   }
 }

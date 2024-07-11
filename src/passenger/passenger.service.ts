@@ -30,4 +30,15 @@ export class PassengerService {
       );
     }
   }
+
+  async getByTour(tourId: string): Promise<PassengerDocument[]> {
+    try {
+      return this.passengerModel.find({ tour: tourId });
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong fetching passengers.',
+        error,
+      );
+    }
+  }
 }
