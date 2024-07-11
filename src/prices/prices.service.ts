@@ -1,12 +1,15 @@
 import { DestinationService } from '@/destination/destination.service';
 import { OriginCityService } from '@/origincity/origincity.service';
 import { Currency } from '@/shared/enums/currency.enum';
+import { Status } from '@/shared/enums/status.enum';
 import { PricesExcel } from '@/shared/interfaces/excel/prices.excel.interface';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
 import { CreateTourPriceDTO } from '@/shared/models/dtos/request/price/createtourprice.dto';
+import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
 import { Prices } from '@/shared/models/schemas/price.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
-import { Injectable } from '@nestjs/common';
+import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -18,6 +21,94 @@ export class PricesService {
     private readonly destinationService: DestinationService,
     private readonly originCityService: OriginCityService,
   ) {}
+
+  async createPrice(createPriceDTO: CreatePriceDTO): Promise<Prices> {
+    try {
+      const createdPrice = new this.priceModel(createPriceDTO);
+      return await createdPrice.save();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while creating price.',
+        error,
+      );
+    }
+  }
+
+  async getPrices(query: any): Promise<Prices[]> {
+    try {
+      const prices = await this.priceModel.find(query).exec();
+      if (!prices) {
+        throw new NotFoundException('No prices registered.');
+      }
+      return prices;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while looking for prices.',
+        error,
+      );
+    }
+  }
+
+  async updatePrice(
+    { id }: UrlValidator,
+    updatePriceDTO: UpdatePriceDTO,
+  ): Promise<Prices> {
+    try {
+      const updatedPrice = await this.priceModel
+        .findByIdAndUpdate(id, updatePriceDTO, { new: true })
+        .exec();
+      if (!updatedPrice) {
+        throw new NotFoundException('Price not found.');
+      }
+      return updatedPrice;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while updating price.',
+        error,
+      );
+    }
+  }
+
+  async getPriceById(params: any): Promise<Prices> {
+    try {
+      const price = await this.priceModel.findById(params.id).exec();
+      if (!price) {
+        throw new NotFoundException('Price not found.');
+      }
+      return price;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while looking for price.',
+        error,
+      );
+    }
+  }
+
+  async inactivatePrice({ id }: UrlValidator): Promise<void> {
+    try {
+      await this.priceModel
+        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
+        .exec();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inactivating price.',
+        error,
+      );
+    }
+  }
+
+  async reactivatePrice({ id }: UrlValidator): Promise<void> {
+    try {
+      await this.priceModel
+        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
+        .exec();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while reactivating price.',
+        error,
+      );
+    }
+  }
 
   async insertPricesBunch(prices: PricesExcel[]): Promise<void> {
     try {

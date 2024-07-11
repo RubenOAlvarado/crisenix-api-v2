@@ -20,6 +20,7 @@ import { PassengerModule } from '@/passenger/passenger.module';
 import { SalesModule } from '@/sales/sales.module';
 import { DestinationModule } from '@/destination/destination.module';
 import { IncludedModule } from '@/included/included.module';
+import { PricesModule } from '@/prices/prices.module';
 
 export const buildSwaggerModule = async (
   applicationCore?: INestApplication,
@@ -40,18 +41,19 @@ export const buildSwaggerModule = async (
 
   const document = SwaggerModule.createDocument(scopedApplicationCore, config, {
     include: [
-      UserModule,
-      RolesModule,
-      OrigincityModule,
       AboardpointModule,
       CaptionsModule,
       CategoryModule,
-      TourModule,
-      PrivatetourModule,
-      PassengerModule,
-      SalesModule,
       DestinationModule,
       IncludedModule,
+      OrigincityModule,
+      PrivatetourModule,
+      PassengerModule,
+      PricesModule,
+      RolesModule,
+      SalesModule,
+      TourModule,
+      UserModule,
     ],
   });
 

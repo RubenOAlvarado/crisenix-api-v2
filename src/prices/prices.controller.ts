@@ -1,31 +1,35 @@
 import {
-  // Body,
+  Body,
   Controller,
-  /* Delete,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Put,
-  Query, */
+  Query,
 } from '@nestjs/common';
-/* import { PricesService } from './prices.service';
+import { PricesService } from './prices.service';
 import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
 import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto'; */
+import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
+@ApiBearerAuth()
+@ApiTags('Prices')
 @Controller('prices')
 export class PricesController {
-  /* constructor(private pricesService: PricesService) {}
+  constructor(private pricesService: PricesService) {}
 
   @ApiCreatedResponse({
     type: ResponsePriceDTO,
@@ -37,7 +41,7 @@ export class PricesController {
   @Post('create')
   @ApiBody({ type: CreatePriceDTO })
   async createPrice(@Body() createPriceDTO: CreatePriceDTO) {
-    // return await this.pricesService.createPrice(createPriceDTO);
+    return await this.pricesService.createPrice(createPriceDTO);
   }
 
   @ApiOkResponse({
@@ -51,7 +55,7 @@ export class PricesController {
   })
   @Get()
   async getAllPrices(@Query() query: StatusDTO) {
-    return await this.pricesService.getPrice(query);
+    return await this.pricesService.getPrices(query);
   }
 
   @ApiOkResponse({
@@ -81,7 +85,7 @@ export class PricesController {
     @Body() updatePriceDTO: UpdatePriceDTO,
     @Param() params: UrlValidator,
   ) {
-    return await this.pricesService.updatePrice(updatePriceDTO, params);
+    return await this.pricesService.updatePrice(params, updatePriceDTO);
   }
 
   @ApiOkResponse({
@@ -110,8 +114,8 @@ export class PricesController {
   @ApiBadRequestResponse({ description: 'Price already active.' })
   @Patch('reactivate/:id')
   async reactivatePrice(@Param() params: UrlValidator) {
-    await this.pricesService.reactivePrice(params);
+    await this.pricesService.reactivatePrice(params);
 
     return 'Price reactivated successfully.';
-  } */
+  }
 }
