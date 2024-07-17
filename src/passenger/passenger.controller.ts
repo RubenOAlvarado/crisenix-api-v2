@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -48,5 +57,83 @@ export class PassengerController {
   @Get('getByTour/:id')
   async getByTour(@Param() { id }: UrlValidator) {
     return await this.passengerService.getByTour(id);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Passenger fetched successfully.',
+    type: ResponsePassengerDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passenger.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passenger not found.',
+  })
+  @Get(':id')
+  async getById(@Param() { id }: UrlValidator) {
+    return await this.passengerService.getById(id);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Passenger deleted successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong deleting the passenger.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passenger not found.',
+  })
+  @Delete(':id')
+  async delete(@Param() { id }: UrlValidator) {
+    await this.passengerService.delete(id);
+    return 'Passenger deleted successfully.';
+  }
+
+  @ApiCreatedResponse({
+    description: 'Passenger updated successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating the passenger.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passenger not found.',
+  })
+  @Put(':id')
+  async update(
+    @Param() { id }: UrlValidator,
+    @Body() updatePassengerDTO: CreatePassengerDTO,
+  ) {
+    return await this.passengerService.update(id, updatePassengerDTO);
+  }
+
+  @ApiCreatedResponse({
+    description: 'Passenger reactivated successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong reactivating the passenger.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passenger not found.',
+  })
+  @Patch('reactivate/:id')
+  async reactivate(@Param() { id }: UrlValidator) {
+    await this.passengerService.reactivate(id);
+    return 'Passenger reactivated successfully.';
+  }
+
+  @ApiCreatedResponse({
+    description: 'Passengers fetched successfully.',
+    type: ResponsePassengerDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passengers.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passengers not found.',
+  })
+  @Get()
+  async getAll() {
+    return await this.passengerService.getAll();
   }
 }
