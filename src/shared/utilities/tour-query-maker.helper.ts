@@ -116,20 +116,20 @@ export function searchByIncludedServiceQuery({
       {
         $lookup: {
           from: 'includeds',
-          localField: 'included',
+          localField: 'includeds',
           foreignField: '_id',
-          as: 'included',
+          as: 'includeds',
         },
       },
       {
         $unwind: {
-          path: '$included',
+          path: '$includeds',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $match: {
-          'included.concept': {
+          'includeds.concept': {
             $regex: word,
             $options: 'i',
           },
@@ -160,20 +160,20 @@ export function searchByDestinationCategory({
       {
         $lookup: {
           from: 'categories',
-          localField: 'destination.category',
+          localField: 'destination.categories',
           foreignField: '_id',
-          as: 'destination.category',
+          as: 'destination.categories',
         },
       },
       {
         $unwind: {
-          path: '$destination.category',
+          path: '$destination.categories',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $match: {
-          'destination.category.label': { $regex: word, $options: 'i' },
+          'destination.categories.label': { $regex: word, $options: 'i' },
         },
       },
     ];
@@ -217,28 +217,6 @@ export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
       {
         $unwind: { path: '$tourType', preserveNullAndEmptyArrays: true },
       },
-      {
-        $lookup: {
-          from: 'origincities',
-          localField: 'originCity',
-          foreignField: '_id',
-          as: 'originCity',
-        },
-      },
-      {
-        $unwind: { path: '$originCity', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $lookup: {
-          from: 'aboardpoints',
-          localField: 'aboardPoint',
-          foreignField: '_id',
-          as: 'aboardPoint',
-        },
-      },
-      {
-        $unwind: { path: '$aboardPoint', preserveNullAndEmptyArrays: true },
-      },
     ];
   }
   return [];
@@ -266,51 +244,29 @@ export function pipelinesMaker(
 }
 
 export function createQueryForCatalog(catalog: string) {
-  const departurePopulate = {
-    path: 'departure',
-    options: {
-      sort: { date: 1, hour: 1 },
-    },
-  };
-
   switch (catalog) {
     case 'returnHour':
     case 'aboardHour':
-      return [
-        {
-          path: `${catalog}.aboardPoint`,
-          model: 'AboardPoints',
-        },
-        departurePopulate,
-      ];
+      return {
+        path: `${catalog}.aboardPoint`,
+        model: 'AboardPoints',
+      };
     case TourCatalogs.PRICES:
-      return [
-        {
-          path: catalog,
-          populate: {
-            path: 'city',
-            model: 'OriginCity',
-          },
-        },
-        departurePopulate,
-      ];
+      return {
+        path: catalog,
+        model: 'Prices',
+      };
     case TourCatalogs.ITINERARY:
-      return [
-        {
-          path: catalog,
-          populate: {
-            path: 'clasification',
-            model: 'Clasifications',
-          },
+      return {
+        path: catalog,
+        populate: {
+          path: 'clasification',
+          model: 'Clasifications',
         },
-        departurePopulate,
-      ];
+      };
     default:
-      return [
-        {
-          path: catalog,
-        },
-        departurePopulate,
-      ];
+      return {
+        path: catalog,
+      };
   }
 }

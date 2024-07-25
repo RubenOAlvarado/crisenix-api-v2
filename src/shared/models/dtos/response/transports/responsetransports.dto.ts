@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 export class ResponseTransportsDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()
@@ -15,9 +15,9 @@ export class ResponseTransportsDTO {
   @ApiProperty()
   @Type(() => ResponseTransferTypeDTO)
   @Expose()
-  transferType?: ResponseTransferTypeDTO;
+  transferType?: ResponseTransferTypeDTO | string;
 
-  constructor(name: string, transferType: ResponseTransferTypeDTO) {
+  constructor(name: string, transferType: ResponseTransferTypeDTO | string) {
     this.name = name;
     this.transferType = transferType;
   }

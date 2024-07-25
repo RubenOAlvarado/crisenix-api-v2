@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -31,6 +32,10 @@ import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto'
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
+import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
+import { plainToInstance } from 'class-transformer';
+import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
@@ -63,7 +68,8 @@ export class TourController {
   @Public()
   @Get(':id')
   async getTourById(@Param() param: UrlValidator) {
-    return await this.tourService.findOne(param);
+    const tour = await this.tourService.findOne(param);
+    return plainToInstance(ResponseTourDTO, tour);
   }
 
   @ApiOkResponse({
@@ -81,7 +87,8 @@ export class TourController {
   })
   @Get('last/:destination')
   async getLastTour(@Param() param: DestinationValidator) {
-    return await this.tourService.getLastRegisteredTour(param);
+    const tour = await this.tourService.getLastRegisteredTour(param);
+    return plainToInstance(ResponseTourDTO, tour);
   }
 
   @ApiPaginatedResponse(ResponseTourDTO)
@@ -94,7 +101,8 @@ export class TourController {
   @Public()
   @Get('')
   async getTours(@Query() query: PaginatedTourDTO) {
-    return await this.tourService.findAll(query);
+    const tours = await this.tourService.findAll(query);
+    return plainToInstance(PaginatedDTO<ResponseTourDTO>, tours);
   }
 
   @ApiOkResponse({
@@ -131,7 +139,8 @@ export class TourController {
   @ApiBody({ type: UpdateTourDTO })
   @Put(':id')
   async updateTour(@Param() param: UrlValidator, @Body() tour: UpdateTourDTO) {
-    return await this.tourService.updateTour(param, tour);
+    const updatedTour = await this.tourService.updateTour(param, tour);
+    return plainToInstance(ResponseTourDTO, updatedTour);
   }
 
   @ApiOkResponse({
@@ -148,7 +157,8 @@ export class TourController {
   })
   @Delete(':id')
   async deleteTour(@Param() param: UrlValidator) {
-    return await this.tourService.deleteTour(param);
+    await this.tourService.deleteTour(param);
+    return 'Tour deleted successfully.';
   }
 
   @ApiPaginatedResponse(ResponseTourDTO)
@@ -165,7 +175,8 @@ export class TourController {
     @Body() body: SearcherTourDTO,
     @Query() query: PaginationDTO,
   ) {
-    return await this.tourService.searchTours(body, query);
+    const toursResponse = await this.tourService.searchTours(body, query);
+    return plainToInstance(PaginatedDTO<ResponseTourDTO>, toursResponse);
   }
 
   @ApiOkResponse({
@@ -184,12 +195,12 @@ export class TourController {
   @Public()
   @Patch('change-status/:newStatus/:id')
   async changeTourStatus(@Param() param: ChangeTourStatusDTO) {
-    return await this.tourService.changeTourStatus(param);
+    const updatedTour = await this.tourService.changeTourStatus(param);
+    return plainToInstance(ResponseTourDTO, updatedTour);
   }
 
-  /*  @ApiOkResponse({
+  @ApiOkResponse({
     description: 'Tour updated successfully.',
-    type: ResponseTourDTO,
   })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong updating tour.',
@@ -200,17 +211,14 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'You sent an invalid catalog name or incorrect values.',
   })
-  @Patch('update-catalog/:id')
+  @Patch('update-catalog')
   @ApiBody({
     description: 'The catalog name and the new values to be updated.',
     type: UpdateTourCatalogDTO,
   })
+  @UseInterceptors(CatalogValidationInterceptor)
   @Public()
-  async updateTourCatalog(
-    @Param() param: UrlValidator,
-    @Body() body: UpdateTourCatalogDTO,
-  ) {
-    // TODO: Implement user role validation
-    return await this.tourService.updateTourCatalog(param, body, 'dev');
-  } */
+  async updateTourCatalog(@Body() body: UpdateTourCatalogDTO) {
+    return await this.tourService.updateTourCatalog(body);
+  }
 }

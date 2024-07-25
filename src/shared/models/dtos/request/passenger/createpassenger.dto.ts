@@ -5,7 +5,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUrl,
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -13,15 +12,6 @@ import { PriceBase } from '@/shared/enums/priceBase.enum';
 import { Currency } from '@/shared/enums/currency.enum';
 
 export class CreatePassengerDTO {
-  @ApiProperty({
-    description: 'Passenger room number',
-    example: '123',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(15)
-  room: string;
-
   @ApiProperty({
     description: 'Passenger name',
     example: 'John',
@@ -89,24 +79,6 @@ export class CreatePassengerDTO {
   @IsEnum(Currency)
   currency: Currency;
 
-  @ApiPropertyOptional({
-    description:
-      'Passenger passport photo url if required (need to be uploaded to firebase first)',
-    example: 'https://firebasestorage.googleapis.com/v0/b/...',
-  })
-  @IsOptional()
-  @IsUrl()
-  passportPhoto?: string;
-
-  @ApiPropertyOptional({
-    description:
-      'Passenger visa photo url if required (need to be uploaded to firebase first)',
-    example: 'https://firebasestorage.googleapis.com/v0/b/...',
-  })
-  @IsOptional()
-  @IsUrl()
-  visaPhoto?: string;
-
   @ApiProperty({
     description: 'Tour id',
     example: '123456789012345678901234',
@@ -123,7 +95,6 @@ export class CreatePassengerDTO {
     price: number,
     base: PriceBase,
     currency: Currency,
-    room: string,
     tour: string,
   ) {
     this.name = name;
@@ -131,7 +102,6 @@ export class CreatePassengerDTO {
     this.originCity = originCity;
     this.aboardPoint = aboardPoint;
     this.price = price;
-    this.room = room;
     this.base = base;
     this.currency = currency;
     this.tour = tour;

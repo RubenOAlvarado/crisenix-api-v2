@@ -1,7 +1,7 @@
 export enum TourCatalogs {
-  COORDINATORS = 'coordinator',
-  INCLUDED = 'included',
-  ITINERARY = 'itinerary',
+  COORDINATORS = 'coordinators',
+  INCLUDED = 'includeds',
+  ITINERARY = 'itineraries',
   ABOARDHOUR = 'aboardHour',
   RETURNHOUR = 'returnHour',
   PRICES = 'prices',

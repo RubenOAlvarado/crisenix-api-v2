@@ -11,7 +11,7 @@ export class ResponseClassificationDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()

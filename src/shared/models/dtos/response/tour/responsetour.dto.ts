@@ -1,26 +1,25 @@
 import { ResponseDestinationDTO } from '../destination/responsedestination.dto';
-import { ResponseAboardHourDTO } from './responseaboardhour.dto';
-import { AboardHourTransformer } from '@/shared/utilities/transformers/aboardhour.transformer';
 import { ResponseTransportsDTO } from '../transports/responsetransports.dto';
-import { ResponseCoordinatorDto } from './response-coordinator.dto';
 import { ResponseTourTypeDTO } from '../tourType/responseTourType.dto';
+import { Expose, Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AboardHourTransformer } from '@/shared/utilities/transformers/aboardhour.transformer';
+import { ResponseAboardHourDTO } from './responseaboardhour.dto';
+import { ResponseCoordinatorDto } from './response-coordinator.dto';
 import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
 import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
-import { Expose, Type } from 'class-transformer';
-import { Types } from 'mongoose';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ResponseTourDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: string;
 
   @ApiProperty()
   @Type(() => ResponseDestinationDTO)
   @Expose()
-  destination: ResponseDestinationDTO;
+  destination: ResponseDestinationDTO | string;
 
   @ApiPropertyOptional()
   @Expose()
@@ -53,7 +52,7 @@ export class ResponseTourDTO {
   @Expose()
   @Type(() => ResponseAboardHourDTO)
   @AboardHourTransformer()
-  aboardHour?: ResponseAboardHourDTO[];
+  aboardHour?: ResponseAboardHourDTO[] | string[];
 
   @ApiPropertyOptional()
   @Expose()
@@ -66,25 +65,28 @@ export class ResponseTourDTO {
   @ApiProperty()
   @Type(() => ResponseTransportsDTO)
   @Expose()
-  transport: ResponseTransportsDTO;
+  transport: ResponseTransportsDTO | string;
 
   @ApiProperty()
   @Expose()
   returnDate: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type: ResponseAboardHourDTO,
+    isArray: true,
+  })
+  @Expose()
   @Type(() => ResponseAboardHourDTO)
-  @Expose()
-  returnHour?: ResponseAboardHourDTO;
+  @AboardHourTransformer()
+  returnHour?: ResponseAboardHourDTO[] | string[];
 
-  @ApiPropertyOptional()
-  @Expose()
-  departure?: string[];
-
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type: ResponseCoordinatorDto,
+    isArray: true,
+  })
   @Expose()
   @Type(() => ResponseCoordinatorDto)
-  coordinator?: ResponseCoordinatorDto;
+  coordinators?: ResponseCoordinatorDto[];
 
   @ApiPropertyOptional()
   @Expose()
@@ -97,7 +99,7 @@ export class ResponseTourDTO {
   @ApiProperty()
   @Type(() => ResponseTourTypeDTO)
   @Expose()
-  tourType: ResponseTourTypeDTO;
+  tourType: ResponseTourTypeDTO | string;
 
   @ApiPropertyOptional({
     type: ResponseIncludedDTO,
@@ -106,7 +108,7 @@ export class ResponseTourDTO {
   @Expose()
   @Type(() => ResponseIncludedDTO)
   @IncludedTransformers()
-  included?: ResponseIncludedDTO[];
+  includeds?: ResponseIncludedDTO[] | string[];
 
   @ApiPropertyOptional({
     type: ResponseItineraryDTO,
@@ -115,10 +117,10 @@ export class ResponseTourDTO {
   @Expose()
   @Type(() => ResponseItineraryDTO)
   @ItineraryTransformers()
-  itinerary?: ResponseItineraryDTO[];
+  itineraries?: ResponseItineraryDTO[] | string[];
 
   constructor(
-    destination: ResponseDestinationDTO,
+    destination: ResponseDestinationDTO | string,
     code: string,
     seating: number,
     initDate: Date,

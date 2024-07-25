@@ -1,3 +1,4 @@
+import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { DestinationService } from '@/destination/destination.service';
 import { PricesService } from '@/prices/prices.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
@@ -13,6 +14,7 @@ import { AboardHourDTO } from '@/shared/models/dtos/request/tour/aboardhour.dto'
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
+import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
 import {
@@ -43,6 +45,7 @@ export class TourService {
     private readonly transportService: TransportsService,
     private readonly tourTypeService: TourtypeService,
     private readonly priceService: PricesService,
+    private readonly aboardPointService: AboardpointService,
   ) {}
 
   async createTour(tour: CreateTourDTO): Promise<Tours> {
@@ -69,21 +72,21 @@ export class TourService {
         .find(query)
         .limit(limit)
         .skip(limit * (page - 1))
-        .populate([
-          'destination',
-          'transport',
-          'tourType',
-          'included',
-          'itinerary',
-        ])
+        .populate('destination', { __v: 0, createdAt: 0 })
+        .populate('transport', { __v: 0, createdAt: 0 })
+        .populate('tourType', { __v: 0, createdAt: 0 })
         .populate({
           path: 'aboardHour.aboardPoint',
           model: 'AboardPoints',
+          select: { __v: 0, createdAt: 0 },
         })
         .populate({
           path: 'returnHour.aboardPoint',
           model: 'AboardPoints',
+          select: { __v: 0, createdAt: 0 },
         })
+        .select({ __v: 0, createdAt: 0 })
+        .lean()
         .exec();
       if (docs.length === 0)
         throw new NotFoundException('No tours registered.');
@@ -102,34 +105,50 @@ export class TourService {
     try {
       const tour = await this.tourModel
         .findById(id)
-        .populate([
-          'transport',
-          'tourType',
-          'included',
-          'itinerary',
-          'departure',
-        ])
+        .populate('transport', { __v: 0, createdAt: 0 })
+        .populate('tourType', { __v: 0, createdAt: 0 })
+        .populate('includeds', { __v: 0, createdAt: 0 })
+        .populate('itineraries', { __v: 0, createdAt: 0 })
         .populate({
           path: 'destination',
-          populate: {
-            path: 'originCity',
-            model: 'OriginCities',
-            populate: {
-              path: 'aboardPoints',
-              model: 'AboardPoints',
+          model: 'Destinations',
+          populate: [
+            {
+              path: 'originCities',
+              model: 'OriginCities',
+              populate: {
+                path: 'aboardPoints',
+                model: 'AboardPoints',
+                select: { __v: 0, createdAt: 0 },
+              },
+              select: { __v: 0, createdAt: 0 },
             },
-          },
+            {
+              path: 'categories',
+              model: 'Categories',
+              select: { __v: 0, createdAt: 0 },
+            },
+            {
+              path: 'transferTypes',
+              model: 'TransferTypes',
+              select: { __v: 0, createdAt: 0 },
+            },
+          ],
+          select: { __v: 0, createdAt: 0 },
         })
         .populate({
           path: 'aboardHour.aboardPoint',
           model: 'AboardPoints',
+          select: { __v: 0, createdAt: 0 },
         })
         .populate({
           path: 'returnHour.aboardPoint',
           model: 'AboardPoints',
+          select: { __v: 0, createdAt: 0 },
         })
         .select({ __v: 0, createdAt: 0 })
-        .lean();
+        .lean()
+        .exec();
 
       if (!tour) throw new NotFoundException('Tour not found.');
       return tour;
@@ -152,20 +171,24 @@ export class TourService {
         const tour = await this.tourModel
           .findOne({ destination })
           .sort({ createdAt: -1 })
-          .populate([
-            'destination',
-            'transport',
-            'tourType',
-            'included',
-            'itinerary',
-          ])
+          .populate('transport', { __v: 0, createdAt: 0 })
+          .populate('tourType', { __v: 0, createdAt: 0 })
+          .populate('includeds', { __v: 0, createdAt: 0 })
+          .populate('itineraries', { __v: 0, createdAt: 0 })
+          .populate({
+            path: 'destination',
+            model: 'Destinations',
+            select: { __v: 0, createdAt: 0 },
+          })
           .populate({
             path: 'aboardHour.aboardPoint',
             model: 'AboardPoints',
+            select: { __v: 0, createdAt: 0 },
           })
           .populate({
             path: 'returnHour.aboardPoint',
             model: 'AboardPoints',
+            select: { __v: 0, createdAt: 0 },
           })
           .select({ __v: 0, createdAt: 0 })
           .limit(1)
@@ -469,8 +492,8 @@ export class TourService {
           destination,
           transport,
           tourType,
-          aboardHour: this.mapAboardHourAndReturnHour(horaDeAbordaje),
-          returnHour: this.mapAboardHourAndReturnHour(horaDeRegreso),
+          aboardHour: await this.mapAboardHourAndReturnHour(horaDeAbordaje),
+          returnHour: await this.mapAboardHourAndReturnHour(horaDeRegreso),
           front: portada ?? '',
           days: dias ?? 1,
           nights: noches ?? 0,
@@ -493,13 +516,22 @@ export class TourService {
     }
   }
 
-  private mapAboardHourAndReturnHour(aboardTime: string): AboardHourDTO[] {
+  private async mapAboardHourAndReturnHour(
+    aboardTime: string,
+  ): Promise<AboardHourDTO[]> {
     try {
       const times = aboardTime.split('|');
-      return times.map((time) => {
-        const [hour, aboardPoint] = time.split(',');
-        return new AboardHourDTO(hour ?? '', aboardPoint ?? '');
+      const mappedDTO = times.map(async (time) => {
+        const [aboardPoint, hour] = time.split(',');
+        const mappedAboardPoint = await this.aboardPointService.findByName(
+          aboardPoint?.trim(),
+        );
+        return new AboardHourDTO(
+          hour ?? '',
+          mappedAboardPoint._id.toString() ?? '',
+        );
       });
+      return Promise.all(mappedDTO);
     } catch (error) {
       throw handleErrorsOnServices(
         'Error mapping aboard hour and return hour.',
@@ -508,35 +540,28 @@ export class TourService {
     }
   }
 
-  /* async updateTourCatalog(
-    { id }: UrlValidator,
-    { catalogName }: UpdateTourCatalogDTO,
-    user: string,
-  ): Promise<TourLean> {
+  async updateTourCatalog({
+    tourId,
+    catalogName,
+    data,
+  }: UpdateTourCatalogDTO): Promise<any> {
     try {
-      const updatedTour = await this.tourModel.findByIdAndUpdate(
-        id,
-        { [catalogName]: values },
-        { new: true },
-      );
+      const update = { $set: { [catalogName]: data } };
+      const tour = await this.tourModel
+        .findByIdAndUpdate(tourId, update, { new: true })
+        .populate(catalogName)
+        .exec();
 
-      if (!updatedTour) {
+      if (!tour) {
         throw new NotFoundException('Tour not found.');
       }
 
-      await this.saveLogInDataBase({
-        serviceId: updatedTour._id.toString(),
-        move: MOVES.UPDATE,
-        user,
-        registry: updatedTour,
-      });
-
-      return updatedTour;
+      return tour[catalogName];
     } catch (error) {
       throw handleErrorsOnServices(
         `Something went wrong updating tour catalog ${catalogName}.`,
         error,
       );
     }
-  } */
+  }
 }

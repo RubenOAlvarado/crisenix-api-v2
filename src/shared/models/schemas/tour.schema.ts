@@ -68,7 +68,7 @@ export class Tours {
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
   @Prop({ type: Array })
-  coordinator?: Array<{
+  coordinators?: Array<{
     transport: string;
     name: string;
     phone: string;
@@ -88,10 +88,10 @@ export class Tours {
   tourType: TourTypes;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Includeds' }] })
-  included?: Array<Includeds>;
+  includeds?: Array<Includeds>;
 
   @Prop({ type: Array })
-  itinerary?: Array<{
+  itineraries?: Array<{
     dayNumber: number;
     clasification: Classifications;
     name: string;

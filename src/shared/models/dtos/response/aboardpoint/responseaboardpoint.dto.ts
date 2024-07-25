@@ -9,7 +9,7 @@ export class ResponseAboardPointDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()

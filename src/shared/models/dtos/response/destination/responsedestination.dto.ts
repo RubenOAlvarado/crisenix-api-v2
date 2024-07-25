@@ -5,13 +5,14 @@ import { ResponseTransferTypeDTO } from '../translationType/responseTranslationT
 import { TranslationTypeTransformers } from '@/shared/utilities/transformers/translationtype.transformer';
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
 import { Expose } from 'class-transformer';
-import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
 export class ResponseDestinationDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()
@@ -31,7 +32,7 @@ export class ResponseDestinationDTO {
   })
   @Expose()
   @CategoryTransformers()
-  category?: ResponseCategoryDTO[];
+  categories?: string[] | ResponseCategoryDTO[];
 
   @ApiPropertyOptional({
     type: ResponseOriginCityDTO,
@@ -39,7 +40,7 @@ export class ResponseDestinationDTO {
   })
   @Expose()
   @OriginCityTransformers()
-  originCity?: ResponseOriginCityDTO[];
+  originCities?: string[] | ResponseOriginCityDTO[];
 
   @ApiPropertyOptional()
   @Expose()
@@ -59,7 +60,7 @@ export class ResponseDestinationDTO {
   })
   @Expose()
   @TranslationTypeTransformers()
-  translationType?: ResponseTransferTypeDTO[];
+  transferTypes?: string[] | ResponseTransferTypeDTO[];
 
   @ApiPropertyOptional()
   @Expose()
@@ -70,6 +71,7 @@ export class ResponseDestinationDTO {
   photos?: string[];
 
   constructor(
+    _id: string,
     code: string,
     name: string,
     description: string,
@@ -78,6 +80,7 @@ export class ResponseDestinationDTO {
     translationRoute: string,
     photos: string[],
   ) {
+    this._id = _id;
     this.code = code;
     this.name = name;
     this.description = description;

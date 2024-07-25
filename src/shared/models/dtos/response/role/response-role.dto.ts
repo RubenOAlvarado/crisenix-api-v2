@@ -5,7 +5,7 @@ import { Types } from 'mongoose';
 export class ResponseRoleDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()
@@ -15,13 +15,8 @@ export class ResponseRoleDTO {
   @Expose()
   status: string;
 
-  @ApiProperty()
-  @Expose()
-  permissions: any;
-
-  constructor(description: string, status: string, permissions: any) {
+  constructor(description: string, status: string) {
     this.description = description;
     this.status = status;
-    this.permissions = permissions;
   }
 }

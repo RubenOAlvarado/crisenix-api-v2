@@ -26,7 +26,6 @@ import { Public } from '@/auth/public.decorator';
 import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import 'multer';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
@@ -34,6 +33,7 @@ import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/c
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -53,7 +53,10 @@ export class DestinationController {
   async create(
     @Body() createDestinationDTO: CreateDestinationDTO,
   ): Promise<ResponseDestinationDTO> {
-    return await this.destinationService.create(createDestinationDTO);
+    const newDestination = await this.destinationService.create(
+      createDestinationDTO,
+    );
+    return plainToInstance(ResponseDestinationDTO, newDestination);
   }
 
   @ApiPaginatedResponse(ResponseDestinationDTO)
@@ -67,8 +70,18 @@ export class DestinationController {
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
-  ): Promise<PaginateResult<ResponseDestinationDTO>> {
-    return await this.destinationService.findAll(queryDTO);
+  ): Promise<PaginatedDTO<ResponseDestinationDTO>> {
+    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
+      await this.destinationService.findAll(queryDTO);
+    const transformedDTO = plainToInstance(ResponseDestinationDTO, docs);
+    return new PaginatedDTO<ResponseDestinationDTO>(
+      transformedDTO,
+      totalDocs,
+      hasPrevPage,
+      hasNextPage,
+      totalPages,
+      page,
+    );
   }
 
   @ApiOkResponse({
@@ -86,7 +99,8 @@ export class DestinationController {
   async findOne(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseDestinationDTO> {
-    return await this.destinationService.findOne(urlValidator);
+    const destination = await this.destinationService.findOne(urlValidator);
+    return plainToInstance(ResponseDestinationDTO, destination);
   }
 
   @ApiOkResponse({
@@ -103,7 +117,8 @@ export class DestinationController {
   async findOneWeb(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseDestinationDTO> {
-    return await this.destinationService.findOneWeb(urlValidator);
+    const destination = await this.destinationService.findOneWeb(urlValidator);
+    return plainToInstance(ResponseDestinationDTO, destination);
   }
 
   @ApiOkResponse({
@@ -122,10 +137,11 @@ export class DestinationController {
     @Param() urlValidator: UrlValidator,
     @Body() updateDestinationDTO: UpdateDestinationDTO,
   ): Promise<ResponseDestinationDTO> {
-    return await this.destinationService.update(
+    const updatedDestination = await this.destinationService.update(
       urlValidator,
       updateDestinationDTO,
     );
+    return plainToInstance(ResponseDestinationDTO, updatedDestination);
   }
 
   @ApiOkResponse({
@@ -218,17 +234,4 @@ export class DestinationController {
   ): Promise<ResponseOriginCityDTO> {
     return await this.destinationService.findCities(urlValidator);
   }
-
-  /* @ApiExcludeEndpoint()
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async load(@UploadedFile() file: Express.Multer.File): Promise<string> {
-    await this.destinationService.loadCatalog(file.path);
-    return 'The destination catalog was successfully created.';
-  } */
 }

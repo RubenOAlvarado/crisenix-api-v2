@@ -55,17 +55,17 @@ export function searchByCategoryQuery({
       {
         $lookup: {
           from: 'categories',
-          localField: 'category',
+          localField: 'categories',
           foreignField: '_id',
-          as: 'category',
+          as: 'categories',
         },
       },
       {
-        $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$categories', preserveNullAndEmptyArrays: true },
       },
       {
         $match: {
-          'category.label': {
+          'categories.label': {
             $regex: word,
             $options: 'i',
           },
@@ -84,35 +84,24 @@ export function populateSubcatalogsQuery(
       {
         $lookup: {
           from: 'origincities',
-          localField: 'originCity',
+          localField: 'originCities',
           foreignField: '_id',
-          as: 'originCity',
+          as: 'originCities',
         },
       },
       {
-        $unwind: { path: '$originCity', preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$originCities', preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
-          from: 'translationtypes',
-          localField: 'translationType',
+          from: 'transferTypes',
+          localField: 'transferTypes',
           foreignField: '_id',
-          as: 'translationType',
+          as: 'transferTypes',
         },
       },
       {
-        $unwind: { path: '$translationType', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $lookup: {
-          from: 'aboardpoints',
-          localField: 'aboardPoint',
-          foreignField: '_id',
-          as: 'aboardPoint',
-        },
-      },
-      {
-        $unwind: { path: '$aboardPoint', preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$transferTypes', preserveNullAndEmptyArrays: true },
       },
     ];
   }
@@ -144,13 +133,13 @@ export function alikeQueryBuilder(word: string): PipelineStage[] {
     {
       $lookup: {
         from: 'categories',
-        localField: 'category',
+        localField: 'categories',
         foreignField: '_id',
-        as: 'category',
+        as: 'categories',
       },
     },
     {
-      $unwind: { path: '$category', preserveNullAndEmptyArrays: true },
+      $unwind: { path: '$categories', preserveNullAndEmptyArrays: true },
     },
     {
       $match: {
@@ -174,7 +163,7 @@ export function alikeQueryBuilder(word: string): PipelineStage[] {
             },
           },
           {
-            'category.label': {
+            'categories.label': {
               $regex: word,
               $options: 'i',
             },

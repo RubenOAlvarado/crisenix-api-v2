@@ -62,7 +62,7 @@ export class DestinationService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<DestinationLean>> {
+  }: QueryDTO): Promise<PaginateResult<Destinations>> {
     try {
       const query = status ? { status } : {};
       const docs = await this.destinationModel
@@ -70,23 +70,20 @@ export class DestinationService {
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .populate({
-          path: 'originCity',
+          path: 'originCities',
           populate: {
             path: 'aboardPoints',
           },
+          select: { __v: 0, createdAt: 0 },
         })
-        .populate('category')
-        .populate('translationType')
+        .populate('categories', { __v: 0, createdAt: 0 })
+        .populate('transferTypes', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
-        .lean();
+        .lean()
+        .exec();
       if (!docs.length) throw new NotFoundException('Destinations not found.');
       const totalDocs = await this.destinationModel.countDocuments(query);
-      return createPaginatedObject<DestinationLean>(
-        docs,
-        totalDocs,
-        page,
-        limit,
-      );
+      return createPaginatedObject<Destinations>(docs, totalDocs, page, limit);
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while finding destinations.',
@@ -100,13 +97,13 @@ export class DestinationService {
       const destination = await this.destinationModel
         .findById(id)
         .populate({
-          path: 'originCity',
+          path: 'originCities',
           populate: {
             path: 'aboardPoints',
           },
         })
-        .populate('category')
-        .populate('translationType')
+        .populate('categories')
+        .populate('transferTypes')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!destination) throw new NotFoundException('Destination not found.');

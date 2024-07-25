@@ -1,8 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 
-export class PaginatedDTO<TData> {
+export class PaginatedDTO<T> {
   constructor(
-    docs: TData[],
+    docs: T[],
     totalDocs: number,
     hasPrevPage: boolean,
     hasNextPage: boolean,
@@ -19,37 +20,45 @@ export class PaginatedDTO<TData> {
 
   @ApiProperty({
     description: 'Result documents',
-    type: [Object],
+    type: Object,
+    isArray: true,
   })
-  docs: TData[];
+  @Type(() => Object)
+  @Expose()
+  docs: T[];
 
   @ApiProperty({
     description: 'Total documents registered.',
     type: Number,
   })
+  @Expose()
   totalDocs: number;
 
   @ApiProperty({
     description: 'Has previous page.',
     type: Boolean,
   })
+  @Expose()
   hasPrevPage: boolean;
 
   @ApiProperty({
     description: 'Has next page.',
     type: Boolean,
   })
+  @Expose()
   hasNextPage: boolean;
 
   @ApiPropertyOptional({
     description: 'Current page.',
     type: Number,
   })
-  page?: number | undefined;
+  @Expose()
+  page?: number;
 
   @ApiProperty({
     description: 'Total pages with sended docs per page.',
     type: Number,
   })
+  @Expose()
   totalPages: number;
 }

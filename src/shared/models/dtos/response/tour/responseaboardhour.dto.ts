@@ -9,9 +9,9 @@ export class ResponseAboardHourDTO {
 
   @ApiProperty()
   @Expose()
-  aboardPoint: ResponseAboardPointDTO;
+  aboardPoint: ResponseAboardPointDTO | string;
 
-  constructor(hour: string, aboardPoint: ResponseAboardPointDTO) {
+  constructor(hour: string, aboardPoint: ResponseAboardPointDTO | string) {
     this.hour = hour;
     this.aboardPoint = aboardPoint;
   }

@@ -86,7 +86,7 @@ export class OriginCityController {
   @Get()
   async findAll(
     @Query() queryDTO: QueryDTO,
-  ): Promise<PaginateResult<OriginCities>> {
+  ): Promise<PaginateResult<ResponseOriginCityDTO>> {
     return await this.originCityService.findAll(queryDTO);
   }
 

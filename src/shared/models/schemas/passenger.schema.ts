@@ -59,12 +59,6 @@ export class Passengers {
   })
   tour: Tours;
 
-  @Prop()
-  passportPhoto?: string;
-
-  @Prop()
-  visaPhoto?: string;
-
   @Prop({ default: Date.now })
   createdAt?: Date;
 

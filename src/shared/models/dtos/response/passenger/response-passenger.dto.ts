@@ -3,15 +3,13 @@ import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PriceBase } from '@/shared/enums/priceBase.enum';
+import { Currency } from '@/shared/enums/currency.enum';
 
 export class ResponsePassengerDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
-
-  @ApiProperty()
-  @Expose()
-  room: string;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()
@@ -28,28 +26,28 @@ export class ResponsePassengerDTO {
   @ApiProperty()
   @Type(() => ResponseOriginCityDTO)
   @Expose()
-  originCity: ResponseOriginCityDTO;
+  originCity: ResponseOriginCityDTO | string;
 
   @ApiProperty()
   @Type(() => ResponseAboardPointDTO)
   @Expose()
-  aboardPoint: ResponseAboardPointDTO;
+  aboardPoint: ResponseAboardPointDTO | string;
 
   @ApiProperty()
   @Expose()
   price: number;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @Expose()
-  passportPhotoUrl?: string;
+  base: PriceBase;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @Expose()
-  visaPhoto?: string;
+  currency: Currency;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @Expose()
-  seat?: string;
+  tour: string;
 
   constructor(
     name: string,
@@ -57,13 +55,17 @@ export class ResponsePassengerDTO {
     originCity: ResponseOriginCityDTO,
     aboardPoint: ResponseAboardPointDTO,
     price: number,
-    room: string,
+    base: PriceBase,
+    currency: Currency,
+    tour: string,
   ) {
     this.name = name;
     this.lastName = lastName;
     this.originCity = originCity;
     this.aboardPoint = aboardPoint;
     this.price = price;
-    this.room = room;
+    this.base = base;
+    this.currency = currency;
+    this.tour = tour;
   }
 }

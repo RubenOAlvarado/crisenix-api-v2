@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 export class ResponseIncludedDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()

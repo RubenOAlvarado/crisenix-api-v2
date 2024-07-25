@@ -6,7 +6,7 @@ import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 export class ResponseWebUserDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiPropertyOptional()
   @Expose()
@@ -55,7 +55,7 @@ export class ResponseWebUserDTO {
   @ApiProperty()
   @Type(() => ResponseRoleDTO)
   @Expose()
-  role: ResponseRoleDTO;
+  role: ResponseRoleDTO | string;
 
   constructor(
     firebaseUid: string,

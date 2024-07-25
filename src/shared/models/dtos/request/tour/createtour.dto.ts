@@ -197,7 +197,7 @@ export class CreateTourDTO {
   @IsDefined()
   @Type(() => ItineraryDTO)
   @ValidateNested({ each: true })
-  itinerary?: Array<ItineraryDTO>;
+  itineraries?: Array<ItineraryDTO>;
 
   @ApiProperty({
     description: 'Tour prices',

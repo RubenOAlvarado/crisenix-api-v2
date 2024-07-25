@@ -32,14 +32,6 @@ export class ResponseItineraryDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  aeroline?: string;
-
-  @ApiPropertyOptional()
-  @Expose()
-  flightNumber?: string;
-
-  @ApiPropertyOptional()
-  @Expose()
   route?: string;
 
   @ApiProperty()

@@ -5,21 +5,15 @@ import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export class ResponseOriginCityDTO {
-  constructor(
-    state: string,
-    name: string,
-    status: string,
-    aboardPoints?: ResponseAboardPointDTO[],
-  ) {
+  constructor(state: string, name: string, status: string) {
     this.state = state;
     this.name = name;
-    this.aboardPoints = aboardPoints;
     this.status = status;
   }
 
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()
@@ -29,13 +23,13 @@ export class ResponseOriginCityDTO {
   @Expose()
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: ResponseAboardPointDTO,
     isArray: true,
   })
   @Expose()
   @AboardPointsTransformer()
-  aboardPoints?: ResponseAboardPointDTO[];
+  aboardPoints?: ResponseAboardPointDTO[] | string[];
 
   @ApiProperty()
   @Expose()

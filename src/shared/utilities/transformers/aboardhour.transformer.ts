@@ -1,15 +1,24 @@
 import { applyDecorators } from '@nestjs/common';
-import { Transform } from 'class-transformer';
-import { TransformerInterface } from './transformer.interface';
+import { Expose, Transform } from 'class-transformer';
 import { ResponseAboardHourDTO } from '@/shared/models/dtos/response/tour/responseaboardhour.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export const aboardHourTransformer: TransformerInterface<
-  ResponseAboardHourDTO[]
-> = ({ value }: { value: ResponseAboardHourDTO[] }) => {
-  return value.map(({ hour, aboardPoint }) => {
-    return new ResponseAboardHourDTO(hour, aboardPoint);
-  });
+export const aboardHourTransformer = ({
+  value,
+}: {
+  value: ResponseAboardHourDTO[];
+}) => {
+  if (value?.length) {
+    return value.map(({ hour, aboardPoint }) => {
+      return new ResponseAboardHourDTO(hour, aboardPoint);
+    });
+  }
+  return undefined;
 };
 
 export const AboardHourTransformer = () =>
-  applyDecorators(Transform(aboardHourTransformer));
+  applyDecorators(
+    ApiPropertyOptional(),
+    Expose(),
+    Transform(aboardHourTransformer),
+  );

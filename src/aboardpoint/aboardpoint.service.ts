@@ -168,9 +168,7 @@ export class AboardpointService {
     try {
       const mappedAboardPoints: string[] = [];
       for (const aboardPoint of aboardPoints) {
-        const foundAboardPoint = await this.aboardPointModel
-          .findOne({ name: aboardPoint.trim() })
-          .exec();
+        const foundAboardPoint = await this.findByName(aboardPoint.trim());
         if (!foundAboardPoint) {
           throw new NotFoundException(`Aboard point ${aboardPoint} not found.`);
         }
@@ -180,6 +178,27 @@ export class AboardpointService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong mapping aboard points.',
+        error,
+      );
+    }
+  }
+
+  async findByName(name?: string): Promise<AboardPointLean> {
+    try {
+      if (!name) {
+        throw new BadRequestException('Name is required.');
+      }
+      const foundAboardPoint = await this.aboardPointModel
+        .findOne({ name })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!foundAboardPoint) {
+        throw new NotFoundException(`Aboard point ${name} not found.`);
+      }
+      return foundAboardPoint;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong finding aboard point by name.',
         error,
       );
     }

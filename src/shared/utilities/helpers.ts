@@ -40,3 +40,9 @@ export function handleErrorsOnServices(message: string, error: any) {
     throw new InternalServerErrorException(message);
   }
 }
+
+export function castMongooseDocsToPlainObject<T extends { toObject(): any }>(
+  docs: T[],
+): T[] {
+  return docs.map((doc) => doc.toObject());
+}

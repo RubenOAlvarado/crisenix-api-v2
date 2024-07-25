@@ -8,7 +8,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class ResponseSalesDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId;
+  _id?: Types.ObjectId | string;
 
   @ApiProperty()
   @Expose()
@@ -36,10 +36,6 @@ export class ResponseSalesDTO {
 
   @ApiProperty()
   @Expose()
-  reservedSeat: number;
-
-  @ApiProperty()
-  @Expose()
   reservationDate: Date;
 
   @ApiPropertyOptional()
@@ -55,12 +51,12 @@ export class ResponseSalesDTO {
     isArray: true,
   })
   @Expose()
-  passengers?: ResponsePassengerDTO[];
+  passengers?: ResponsePassengerDTO[] | string[];
 
   @ApiPropertyOptional()
   @Type(() => ResponseWebUserDTO)
   @Expose()
-  user?: ResponseWebUserDTO;
+  user?: ResponseWebUserDTO | string;
 
   constructor(
     tour: string,
@@ -68,7 +64,6 @@ export class ResponseSalesDTO {
     clientName: string,
     clientLastName: string,
     email: string,
-    reservedSeat: number,
     reservationDate: Date,
     payDate: Date,
     totalPayedMount: number,
@@ -80,7 +75,6 @@ export class ResponseSalesDTO {
     this.clientName = clientName;
     this.clientLastName = clientLastName;
     this.email = email;
-    this.reservedSeat = reservedSeat;
     this.reservationDate = reservationDate;
     this.payDate = payDate;
     this.totalPayedMount = totalPayedMount;

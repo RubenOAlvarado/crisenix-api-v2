@@ -9,6 +9,7 @@ import { DestinationModule } from '@/destination/destination.module';
 import { TransportsModule } from '@/transports/transports.module';
 import { TourtypeModule } from '@/tourtype/tourtype.module';
 import { PricesModule } from '@/prices/prices.module';
+import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PricesModule } from '@/prices/prices.module';
     TransportsModule,
     TourtypeModule,
     PricesModule,
+    AboardpointModule,
   ],
   controllers: [TourController],
   providers: [TourService],
