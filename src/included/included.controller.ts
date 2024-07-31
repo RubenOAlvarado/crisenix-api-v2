@@ -27,6 +27,7 @@ import { QueryDTO } from '@/shared/dtos/query.dto';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
 import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('included')
 @ApiTags('Included')
@@ -46,7 +47,10 @@ export class IncludedController {
   async create(
     @Body() createIncludedDTO: CreateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
-    return await this.includedService.create(createIncludedDTO);
+    const createdIncluded = await this.includedService.create(
+      createIncludedDTO,
+    );
+    return plainToInstance(ResponseIncludedDTO, createdIncluded);
   }
 
   @ApiOkResponse({
@@ -64,7 +68,8 @@ export class IncludedController {
   async findOne(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseIncludedDTO> {
-    return await this.includedService.findOne(urlValidator);
+    const included = await this.includedService.findOne(urlValidator);
+    return plainToInstance(ResponseIncludedDTO, included);
   }
 
   @ApiPaginatedResponse(ResponseIncludedDTO)
@@ -77,7 +82,17 @@ export class IncludedController {
   async findAll(
     @Query() queryDTO: QueryDTO,
   ): Promise<PaginatedDTO<ResponseIncludedDTO>> {
-    return await this.includedService.findAll(queryDTO);
+    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
+      await this.includedService.findAll(queryDTO);
+    const transformedDTO = plainToInstance(ResponseIncludedDTO, docs);
+    return new PaginatedDTO<ResponseIncludedDTO>(
+      transformedDTO,
+      totalDocs,
+      hasPrevPage,
+      hasNextPage,
+      totalPages,
+      page,
+    );
   }
 
   @ApiOkResponse({
@@ -96,7 +111,11 @@ export class IncludedController {
     @Param() urlValidator: UrlValidator,
     @Body() updateItineraryDTO: UpdateIncludedDTO,
   ): Promise<ResponseIncludedDTO> {
-    return await this.includedService.update(urlValidator, updateItineraryDTO);
+    const updatedIncluded = await this.includedService.update(
+      urlValidator,
+      updateItineraryDTO,
+    );
+    return plainToInstance(ResponseIncludedDTO, updatedIncluded);
   }
 
   @ApiOkResponse({

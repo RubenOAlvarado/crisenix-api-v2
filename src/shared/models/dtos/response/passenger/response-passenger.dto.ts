@@ -1,15 +1,16 @@
 import { ResponseOriginCityDTO } from '../origincity/responseorigincity.dto';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 import { Expose, Type } from 'class-transformer';
-import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PriceBase } from '@/shared/enums/priceBase.enum';
 import { Currency } from '@/shared/enums/currency.enum';
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
 export class ResponsePassengerDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()

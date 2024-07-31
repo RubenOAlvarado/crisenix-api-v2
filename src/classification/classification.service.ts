@@ -2,7 +2,6 @@ import { Status } from '@/shared/enums/status.enum';
 import { ClassificationLean } from '@/shared/interfaces/classification/classification.lean.interface';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
 import { UpdateClassificationDTO } from '@/shared/models/dtos/request/classification/updateclasification.dto';
-import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { Classifications } from '@/shared/models/schemas/classification.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import {
@@ -22,7 +21,7 @@ export class ClassificationService {
 
   async create(
     createClassificationDTO: CreateClassificationDTO,
-  ): Promise<ResponseClassificationDTO> {
+  ): Promise<ClassificationLean> {
     try {
       const classification = new this.classificationModel(
         createClassificationDTO,
@@ -135,62 +134,4 @@ export class ClassificationService {
       );
     }
   }
-
-  /* async loadFromExcel(file: Express.Multer.File): Promise<void> {
-    try {
-      const jsonObject = this.filerService.excelToJson(file.path);
-      const Classifications: CreateClassificationDTO[] =
-        this.mapJsonToclassification(jsonObject);
-      await this.classificationModel.insertMany(Classifications);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while loading the Classifications.',
-        error,
-      );
-    }
-  } */
-
-  /* private mapJsonToclassification(json: any): CreateClassificationDTO[] {
-    return json.map((classification: Classifications) => {
-      return {
-        name: classification.name,
-        description: classification?.description,
-        status: Status.ACTIVE,
-      };
-    });
-  }
-
-  async mapFromNameToObjectId(names: string[]): Promise<string[] | undefined> {
-    try {
-      if (!names.length) {
-        return;
-      }
-
-      const mappedClassifications = await Promise.all(
-        names.map(async (name) => {
-          const classification = await this.classificationModel
-            .findOne({ name })
-            .lean();
-
-          if (!classification) {
-            const createdclassification = await this.create({
-              name: name,
-              status: Status.ACTIVE,
-            });
-
-            return createdclassification?._id?.toString();
-          }
-
-          return classification._id.toString();
-        }),
-      );
-
-      return mappedClassifications as string[];
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong mapping Classifications',
-        error,
-      );
-    }
-  } */
 }

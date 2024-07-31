@@ -6,9 +6,31 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export const itineraryTransformer = ({ value }: { value: ItineraryDTO[] }) => {
   if (value?.length) {
-    return value.map(({ dayNumber, clasification, order }) => {
-      return new ResponseItineraryDTO(dayNumber, clasification, order);
-    });
+    return value.map(
+      ({
+        dayNumber,
+        clasification,
+        order,
+        additionalCost,
+        initDate,
+        initHour,
+        finishDate,
+        finishHour,
+        route,
+      }) => {
+        return new ResponseItineraryDTO(
+          dayNumber,
+          clasification,
+          order,
+          additionalCost,
+          initDate,
+          initHour,
+          finishDate,
+          finishHour,
+          route,
+        );
+      },
+    );
   }
   return undefined;
 };

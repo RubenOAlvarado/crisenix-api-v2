@@ -1,12 +1,13 @@
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 import { Entry } from '@/shared/enums/entry.enum';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { Types } from 'mongoose';
 
 export class ResponseIncludedDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()
@@ -34,11 +35,13 @@ export class ResponseIncludedDTO {
     publish: string,
     entry: Entry,
     status: string,
+    _id?: string,
   ) {
     this.concept = concept;
     this.included = included;
     this.publish = publish;
     this.entry = entry;
     this.status = status;
+    this._id = _id;
   }
 }

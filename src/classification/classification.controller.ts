@@ -71,8 +71,8 @@ export class ClassificationController {
   async findAll(
     @Query() { status }: QueryDTO,
   ): Promise<ResponseClassificationDTO[]> {
-    const categories = await this.classificationService.findAll(status);
-    return plainToInstance(ResponseClassificationDTO, categories);
+    const classifications = await this.classificationService.findAll(status);
+    return plainToInstance(ResponseClassificationDTO, classifications);
   }
 
   @ApiOkResponse({
@@ -156,16 +156,4 @@ export class ClassificationController {
     await this.classificationService.reactivate(id);
     return 'The classification was reactivated successfully.';
   }
-
-  /* @ApiExcludeEndpoint()
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async load(@UploadedFile() file: Express.Multer.File) {
-    return await this.classificationService.loadFromExcel(file);
-  } */
 }

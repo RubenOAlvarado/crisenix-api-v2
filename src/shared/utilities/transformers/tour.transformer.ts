@@ -1,11 +1,11 @@
+import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { ResponseTourTypeDTO } from '@/shared/models/dtos/response/tourType/responseTourType.dto';
-import { Tours } from '@/shared/models/schemas/tour.schema';
 import { applyDecorators } from '@nestjs/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 
-export const tourTransformer = ({ value }: { value: Tours[] }) => {
+export const tourTransformer = ({ value }: { value: TourLean[] }) => {
   if (value?.length) {
     return value.map(
       ({

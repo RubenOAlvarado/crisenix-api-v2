@@ -232,6 +232,7 @@ export class DestinationController {
   async findCities(
     @Param() urlValidator: UrlValidator,
   ): Promise<ResponseOriginCityDTO> {
-    return await this.destinationService.findCities(urlValidator);
+    const cities = await this.destinationService.findCities(urlValidator);
+    return plainToInstance(ResponseOriginCityDTO, cities);
   }
 }

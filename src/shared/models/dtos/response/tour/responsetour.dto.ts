@@ -10,10 +10,12 @@ import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
 import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
 export class ResponseTourDTO {
   @ApiPropertyOptional()
   @Expose()
+  @ObjectIdToString()
   _id?: string;
 
   @ApiProperty()

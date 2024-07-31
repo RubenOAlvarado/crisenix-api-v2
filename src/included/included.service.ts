@@ -2,10 +2,10 @@ import { QueryDTO } from '@/shared/dtos/query.dto';
 import { Entry } from '@/shared/enums/entry.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { IncludedExcel } from '@/shared/interfaces/excel/included.excel.interface';
+import { IncludedLean } from '@/shared/interfaces/included/included.lean.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
 import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
-import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 import { Includeds } from '@/shared/models/schemas/included.schema';
 import {
   createPaginatedObject,
@@ -30,9 +30,7 @@ export class IncludedService {
 
   private readonly logger = new Logger(IncludedService.name);
 
-  async create(
-    createIncludedDTO: CreateIncludedDTO,
-  ): Promise<ResponseIncludedDTO> {
+  async create(createIncludedDTO: CreateIncludedDTO): Promise<IncludedLean> {
     try {
       const createdIncluded = new this.includedModel(createIncludedDTO);
       const savedIncluded = await createdIncluded.save();
@@ -50,7 +48,7 @@ export class IncludedService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<ResponseIncludedDTO> {
+  async findOne({ id }: UrlValidator): Promise<IncludedLean> {
     try {
       const included = await this.includedModel
         .findById(id)
@@ -74,14 +72,13 @@ export class IncludedService {
     page,
     limit,
     status,
-  }: QueryDTO): Promise<PaginateResult<ResponseIncludedDTO>> {
+  }: QueryDTO): Promise<PaginateResult<IncludedLean>> {
     try {
       const query = status ? { status } : {};
       const docs = await this.includedModel
         .find(query)
         .limit(limit * 1)
         .skip((page - 1) * limit)
-        .populate('lodging')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!docs.length)
@@ -91,7 +88,7 @@ export class IncludedService {
         ...included,
         entry: included?.entry as Entry,
       }));
-      return createPaginatedObject<ResponseIncludedDTO>(
+      return createPaginatedObject<IncludedLean>(
         mappedDocs,
         totalDocs,
         page,
@@ -108,7 +105,7 @@ export class IncludedService {
   async update(
     { id }: UrlValidator,
     body: UpdateIncludedDTO,
-  ): Promise<ResponseIncludedDTO> {
+  ): Promise<IncludedLean> {
     try {
       const included = await this.includedModel
         .findByIdAndUpdate(id, body, { new: true })

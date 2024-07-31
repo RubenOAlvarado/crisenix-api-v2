@@ -1,12 +1,13 @@
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { ResponseTransferTypeDTO } from '../translationType/responseTranslationType.dto';
 import { Expose, Type } from 'class-transformer';
-import { Types } from 'mongoose';
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
 export class ResponseTransportsDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()

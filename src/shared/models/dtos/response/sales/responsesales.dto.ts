@@ -2,13 +2,14 @@ import { ResponseWebUserDTO } from '../user/response-webuser.dto';
 import { ResponsePassengerDTO } from '../passenger/response-passenger.dto';
 import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
 import { Expose, Type } from 'class-transformer';
-import { Types } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
 export class ResponseSalesDTO {
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()

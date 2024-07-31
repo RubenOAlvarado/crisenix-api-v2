@@ -1,19 +1,28 @@
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 import { ResponseAboardPointDTO } from '../aboardpoint/responseaboardpoint.dto';
 import { AboardPointsTransformer } from '@/shared/utilities/transformers/aboardpoint.transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { Types } from 'mongoose';
 
 export class ResponseOriginCityDTO {
-  constructor(state: string, name: string, status: string) {
+  constructor(
+    state: string,
+    name: string,
+    status: string,
+    _id?: string,
+    aboardPoints?: ResponseAboardPointDTO[] | string[],
+  ) {
     this.state = state;
     this.name = name;
     this.status = status;
+    this._id = _id;
+    this.aboardPoints = aboardPoints;
   }
 
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()

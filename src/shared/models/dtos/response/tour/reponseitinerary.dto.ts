@@ -38,9 +38,25 @@ export class ResponseItineraryDTO {
   @Expose()
   order: number;
 
-  constructor(dayNumber: number, clasification: string, order: number) {
+  constructor(
+    dayNumber: number,
+    clasification: string,
+    order: number,
+    additionalCost?: number,
+    initDate?: Date,
+    initHour?: string,
+    finishDate?: Date,
+    finishHour?: string,
+    route?: string,
+  ) {
     this.dayNumber = dayNumber;
     this.clasification = clasification;
     this.order = order;
+    this.additionalCost = additionalCost;
+    this.initDate = initDate;
+    this.initHour = initHour;
+    this.finishDate = finishDate;
+    this.finishHour = finishHour;
+    this.route = route;
   }
 }

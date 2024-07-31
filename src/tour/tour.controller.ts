@@ -101,8 +101,17 @@ export class TourController {
   @Public()
   @Get('')
   async getTours(@Query() query: PaginatedTourDTO) {
-    const tours = await this.tourService.findAll(query);
-    return plainToInstance(PaginatedDTO<ResponseTourDTO>, tours);
+    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
+      await this.tourService.findAll(query);
+    const transformedDTO = plainToInstance(ResponseTourDTO, docs);
+    return new PaginatedDTO<ResponseTourDTO>(
+      transformedDTO,
+      totalDocs,
+      hasPrevPage,
+      hasNextPage,
+      totalPages,
+      page,
+    );
   }
 
   @ApiOkResponse({

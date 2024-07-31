@@ -1,6 +1,6 @@
+import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { Types } from 'mongoose';
 
 export class ResponseClassificationDTO {
   constructor(name: string, description: string, status: string) {
@@ -11,7 +11,8 @@ export class ResponseClassificationDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  _id?: Types.ObjectId | string;
+  @ObjectIdToString()
+  _id?: string;
 
   @ApiProperty()
   @Expose()
