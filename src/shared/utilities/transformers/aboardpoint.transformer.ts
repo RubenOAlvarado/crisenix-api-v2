@@ -3,6 +3,7 @@ import { Expose, Transform } from 'class-transformer';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
+import { handleDocumentsId } from '../helpers';
 
 export const aboardPointsTransformer = ({
   value,
@@ -11,7 +12,7 @@ export const aboardPointsTransformer = ({
 }) => {
   if (value?.length) {
     return value.map(({ name, status, _id }) => {
-      return new ResponseAboardPointDTO(name, status, _id.toHexString());
+      return new ResponseAboardPointDTO(name, status, handleDocumentsId(_id));
     });
   }
   return undefined;

@@ -6,7 +6,7 @@ import { TourTypes } from './tourtype.schema';
 import { Includeds } from './included.schema';
 import { Classifications } from './classification.schema';
 import { Transports } from './transports.schema';
-import { CreateTourPriceDTO } from '../dtos/request/price/createtourprice.dto';
+import { Prices } from './price.schema';
 
 @Schema()
 export class Tours {
@@ -93,7 +93,7 @@ export class Tours {
   @Prop({ type: Array })
   itineraries?: Array<{
     dayNumber: number;
-    clasification: Classifications;
+    classification: Classifications;
     name: string;
     additionalCost: number;
     initDate: Date;
@@ -103,8 +103,8 @@ export class Tours {
     order: number;
   }>;
 
-  @Prop({ type: Array })
-  prices: Array<CreateTourPriceDTO>;
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prices' }] })
+  prices: Array<Prices>;
 
   @Prop({ type: Date, default: Date.now })
   createdAt?: Date;
@@ -116,12 +116,32 @@ export class Tours {
     boxLunch: string,
     seating: number,
     initDate: Date,
-    days: number,
-    nights: number,
     transport: Transports,
     returnDate: Date,
     tourType: TourTypes,
-    prices: Array<CreateTourPriceDTO>,
+    prices: Array<Prices>,
+    availableSeat?: number,
+    ocuppiedSeat?: number,
+    aboardHour?: Array<{ hour: string; aboardPoint: AboardPoints }>,
+    days = 1,
+    nights = 0,
+    returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>,
+    coordinators?: Array<{ transport: string; name: string; phone: string }>,
+    front?: string,
+    recommendations?: string,
+    includeds?: Array<Includeds>,
+    itineraries?: Array<{
+      dayNumber: number;
+      classification: Classifications;
+      name: string;
+      additionalCost: number;
+      initDate: Date;
+      initHour: string;
+      finishDate: Date;
+      finishHour: string;
+      order: number;
+    }>,
+    createdAt?: Date,
   ) {
     this.destination = destination;
     this.code = code;
@@ -129,12 +149,22 @@ export class Tours {
     this.boxLunch = boxLunch;
     this.seating = seating;
     this.initDate = initDate;
-    this.days = days;
-    this.nights = nights;
     this.transport = transport;
     this.returnDate = returnDate;
     this.tourType = tourType;
     this.prices = prices;
+    this.availableSeat = availableSeat;
+    this.ocuppiedSeat = ocuppiedSeat;
+    this.aboardHour = aboardHour;
+    this.days = days;
+    this.nights = nights;
+    this.returnHour = returnHour;
+    this.coordinators = coordinators;
+    this.front = front;
+    this.recommendations = recommendations;
+    this.includeds = includeds;
+    this.itineraries = itineraries;
+    this.createdAt = createdAt;
   }
 }
 

@@ -11,6 +11,8 @@ import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
+import { ResponsePriceDTO } from '../price/responseprice.dto';
+import { PriceTransformers } from '@/shared/utilities/transformers/price.transformer';
 
 export class ResponseTourDTO {
   @ApiPropertyOptional()
@@ -121,21 +123,64 @@ export class ResponseTourDTO {
   @ItineraryTransformers()
   itineraries?: ResponseItineraryDTO[] | string[];
 
+  @ApiProperty({
+    type: ResponsePriceDTO,
+    isArray: true,
+  })
+  @Expose()
+  @Type(() => ResponsePriceDTO)
+  @PriceTransformers()
+  prices: ResponsePriceDTO[] | string[];
+
+  @ApiProperty()
+  @Expose()
+  status: string;
+
   constructor(
     destination: ResponseDestinationDTO | string,
     code: string,
     seating: number,
     initDate: Date,
-    transport: ResponseTransportsDTO,
+    transport: ResponseTransportsDTO | string,
     returnDate: Date,
-    tourType: ResponseTourTypeDTO,
+    tourType: ResponseTourTypeDTO | string,
+    prices: ResponsePriceDTO[] | string[],
+    status: string,
+    _id?: string,
+    boxLunch?: string,
+    availableSeat?: number,
+    ocuppiedSeat?: number,
+    aboardHour?: ResponseAboardHourDTO[] | string[],
+    days?: number,
+    nights?: number,
+    returnHour?: ResponseAboardHourDTO[] | string[],
+    coordinators?: ResponseCoordinatorDto[],
+    front?: string,
+    recommendations?: string,
+    includeds?: ResponseIncludedDTO[] | string[],
+    itineraries?: ResponseItineraryDTO[] | string[],
   ) {
+    this._id = _id;
     this.destination = destination;
+    this.boxLunch = boxLunch;
     this.code = code;
     this.seating = seating;
+    this.availableSeat = availableSeat;
+    this.ocuppiedSeat = ocuppiedSeat;
     this.initDate = initDate;
+    this.aboardHour = aboardHour;
+    this.days = days;
+    this.nights = nights;
     this.transport = transport;
     this.returnDate = returnDate;
+    this.returnHour = returnHour;
+    this.coordinators = coordinators;
+    this.front = front;
+    this.recommendations = recommendations;
     this.tourType = tourType;
+    this.includeds = includeds;
+    this.itineraries = itineraries;
+    this.prices = prices;
+    this.status = status;
   }
 }

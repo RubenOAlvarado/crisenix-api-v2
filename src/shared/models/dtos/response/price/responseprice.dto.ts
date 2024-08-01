@@ -3,6 +3,7 @@ import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Currency } from '@/shared/enums/currency.enum';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
+import { ResponseDestinationDTO } from '../destination/responsedestination.dto';
 
 export class ResponsePriceDTO {
   @ApiPropertyOptional()
@@ -10,7 +11,16 @@ export class ResponsePriceDTO {
   @ObjectIdToString()
   _id?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: ResponseDestinationDTO,
+  })
+  @Type(() => ResponseDestinationDTO)
+  @Expose()
+  destination: ResponseDestinationDTO | string;
+
+  @ApiProperty({
+    type: ResponseOriginCityDTO,
+  })
   @Type(() => ResponseOriginCityDTO)
   @Expose()
   city: ResponseOriginCityDTO | string;
@@ -47,8 +57,29 @@ export class ResponsePriceDTO {
   @Expose()
   inapam?: number;
 
-  constructor(city: ResponseOriginCityDTO | string, currency: Currency) {
+  constructor(
+    destination: ResponseDestinationDTO | string,
+    city: ResponseOriginCityDTO | string,
+    currency: Currency,
+    _id?: string,
+    general?: number,
+    singleBase?: number,
+    doubleBase?: number,
+    tripleBase?: number,
+    quadrupleBase?: number,
+    minor?: number,
+    inapam?: number,
+  ) {
+    this.destination = destination;
+    this._id = _id;
     this.city = city;
     this.currency = currency;
+    this.general = general;
+    this.singleBase = singleBase;
+    this.doubleBase = doubleBase;
+    this.tripleBase = tripleBase;
+    this.quadrupleBase = quadrupleBase;
+    this.minor = minor;
+    this.inapam = inapam;
   }
 }

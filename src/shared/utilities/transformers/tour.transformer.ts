@@ -4,6 +4,10 @@ import { ResponseTourTypeDTO } from '@/shared/models/dtos/response/tourType/resp
 import { applyDecorators } from '@nestjs/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
+import { handleDocumentsId } from '../helpers';
+import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
+import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
+import { ResponseItineraryDTO } from '@/shared/models/dtos/response/tour/reponseitinerary.dto';
 
 export const tourTransformer = ({ value }: { value: TourLean[] }) => {
   if (value?.length) {
@@ -16,6 +20,21 @@ export const tourTransformer = ({ value }: { value: TourLean[] }) => {
         transport,
         returnDate,
         tourType,
+        status,
+        boxLunch,
+        availableSeat,
+        ocuppiedSeat,
+        aboardHour,
+        days,
+        nights,
+        returnHour,
+        coordinators,
+        front,
+        recommendations,
+        includeds,
+        itineraries,
+        prices,
+        _id,
       }) => {
         return new ResponseTourDTO(
           destination,
@@ -25,6 +44,21 @@ export const tourTransformer = ({ value }: { value: TourLean[] }) => {
           transport,
           returnDate,
           tourType as ResponseTourTypeDTO,
+          prices as ResponsePriceDTO[],
+          status,
+          handleDocumentsId(_id),
+          boxLunch,
+          availableSeat,
+          ocuppiedSeat,
+          aboardHour,
+          days,
+          nights,
+          returnHour,
+          coordinators,
+          front,
+          recommendations,
+          includeds as ResponseIncludedDTO[],
+          itineraries as ResponseItineraryDTO[],
         );
       },
     );

@@ -5,6 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 const logger = new Logger();
 
@@ -45,4 +46,10 @@ export function castMongooseDocsToPlainObject<T extends { toObject(): any }>(
   docs: T[],
 ): T[] {
   return docs.map((doc) => doc.toObject());
+}
+
+export function handleDocumentsId(_id?: string | Types.ObjectId) {
+  return _id && _id instanceof Types.ObjectId
+    ? _id.toHexString()
+    : (_id as string);
 }

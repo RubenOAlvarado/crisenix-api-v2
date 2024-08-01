@@ -3,10 +3,16 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 export class ResponseClassificationDTO {
-  constructor(name: string, description: string, status: string) {
+  constructor(
+    name: string,
+    _id?: string,
+    description?: string,
+    status?: string,
+  ) {
     this.name = name;
     this.description = description;
     this.status = status;
+    this._id = _id;
   }
 
   @ApiPropertyOptional()
@@ -22,7 +28,7 @@ export class ResponseClassificationDTO {
   @Expose()
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Expose()
-  status: string;
+  status?: string;
 }

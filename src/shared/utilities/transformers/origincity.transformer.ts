@@ -3,6 +3,7 @@ import { Expose, Transform } from 'class-transformer';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
+import { handleDocumentsId } from '../helpers';
 
 export const originCityTransformer = ({
   value,
@@ -15,7 +16,7 @@ export const originCityTransformer = ({
         state,
         name,
         status,
-        _id.toHexString(),
+        handleDocumentsId(_id),
         aboardPoints,
       );
     });

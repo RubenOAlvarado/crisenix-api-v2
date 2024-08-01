@@ -4,7 +4,6 @@ import { Currency } from '@/shared/enums/currency.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { PricesExcel } from '@/shared/interfaces/excel/prices.excel.interface';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
-import { CreateTourPriceDTO } from '@/shared/models/dtos/request/price/createtourprice.dto';
 import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
 import { Prices } from '@/shared/models/schemas/price.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
@@ -163,9 +162,9 @@ export class PricesService {
     }
   }
 
-  async validateFromTourExcel(price: string): Promise<CreateTourPriceDTO[]> {
+  async validateFromTourExcel(price: string): Promise<string[]> {
     try {
-      const mappedPrices: CreateTourPriceDTO[] = [];
+      const mappedPrices: string[] = [];
       const prices = price.split(',');
       for (const price of prices) {
         const [destination, city] = price.split('-');
@@ -185,16 +184,7 @@ export class PricesService {
         if (!priceExists) {
           throw new Error('Price not found.');
         }
-        mappedPrices.push({
-          currency: priceExists.currency as Currency,
-          general: priceExists.general,
-          singleBase: priceExists.singleBase,
-          doubleBase: priceExists.doubleBase,
-          tripleBase: priceExists.tripleBase,
-          quadrupleBase: priceExists.quadrupleBase,
-          minor: priceExists.minor,
-          inapam: priceExists.inapam,
-        });
+        mappedPrices.push(priceExists._id.toHexString());
       }
       return mappedPrices;
     } catch (error) {

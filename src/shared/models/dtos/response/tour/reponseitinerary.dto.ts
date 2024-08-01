@@ -1,14 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ResponseClassificationDTO } from '../classifications/responseclassifications.dto';
+import { ClassificationTransformers } from '@/shared/utilities/transformers/classifications.transformer';
 
 export class ResponseItineraryDTO {
   @ApiProperty()
   @Expose()
   dayNumber: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: ResponseClassificationDTO,
+  })
   @Expose()
-  clasification: string;
+  @Type(() => ResponseClassificationDTO)
+  @ClassificationTransformers()
+  classification: ResponseClassificationDTO | string;
 
   @ApiProperty()
   @Expose()
@@ -40,7 +46,7 @@ export class ResponseItineraryDTO {
 
   constructor(
     dayNumber: number,
-    clasification: string,
+    classification: string,
     order: number,
     additionalCost?: number,
     initDate?: Date,
@@ -50,7 +56,7 @@ export class ResponseItineraryDTO {
     route?: string,
   ) {
     this.dayNumber = dayNumber;
-    this.clasification = clasification;
+    this.classification = classification;
     this.order = order;
     this.additionalCost = additionalCost;
     this.initDate = initDate;

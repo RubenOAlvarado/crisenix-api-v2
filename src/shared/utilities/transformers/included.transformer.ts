@@ -4,6 +4,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IncludedLean } from '@/shared/interfaces/included/included.lean.interface';
+import { handleDocumentsId } from '../helpers';
 
 export const includedTransformer = ({ value }: { value: IncludedLean[] }) => {
   if (value?.length) {
@@ -14,7 +15,7 @@ export const includedTransformer = ({ value }: { value: IncludedLean[] }) => {
         publish,
         entry as Entry,
         status,
-        _id.toHexString(),
+        handleDocumentsId(_id),
       );
     });
   }

@@ -21,7 +21,6 @@ import { CoordinatorDTO } from './coordinator.dto';
 import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
 import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
-import { CreateTourPriceDTO } from '../price/createtourprice.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -201,32 +200,54 @@ export class CreateTourDTO {
 
   @ApiProperty({
     description: 'Tour prices',
-    type: CreateTourPriceDTO,
+    type: String,
     isArray: true,
   })
   @ArrayNotEmpty()
-  @IsDefined()
-  @Type(() => CreateTourPriceDTO)
-  @ValidateNested({ each: true })
-  prices: Array<CreateTourPriceDTO>;
+  @IsMongoId({ each: true })
+  prices?: Array<string>;
 
   constructor(
     destination: string,
+    boxLunch: BoxLunch,
     code: string,
     seating: number,
     initDate: Date,
     transport: string,
     returnDate: Date,
     tourType: string,
-    prices: Array<CreateTourPriceDTO>,
+    availableSeat?: number,
+    ocuppiedSeat?: number,
+    aboardHour?: Array<AboardHourDTO>,
+    days?: number,
+    nights?: number,
+    returnHour?: Array<AboardHourDTO>,
+    coordinator?: Array<CoordinatorDTO>,
+    front?: string,
+    recommendations?: string,
+    included?: Array<string>,
+    itineraries?: Array<ItineraryDTO>,
+    prices?: Array<string>,
   ) {
     this.destination = destination;
+    this.boxLunch = boxLunch;
     this.code = code;
     this.seating = seating;
+    this.availableSeat = availableSeat;
+    this.ocuppiedSeat = ocuppiedSeat;
     this.initDate = initDate;
+    this.aboardHour = aboardHour;
+    this.days = days;
+    this.nights = nights;
     this.transport = transport;
     this.returnDate = returnDate;
+    this.returnHour = returnHour;
+    this.coordinator = coordinator;
+    this.front = front;
+    this.recommendations = recommendations;
     this.tourType = tourType;
+    this.included = included;
+    this.itineraries = itineraries;
     this.prices = prices;
   }
 }
