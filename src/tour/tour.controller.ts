@@ -34,7 +34,6 @@ import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCata
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
-import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 
 @ApiTags('Tour')
 @Controller('tour')
