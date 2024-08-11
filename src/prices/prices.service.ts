@@ -184,7 +184,7 @@ export class PricesService {
         if (!priceExists) {
           throw new Error('Price not found.');
         }
-        mappedPrices.push(priceExists._id.toHexString());
+        mappedPrices.push(priceExists?._id?.toString());
       }
       return mappedPrices;
     } catch (error) {

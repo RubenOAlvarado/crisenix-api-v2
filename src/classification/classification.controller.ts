@@ -23,7 +23,6 @@ import { ClassificationService } from './classification.service';
 import { Public } from '@/auth/public.decorator';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { plainToInstance } from 'class-transformer';
 import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
 import { UpdateClassificationDTO } from '@/shared/models/dtos/request/classification/updateclasification.dto';
@@ -46,13 +45,8 @@ export class ClassificationController {
     description: 'Classification object',
     type: CreateClassificationDTO,
   })
-  async create(
-    @Body() createClassificationDTO: CreateClassificationDTO,
-  ): Promise<ResponseClassificationDTO> {
-    const newclassification = await this.classificationService.create(
-      createClassificationDTO,
-    );
-    return plainToInstance(ResponseClassificationDTO, newclassification);
+  async create(@Body() createClassificationDTO: CreateClassificationDTO) {
+    return await this.classificationService.create(createClassificationDTO);
   }
 
   @ApiOkResponse({
@@ -68,11 +62,8 @@ export class ClassificationController {
   })
   @Public()
   @Get()
-  async findAll(
-    @Query() { status }: QueryDTO,
-  ): Promise<ResponseClassificationDTO[]> {
-    const classifications = await this.classificationService.findAll(status);
-    return plainToInstance(ResponseClassificationDTO, classifications);
+  async findAll(@Query() { status }: QueryDTO) {
+    return await this.classificationService.findAll(status);
   }
 
   @ApiOkResponse({
@@ -86,11 +77,8 @@ export class ClassificationController {
     description: 'classification not found.',
   })
   @Get(':id')
-  async findOne(
-    @Param() { id }: UrlValidator,
-  ): Promise<ResponseClassificationDTO> {
-    const classification = await this.classificationService.findOne(id);
-    return plainToInstance(ResponseClassificationDTO, classification);
+  async findOne(@Param() { id }: UrlValidator) {
+    return await this.classificationService.findOne(id);
   }
 
   @ApiOkResponse({
@@ -111,12 +99,12 @@ export class ClassificationController {
   async update(
     @Param() { id }: UrlValidator,
     @Body() updateclassificationDTO: UpdateClassificationDTO,
-  ): Promise<ResponseClassificationDTO> {
+  ) {
     const updatedclassification = await this.classificationService.update(
       id,
       updateclassificationDTO,
     );
-    return plainToInstance(ResponseClassificationDTO, updatedclassification);
+    return updatedclassification;
   }
 
   @ApiOkResponse({

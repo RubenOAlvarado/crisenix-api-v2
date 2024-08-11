@@ -33,7 +33,6 @@ import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/c
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
-import { plainToInstance } from 'class-transformer';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -50,16 +49,10 @@ export class DestinationController {
   })
   @ApiBody({ type: CreateDestinationDTO })
   @Post('/create')
-  async create(
-    @Body() createDestinationDTO: CreateDestinationDTO,
-  ): Promise<ResponseDestinationDTO> {
-    const newDestination = await this.destinationService.create(
-      createDestinationDTO,
-    );
-    return plainToInstance(ResponseDestinationDTO, newDestination);
+  async create(@Body() createDestinationDTO: CreateDestinationDTO) {
+    return await this.destinationService.create(createDestinationDTO);
   }
 
-  @ApiPaginatedResponse(ResponseDestinationDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the destinations.',
   })
@@ -68,20 +61,8 @@ export class DestinationController {
   })
   @Public()
   @Get()
-  async findAll(
-    @Query() queryDTO: QueryDTO,
-  ): Promise<PaginatedDTO<ResponseDestinationDTO>> {
-    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
-      await this.destinationService.findAll(queryDTO);
-    const transformedDTO = plainToInstance(ResponseDestinationDTO, docs);
-    return new PaginatedDTO<ResponseDestinationDTO>(
-      transformedDTO,
-      totalDocs,
-      hasPrevPage,
-      hasNextPage,
-      totalPages,
-      page,
-    );
+  async findAll(@Query() queryDTO: QueryDTO) {
+    return await this.destinationService.findAll(queryDTO);
   }
 
   @ApiOkResponse({
@@ -96,11 +77,8 @@ export class DestinationController {
   })
   @Get(':id')
   @Public()
-  async findOne(
-    @Param() urlValidator: UrlValidator,
-  ): Promise<ResponseDestinationDTO> {
-    const destination = await this.destinationService.findOne(urlValidator);
-    return plainToInstance(ResponseDestinationDTO, destination);
+  async findOne(@Param() urlValidator: UrlValidator) {
+    return await this.destinationService.findOne(urlValidator);
   }
 
   @ApiOkResponse({
@@ -114,11 +92,8 @@ export class DestinationController {
     description: 'Destination not found.',
   })
   @Get('web/:id')
-  async findOneWeb(
-    @Param() urlValidator: UrlValidator,
-  ): Promise<ResponseDestinationDTO> {
-    const destination = await this.destinationService.findOneWeb(urlValidator);
-    return plainToInstance(ResponseDestinationDTO, destination);
+  async findOneWeb(@Param() urlValidator: UrlValidator) {
+    return await this.destinationService.findOneWeb(urlValidator);
   }
 
   @ApiOkResponse({
@@ -136,12 +111,12 @@ export class DestinationController {
   async update(
     @Param() urlValidator: UrlValidator,
     @Body() updateDestinationDTO: UpdateDestinationDTO,
-  ): Promise<ResponseDestinationDTO> {
+  ) {
     const updatedDestination = await this.destinationService.update(
       urlValidator,
       updateDestinationDTO,
     );
-    return plainToInstance(ResponseDestinationDTO, updatedDestination);
+    return updatedDestination;
   }
 
   @ApiOkResponse({
@@ -229,10 +204,7 @@ export class DestinationController {
   })
   @Public()
   @Get('cities/:id')
-  async findCities(
-    @Param() urlValidator: UrlValidator,
-  ): Promise<ResponseOriginCityDTO> {
-    const cities = await this.destinationService.findCities(urlValidator);
-    return plainToInstance(ResponseOriginCityDTO, cities);
+  async findCities(@Param() urlValidator: UrlValidator) {
+    return await this.destinationService.findCities(urlValidator);
   }
 }

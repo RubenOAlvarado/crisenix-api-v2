@@ -34,7 +34,6 @@ import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCata
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
-import { plainToInstance } from 'class-transformer';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 
 @ApiTags('Tour')
@@ -68,8 +67,7 @@ export class TourController {
   @Public()
   @Get(':id')
   async getTourById(@Param() param: UrlValidator) {
-    const tour = await this.tourService.findOne(param);
-    return plainToInstance(ResponseTourDTO, tour);
+    return await this.tourService.findOne(param);
   }
 
   @ApiOkResponse({
@@ -87,8 +85,7 @@ export class TourController {
   })
   @Get('last/:destination')
   async getLastTour(@Param() param: DestinationValidator) {
-    const tour = await this.tourService.getLastRegisteredTour(param);
-    return plainToInstance(ResponseTourDTO, tour);
+    return await this.tourService.getLastRegisteredTour(param);
   }
 
   @ApiPaginatedResponse(ResponseTourDTO)
@@ -101,17 +98,7 @@ export class TourController {
   @Public()
   @Get('')
   async getTours(@Query() query: PaginatedTourDTO) {
-    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
-      await this.tourService.findAll(query);
-    const transformedDTO = plainToInstance(ResponseTourDTO, docs);
-    return new PaginatedDTO<ResponseTourDTO>(
-      transformedDTO,
-      totalDocs,
-      hasPrevPage,
-      hasNextPage,
-      totalPages,
-      page,
-    );
+    return await this.tourService.findAll(query);
   }
 
   @ApiOkResponse({
@@ -148,8 +135,7 @@ export class TourController {
   @ApiBody({ type: UpdateTourDTO })
   @Put(':id')
   async updateTour(@Param() param: UrlValidator, @Body() tour: UpdateTourDTO) {
-    const updatedTour = await this.tourService.updateTour(param, tour);
-    return plainToInstance(ResponseTourDTO, updatedTour);
+    return await this.tourService.updateTour(param, tour);
   }
 
   @ApiOkResponse({
@@ -184,8 +170,7 @@ export class TourController {
     @Body() body: SearcherTourDTO,
     @Query() query: PaginationDTO,
   ) {
-    const toursResponse = await this.tourService.searchTours(body, query);
-    return plainToInstance(PaginatedDTO<ResponseTourDTO>, toursResponse);
+    return await this.tourService.searchTours(body, query);
   }
 
   @ApiOkResponse({
@@ -204,8 +189,7 @@ export class TourController {
   @Public()
   @Patch('change-status/:newStatus/:id')
   async changeTourStatus(@Param() param: ChangeTourStatusDTO) {
-    const updatedTour = await this.tourService.changeTourStatus(param);
-    return plainToInstance(ResponseTourDTO, updatedTour);
+    return await this.tourService.changeTourStatus(param);
   }
 
   @ApiOkResponse({

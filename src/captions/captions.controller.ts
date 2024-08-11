@@ -25,7 +25,6 @@ import { Public } from '@/auth/public.decorator';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
 import { ResponseCaptionsDTO } from '@/shared/models/dtos/response/captions/responseCaptions.dto';
 import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Captions')
 @ApiBearerAuth()
@@ -45,11 +44,8 @@ export class CaptionsController {
     description: 'Caption creation object',
     type: CreateCaptionDTO,
   })
-  async create(
-    @Body() createCaptionDTO: CreateCaptionDTO,
-  ): Promise<ResponseCaptionsDTO> {
-    const newCaption = await this.captionService.create(createCaptionDTO);
-    return plainToInstance(ResponseCaptionsDTO, newCaption);
+  async create(@Body() createCaptionDTO: CreateCaptionDTO) {
+    return await this.captionService.create(createCaptionDTO);
   }
 
   @ApiOkResponse({
@@ -65,9 +61,8 @@ export class CaptionsController {
   })
   @Public()
   @Get()
-  async findAll(@Query() query: StatusDTO): Promise<ResponseCaptionsDTO[]> {
-    const captions = await this.captionService.findAll(query);
-    return plainToInstance(ResponseCaptionsDTO, captions);
+  async findAll(@Query() query: StatusDTO) {
+    return await this.captionService.findAll(query);
   }
 
   @ApiOkResponse({
@@ -82,9 +77,8 @@ export class CaptionsController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() params: UrlValidator): Promise<ResponseCaptionsDTO> {
-    const caption = await this.captionService.findOne(params);
-    return plainToInstance(ResponseCaptionsDTO, caption);
+  async findOne(@Param() params: UrlValidator) {
+    return await this.captionService.findOne(params);
   }
 
   @ApiOkResponse({
@@ -105,12 +99,12 @@ export class CaptionsController {
   async update(
     @Param() params: UrlValidator,
     @Body() updateCaptionDTO: UpdateCaptionDTO,
-  ): Promise<ResponseCaptionsDTO> {
+  ) {
     const updatedCaption = await this.captionService.update(
       params,
       updateCaptionDTO,
     );
-    return plainToInstance(ResponseCaptionsDTO, updatedCaption);
+    return updatedCaption;
   }
 
   @ApiOkResponse({
@@ -147,16 +141,4 @@ export class CaptionsController {
     await this.captionService.reactivate(params);
     return 'The caption has been successfully reactivated.';
   }
-
-  /* @ApiExcludeEndpoint()
-  @Post('load')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      dest: './uploads',
-      fileFilter: excelFileFilter,
-    }),
-  )
-  async load(@UploadedFile() file: Express.Multer.File): Promise<void> {
-    await this.captionService.loadFromExcel(file);
-  } */
 }

@@ -79,8 +79,7 @@ export class DestinationService {
         .populate('categories', { __v: 0, createdAt: 0 })
         .populate('transferTypes', { __v: 0, createdAt: 0 })
         .select({ __v: 0, createdAt: 0 })
-        .lean()
-        .exec();
+        .lean();
       if (!docs.length) throw new NotFoundException('Destinations not found.');
       const totalDocs = await this.destinationModel.countDocuments(query);
       return createPaginatedObject<Destinations>(docs, totalDocs, page, limit);

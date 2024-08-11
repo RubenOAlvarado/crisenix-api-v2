@@ -26,7 +26,6 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Category')
 @ApiBearerAuth()
@@ -43,11 +42,8 @@ export class CategoryController {
   })
   @Post('create')
   @ApiBody({ description: 'Category object', type: CreateCategoryDTO })
-  async create(
-    @Body() createCategoryDTO: CreateCategoryDTO,
-  ): Promise<ResponseCategoryDTO> {
-    const newCategory = await this.categoryService.create(createCategoryDTO);
-    return plainToInstance(ResponseCategoryDTO, newCategory);
+  async create(@Body() createCategoryDTO: CreateCategoryDTO) {
+    return await this.categoryService.create(createCategoryDTO);
   }
 
   @ApiOkResponse({
@@ -63,9 +59,8 @@ export class CategoryController {
   })
   @Public()
   @Get()
-  async findAll(@Query() { status }: QueryDTO): Promise<ResponseCategoryDTO[]> {
-    const categories = await this.categoryService.findAll(status);
-    return plainToInstance(ResponseCategoryDTO, categories);
+  async findAll(@Query() { status }: QueryDTO) {
+    return await this.categoryService.findAll(status);
   }
 
   @ApiOkResponse({
@@ -79,9 +74,8 @@ export class CategoryController {
     description: 'Category not found.',
   })
   @Get(':id')
-  async findOne(@Param() { id }: UrlValidator): Promise<ResponseCategoryDTO> {
-    const category = await this.categoryService.findOne(id);
-    return plainToInstance(ResponseCategoryDTO, category);
+  async findOne(@Param() { id }: UrlValidator) {
+    return await this.categoryService.findOne(id);
   }
 
   @ApiOkResponse({
@@ -99,12 +93,12 @@ export class CategoryController {
   async update(
     @Param() { id }: UrlValidator,
     @Body() updateCategoryDTO: UpdateCategoryDTO,
-  ): Promise<ResponseCategoryDTO> {
+  ) {
     const updatedCategory = await this.categoryService.update(
       id,
       updateCategoryDTO,
     );
-    return plainToInstance(ResponseCategoryDTO, updatedCategory);
+    return updatedCategory;
   }
 
   @ApiOkResponse({

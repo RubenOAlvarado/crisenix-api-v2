@@ -20,7 +20,6 @@ import { ResponseSalesDTO } from '@/shared/models/dtos/response/sales/responsesa
 import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dto';
 import { ResponseSavedPaypalResponse } from '@/shared/models/dtos/response/sales/response-paypal.response.dto';
 import { PaypalResponse } from '@/shared/models/dtos/response/sales/paypal.response.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiBearerAuth()
 @ApiTags('Sales')
@@ -41,11 +40,8 @@ export class SalesController {
     description: 'Sale object',
     type: CreateSaleDTO,
   })
-  async createSale(
-    @Body() createSaleDTO: CreateSaleDTO,
-  ): Promise<ResponseSalesDTO> {
-    const newSale = await this.salesService.create(createSaleDTO);
-    return plainToInstance(ResponseSalesDTO, newSale);
+  async createSale(@Body() createSaleDTO: CreateSaleDTO) {
+    return await this.salesService.create(createSaleDTO);
   }
 
   @ApiPaginatedResponse(ResponseSalesDTO)
@@ -63,9 +59,8 @@ export class SalesController {
   async salesByUser(
     @Param() param: UrlValidator,
     @Query() query: PaginationDTO,
-  ): Promise<PaginatedDTO<ResponseSalesDTO>> {
-    const sales = await this.salesService.salesByUser(param.id, query);
-    return plainToInstance(PaginatedDTO<ResponseSalesDTO>, sales);
+  ) {
+    return await this.salesService.salesByUser(param.id, query);
   }
 
   @ApiOkResponse({

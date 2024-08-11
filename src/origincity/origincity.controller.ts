@@ -32,7 +32,6 @@ import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiBearerAuth()
 @Controller('origincity')
@@ -53,11 +52,8 @@ export class OriginCityController {
     description: 'Origin city object',
     type: CreateOriginCityDTO,
   })
-  async create(
-    @Body() createOriginCityDTO: CreateOriginCityDTO,
-  ): Promise<ResponseOriginCityDTO> {
-    const newCity = await this.originCityService.create(createOriginCityDTO);
-    return plainToInstance(ResponseOriginCityDTO, newCity);
+  async create(@Body() createOriginCityDTO: CreateOriginCityDTO) {
+    return await this.originCityService.create(createOriginCityDTO);
   }
 
   @ApiOkResponse({
@@ -72,11 +68,8 @@ export class OriginCityController {
   })
   @Get(':id')
   @Public()
-  async findOne(
-    @Param() urlValidator: UrlValidator,
-  ): Promise<ResponseOriginCityDTO> {
-    const city = await this.originCityService.findOne(urlValidator);
-    return plainToInstance(ResponseOriginCityDTO, city);
+  async findOne(@Param() urlValidator: UrlValidator) {
+    return await this.originCityService.findOne(urlValidator);
   }
 
   @ApiPaginatedResponse(ResponseOriginCityDTO)
@@ -86,20 +79,8 @@ export class OriginCityController {
   })
   @Public()
   @Get()
-  async findAll(
-    @Query() queryDTO: QueryDTO,
-  ): Promise<PaginatedDTO<ResponseOriginCityDTO>> {
-    const { docs, page, totalDocs, totalPages, hasNextPage, hasPrevPage } =
-      await this.originCityService.findAll(queryDTO);
-    const transformedDTO = plainToInstance(ResponseOriginCityDTO, docs);
-    return new PaginatedDTO<ResponseOriginCityDTO>(
-      transformedDTO,
-      totalDocs,
-      hasPrevPage,
-      hasNextPage,
-      totalPages,
-      page,
-    );
+  async findAll(@Query() queryDTO: QueryDTO) {
+    return await this.originCityService.findAll(queryDTO);
   }
 
   @ApiOkResponse({
@@ -120,12 +101,11 @@ export class OriginCityController {
   async update(
     @Param() urlValidator: UrlValidator,
     @Body() updateOriginCityDTO: UpdateOriginCityDTO,
-  ): Promise<ResponseOriginCityDTO> {
-    const updatedCity = await this.originCityService.update(
+  ) {
+    return await this.originCityService.update(
       urlValidator,
       updateOriginCityDTO,
     );
-    return plainToInstance(ResponseOriginCityDTO, updatedCity);
   }
 
   @ApiOkResponse({

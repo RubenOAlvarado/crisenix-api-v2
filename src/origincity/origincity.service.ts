@@ -47,7 +47,7 @@ export class OriginCityService {
     try {
       const city = await this.originCityModel
         .findById(id)
-        .select({ _id: 0, __v: 0, createdAt: 0 })
+        .select({ __v: 0, createdAt: 0 })
         .populate('aboardPoints')
         .lean();
       if (!city) throw new NotFoundException('Origin city not found.');
@@ -264,7 +264,6 @@ export class OriginCityService {
         const sanitizedCity = name.trim();
         const originCity = await this.originCityModel
           .findOne({ name: sanitizedCity })
-          .select({ _id: 1 })
           .lean();
         if (!originCity) throw new NotFoundException('Origin city not found.');
         cities.push(originCity._id.toString());

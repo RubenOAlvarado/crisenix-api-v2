@@ -25,7 +25,6 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
-import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Aboard Point')
 @ApiBearerAuth()
@@ -45,11 +44,8 @@ export class AboardPointController {
     description: 'Aboard point object',
     type: CreateAboardPointDTO,
   })
-  async create(
-    @Body() createAboardPointDTO: CreateAboardPointDTO,
-  ): Promise<ResponseAboardPointDTO> {
-    const aboardPoint = await this.service.create(createAboardPointDTO);
-    return plainToInstance(ResponseAboardPointDTO, aboardPoint);
+  async create(@Body() createAboardPointDTO: CreateAboardPointDTO) {
+    return await this.service.create(createAboardPointDTO);
   }
 
   @ApiOkResponse({
@@ -63,9 +59,8 @@ export class AboardPointController {
     description: 'No aboard points registered.',
   })
   @Get()
-  async findAll(@Query() query: StatusDTO): Promise<ResponseAboardPointDTO[]> {
-    const aboardPoints = await this.service.findAll(query);
-    return plainToInstance(ResponseAboardPointDTO, aboardPoints);
+  async findAll(@Query() query: StatusDTO) {
+    return await this.service.findAll(query);
   }
 
   @ApiOkResponse({
@@ -80,9 +75,8 @@ export class AboardPointController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() param: UrlValidator): Promise<ResponseAboardPointDTO> {
-    const aboardPoint = await this.service.findOne(param);
-    return plainToInstance(ResponseAboardPointDTO, aboardPoint);
+  async findOne(@Param() param: UrlValidator) {
+    return await this.service.findOne(param);
   }
 
   @ApiOkResponse({
@@ -103,12 +97,12 @@ export class AboardPointController {
   async update(
     @Param() param: UrlValidator,
     @Body() updateAboardPointDTO: UpdateAboardPointDTO,
-  ): Promise<ResponseAboardPointDTO> {
-    const updatedaboardpoint = await this.service.update(
+  ) {
+    const updatedAboardpoint = await this.service.update(
       param,
       updateAboardPointDTO,
     );
-    return plainToInstance(ResponseAboardPointDTO, updatedaboardpoint);
+    return updatedAboardpoint;
   }
 
   @ApiOkResponse({

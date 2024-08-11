@@ -48,8 +48,9 @@ export function castMongooseDocsToPlainObject<T extends { toObject(): any }>(
   return docs.map((doc) => doc.toObject());
 }
 
-export function handleDocumentsId(_id?: string | Types.ObjectId) {
-  return _id && _id instanceof Types.ObjectId
-    ? _id.toHexString()
-    : (_id as string);
+export function handleDocumentsId(objectId?: string | Types.ObjectId) {
+  if (objectId instanceof Types.ObjectId) {
+    return objectId.toString();
+  }
+  return objectId as string;
 }
