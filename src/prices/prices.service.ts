@@ -33,9 +33,12 @@ export class PricesService {
     }
   }
 
-  async getPrices(query: any): Promise<Prices[]> {
+  async getPrices(): Promise<Prices[]> {
     try {
-      const prices = await this.priceModel.find(query).exec();
+      const prices = await this.priceModel
+        .find()
+        .select({ __v: 0, createdAt: 0 })
+        .exec();
       if (!prices) {
         throw new NotFoundException('No prices registered.');
       }
@@ -68,9 +71,9 @@ export class PricesService {
     }
   }
 
-  async getPriceById(params: any): Promise<Prices> {
+  async getPriceById({ id }: UrlValidator): Promise<Prices> {
     try {
-      const price = await this.priceModel.findById(params.id).exec();
+      const price = await this.priceModel.findById(id).exec();
       if (!price) {
         throw new NotFoundException('Price not found.');
       }

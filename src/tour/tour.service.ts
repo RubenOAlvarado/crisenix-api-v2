@@ -546,7 +546,13 @@ export class TourService {
     data,
   }: UpdateTourCatalogDTO): Promise<any> {
     try {
-      const update = { $set: { [catalogName]: data } };
+      const isUrlValidator =
+        catalogName === 'includeds' || catalogName === 'prices';
+
+      const transformedData = isUrlValidator
+        ? data.map(({ id }: UrlValidator) => id)
+        : data;
+      const update = { $set: { [catalogName]: transformedData } };
       const tour = await this.tourModel
         .findByIdAndUpdate(tourId, update, { new: true })
         .populate(catalogName)

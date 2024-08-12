@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { PricesService } from './prices.service';
 import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
@@ -22,9 +21,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
+import { Public } from '@/auth/public.decorator';
 @ApiBearerAuth()
 @ApiTags('Prices')
 @Controller('prices')
@@ -53,9 +52,10 @@ export class PricesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong looking Prices.',
   })
+  @Public()
   @Get()
-  async getAllPrices(@Query() query: StatusDTO) {
-    return await this.pricesService.getPrices(query);
+  async getAllPrices() {
+    return await this.pricesService.getPrices();
   }
 
   @ApiOkResponse({

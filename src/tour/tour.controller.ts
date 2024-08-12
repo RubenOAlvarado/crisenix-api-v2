@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -35,6 +36,7 @@ import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto'
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
 
+@ApiBearerAuth()
 @ApiTags('Tour')
 @Controller('tour')
 export class TourController {
