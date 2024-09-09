@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
+  // ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -26,9 +26,10 @@ import { ResponseRoleDTO } from '@/shared/models/dtos/response/role/response-rol
 import { CreateRoleDTO } from '@/shared/models/dtos/request/role/createrole.dto';
 import { UpdateRoleDTO } from '@/shared/models/dtos/request/role/updaterole.dto';
 import { DescriptionDTO } from '@/shared/models/dtos/request/role/findByDescription.dto';
+import { Public } from '@/auth/public.decorator';
 
 @ApiTags('Roles')
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @Controller('roles')
 export class RolesController {
   constructor(private rolesService: RolesService) {}
@@ -41,6 +42,7 @@ export class RolesController {
     description: 'Something went wrong creating role.',
   })
   @Post('create')
+  @Public()
   @ApiBody({ type: CreateRoleDTO })
   async createRole(@Body() createRoleDTO: CreateRoleDTO) {
     return await this.rolesService.createRole(createRoleDTO);
@@ -55,6 +57,7 @@ export class RolesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong looking roles.',
   })
+  @Public()
   @Get()
   async getAllRoles(@Query() query: StatusDTO) {
     return await this.rolesService.getRoles(query);
@@ -68,6 +71,7 @@ export class RolesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong looking role.',
   })
+  @Public()
   @Get(':id')
   async findRole(@Param() params: UrlValidator) {
     return await this.rolesService.getRoleById(params);
@@ -82,6 +86,7 @@ export class RolesController {
     description: 'Something went wrong updating role.',
   })
   @Put(':id')
+  @Public()
   @ApiBody({ type: UpdateRoleDTO })
   async updateRole(
     @Body() updateRoleDTO: UpdateRoleDTO,

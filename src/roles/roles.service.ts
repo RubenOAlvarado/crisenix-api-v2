@@ -37,7 +37,8 @@ export class RolesService {
       const roles = await this.roleModel
         .find(query)
         .select({ __v: 0, createdAt: 0 })
-        .lean();
+        .lean()
+        .exec();
       if (!roles) throw new NotFoundException('No roles registered.');
       return roles;
     } catch (e) {
@@ -50,7 +51,8 @@ export class RolesService {
       const role = await this.roleModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
-        .lean();
+        .lean()
+        .exec();
       if (!role) throw new NotFoundException(`Role not found.`);
       return role;
     } catch (e) {

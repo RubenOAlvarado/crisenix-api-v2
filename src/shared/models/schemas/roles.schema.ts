@@ -12,9 +12,13 @@ export class Roles {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(description: string, status: string) {
+  @Prop({ type: [String], required: true })
+  permissions: string[];
+
+  constructor(description: string, status: string, permissions: string[]) {
     this.description = description;
     this.status = status;
+    this.permissions = permissions;
   }
 }
 

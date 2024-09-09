@@ -29,18 +29,20 @@ export class User {
   deletedAt?: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Roles' })
-  role?: Roles;
+  role: Roles;
 
   constructor(
     firebaseUid: string,
     name: string,
     lastName: string,
     status: string,
+    role: Roles,
   ) {
     this.firebaseUid = firebaseUid;
     this.name = name;
     this.lastName = lastName;
     this.status = status;
+    this.role = role;
   }
 }
 

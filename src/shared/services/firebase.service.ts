@@ -28,7 +28,7 @@ export class FirebaseService {
 
   async setCustomUserClaims(
     uid: string,
-    role = UserRoles.CLIENTE,
+    role = UserRoles.CLIENT,
   ): Promise<void> {
     try {
       const claims = { role };

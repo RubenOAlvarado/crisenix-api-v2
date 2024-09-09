@@ -1,12 +1,15 @@
+import { UserRoles } from '@/shared/enums/roles';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class DescriptionDTO {
   @ApiProperty({
     description: 'Description of the role.',
-    example: 'admin',
+    enum: UserRoles,
+    example: UserRoles.ADMIN,
   })
   @IsNotEmpty()
+  @IsEnum(UserRoles)
   @IsString()
   description: string;
 

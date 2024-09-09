@@ -24,7 +24,6 @@ import { CreateUserDTO } from '@/shared/models/dtos/request/user/createuser.dto'
 import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
 import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.dto';
 import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
-import { ResponseRoleDTO } from '@/shared/models/dtos/response/role/response-role.dto';
 import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
 import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
 
@@ -265,7 +264,7 @@ export class UserService {
     fbUser: UserRecord | undefined,
   ): Promise<ResponseWebUserDTO> {
     return {
-      role: user?.role as ResponseRoleDTO,
+      role: user?.role,
       email: fbUser?.email,
       emailVerified: fbUser?.emailVerified,
       displayName: fbUser?.displayName,

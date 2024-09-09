@@ -86,11 +86,17 @@ export class CreateUserDTO {
   })
   @IsOptional()
   @IsMongoId()
-  role?: string;
+  role: string;
 
-  constructor(name: string, lastName: string, firebaseUid?: string) {
+  constructor(
+    name: string,
+    lastName: string,
+    role: string,
+    firebaseUid?: string,
+  ) {
     this.firebaseUid = firebaseUid;
     this.name = name;
     this.lastName = lastName;
+    this.role = role;
   }
 }
