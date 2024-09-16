@@ -6,10 +6,10 @@ export class Includeds {
   @Prop({ required: true, index: true })
   concept: string;
 
-  @Prop({ required: true })
+  @Prop({ enum: ['Sí', 'No'], required: true })
   included: string;
 
-  @Prop({ required: true })
+  @Prop({ enum: ['Sí', 'No'], required: true })
   publish: string;
 
   @Prop({

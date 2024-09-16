@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Entry } from 'src/shared/enums/entry.enum';
 
@@ -14,18 +14,22 @@ export class CreateIncludedDTO {
 
   @ApiProperty({
     description: 'Included indicator',
-    example: 'SI',
+    example: 'Sí',
+    enum: ['Sí', 'No'],
   })
   @IsNotEmpty()
+  @IsEnum(['Sí', 'No'])
   @IsString()
   @MaxLength(2)
   included: string;
 
   @ApiProperty({
     description: 'Publish indicator',
-    example: 'SI',
+    example: 'Sí',
+    enum: ['Sí', 'No'],
   })
   @IsNotEmpty()
+  @IsEnum(['Sí', 'No'])
   @IsString()
   @MaxLength(2)
   publish: string;
@@ -35,6 +39,7 @@ export class CreateIncludedDTO {
     example: Entry.ALIMENTOS,
     enum: Entry,
   })
+  @IsEnum(Entry)
   @IsNotEmpty()
   @IsString()
   entry: Entry;

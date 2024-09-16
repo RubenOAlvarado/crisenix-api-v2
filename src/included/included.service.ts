@@ -12,12 +12,7 @@ import {
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -28,22 +23,14 @@ export class IncludedService {
     private readonly includedModel: Model<Includeds>,
   ) {}
 
-  private readonly logger = new Logger(IncludedService.name);
-
   async create(createIncludedDTO: CreateIncludedDTO): Promise<IncludedLean> {
     try {
       const createdIncluded = new this.includedModel(createIncludedDTO);
-      const savedIncluded = await createdIncluded.save();
-      return {
-        ...savedIncluded,
-        entry: savedIncluded?.entry as Entry,
-      };
+      return await createdIncluded.save();
     } catch (error) {
-      this.logger.error(
-        `Something went wrong while creating included service: ${error}`,
-      );
-      throw new InternalServerErrorException(
-        'Something went wrong while creating included service.',
+      throw handleErrorsOnServices(
+        'Something went wrong creating included service',
+        error,
       );
     }
   }
@@ -56,10 +43,7 @@ export class IncludedService {
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!included) throw new NotFoundException('Included service not found.');
-      return {
-        ...included,
-        entry: included?.entry as Entry,
-      };
+      return included;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong finding included service',
@@ -84,16 +68,7 @@ export class IncludedService {
       if (!docs.length)
         throw new NotFoundException('No included services registered.');
       const totalDocs = await this.includedModel.countDocuments(query).exec();
-      const mappedDocs = docs.map((included) => ({
-        ...included,
-        entry: included?.entry as Entry,
-      }));
-      return createPaginatedObject<IncludedLean>(
-        mappedDocs,
-        totalDocs,
-        page,
-        limit,
-      );
+      return createPaginatedObject<IncludedLean>(docs, totalDocs, page, limit);
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong finding included services',
@@ -112,10 +87,7 @@ export class IncludedService {
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!included) throw new NotFoundException('Included service not found.');
-      return {
-        ...included,
-        entry: included?.entry as Entry,
-      };
+      return included;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong updating included service',

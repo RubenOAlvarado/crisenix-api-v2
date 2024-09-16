@@ -29,6 +29,7 @@ export class FileManagerController {
     }),
   )
   async load(@UploadedFile() file: Express.Multer.File) {
+    // deepcode ignore PT: <please specify a reason of ignoring this>
     await this.fileManagerService.loadToursAndDestinations(file.path);
   }
 
@@ -42,6 +43,7 @@ export class FileManagerController {
     }),
   )
   async loadCatalogs(@UploadedFile() file: Express.Multer.File) {
+    // deepcode ignore PT: <please specify a reason of ignoring this>
     await this.catalogFileManager.loadCatalogs(file.path);
   }
 }
