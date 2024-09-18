@@ -1,6 +1,5 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Entry } from 'src/shared/enums/entry.enum';
 
 export class CreateIncludedDTO {
   @ApiProperty({
@@ -13,46 +12,16 @@ export class CreateIncludedDTO {
   concept: string;
 
   @ApiProperty({
-    description: 'Included indicator',
-    example: 'Sí',
-    enum: ['Sí', 'No'],
+    description: 'Entry (kind of included service)',
+    example: '60a7e9b1e9d1f0c6e0f6e6f2',
   })
   @IsNotEmpty()
-  @IsEnum(['Sí', 'No'])
   @IsString()
-  @MaxLength(2)
-  included: string;
+  @IsMongoId()
+  entry: string;
 
-  @ApiProperty({
-    description: 'Publish indicator',
-    example: 'Sí',
-    enum: ['Sí', 'No'],
-  })
-  @IsNotEmpty()
-  @IsEnum(['Sí', 'No'])
-  @IsString()
-  @MaxLength(2)
-  publish: string;
-
-  @ApiProperty({
-    description: 'Entry indicator',
-    example: Entry.ALIMENTOS,
-    enum: Entry,
-  })
-  @IsEnum(Entry)
-  @IsNotEmpty()
-  @IsString()
-  entry: Entry;
-
-  constructor(
-    concept: string,
-    included: string,
-    publish: string,
-    entry: Entry,
-  ) {
+  constructor(concept: string, entry: string) {
     this.concept = concept;
-    this.included = included;
-    this.publish = publish;
     this.entry = entry;
   }
 }

@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { AboardPoints } from './aboarpoint.schema';
+import { Reservations } from './reservation.schema';
 import { OriginCities } from './origincity.schema';
-import { Tours } from './tour.schema';
+import { AboardPoints } from './aboarpoint.schema';
 
 @Schema()
 export class Passengers {
@@ -15,7 +15,6 @@ export class Passengers {
   @Prop({ required: true, index: true })
   secondLastName: string;
 
-  // ref: 'OriginCity'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'OriginCities',
@@ -23,16 +22,12 @@ export class Passengers {
   })
   originCity: OriginCities;
 
-  // ref: 'AboardPoint'
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'AboardPoints',
     required: true,
   })
   aboardPoint: AboardPoints;
-
-  @Prop({ required: true })
-  price: number;
 
   @Prop({
     enum: [
@@ -49,15 +44,12 @@ export class Passengers {
   })
   base: string;
 
-  @Prop({ enum: ['MXN', 'USD'], required: true })
-  currency: string;
-
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tours',
+    ref: 'Reservations',
     required: true,
   })
-  tour: Tours;
+  reservation: Reservations;
 
   @Prop({ default: Date.now })
   createdAt?: Date;
@@ -66,22 +58,18 @@ export class Passengers {
     name: string,
     lastName: string,
     secondLastName: string,
+    base: string,
+    reservation: Reservations,
     originCity: OriginCities,
     aboardPoint: AboardPoints,
-    price: number,
-    base: string,
-    currency: string,
-    tour: Tours,
   ) {
     this.name = name;
     this.lastName = lastName;
     this.secondLastName = secondLastName;
+    this.base = base;
+    this.reservation = reservation;
     this.originCity = originCity;
     this.aboardPoint = aboardPoint;
-    this.price = price;
-    this.base = base;
-    this.currency = currency;
-    this.tour = tour;
   }
 }
 

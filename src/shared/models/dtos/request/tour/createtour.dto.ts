@@ -2,7 +2,6 @@ import {
   ArrayNotEmpty,
   IsDateString,
   IsDefined,
-  IsEnum,
   IsInt,
   IsMongoId,
   IsNotEmpty,
@@ -20,7 +19,7 @@ import { AboardHourDTO } from './aboardhour.dto';
 import { CoordinatorDTO } from './coordinator.dto';
 import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
-import { BoxLunch } from 'src/shared/enums/tour/boxlunch.enum';
+import { CreateTourIncludedDTO } from './createTourIncluded.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -31,15 +30,6 @@ export class CreateTourDTO {
   @IsString()
   @IsMongoId()
   destination: string;
-
-  @ApiPropertyOptional({
-    enum: BoxLunch,
-    description: 'Box lunch indicator',
-    example: BoxLunch.NO,
-  })
-  @IsOptional()
-  @IsEnum(BoxLunch)
-  boxLunch?: BoxLunch;
 
   @ApiProperty({
     description: 'Tour code',
@@ -179,12 +169,15 @@ export class CreateTourDTO {
 
   @ApiPropertyOptional({
     description: 'Tour included',
-    type: String,
+    type: CreateTourIncludedDTO,
     isArray: true,
   })
   @IsOptional()
-  @IsMongoId({ each: true })
-  included?: Array<string>;
+  @ArrayNotEmpty()
+  @IsDefined()
+  @Type(() => CreateTourIncludedDTO)
+  @ValidateNested({ each: true })
+  includeds?: Array<CreateTourIncludedDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour itinerary, array of activities',
@@ -209,7 +202,6 @@ export class CreateTourDTO {
 
   constructor(
     destination: string,
-    boxLunch: BoxLunch,
     code: string,
     seating: number,
     initDate: Date,
@@ -225,12 +217,11 @@ export class CreateTourDTO {
     coordinator?: Array<CoordinatorDTO>,
     front?: string,
     recommendations?: string,
-    included?: Array<string>,
+    includeds?: Array<CreateTourIncludedDTO>,
     itineraries?: Array<ItineraryDTO>,
     prices?: Array<string>,
   ) {
     this.destination = destination;
-    this.boxLunch = boxLunch;
     this.code = code;
     this.seating = seating;
     this.availableSeat = availableSeat;
@@ -246,7 +237,7 @@ export class CreateTourDTO {
     this.front = front;
     this.recommendations = recommendations;
     this.tourType = tourType;
-    this.included = included;
+    this.includeds = includeds;
     this.itineraries = itineraries;
     this.prices = prices;
   }

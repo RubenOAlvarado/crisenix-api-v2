@@ -1,30 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Entries } from './entry.schema';
 
 @Schema()
 export class Includeds {
   @Prop({ required: true, index: true })
   concept: string;
 
-  @Prop({ enum: ['Sí', 'No'], required: true })
-  included: string;
-
-  @Prop({ enum: ['Sí', 'No'], required: true })
-  publish: string;
-
   @Prop({
-    enum: [
-      'Alimentos',
-      'Actividades',
-      'Gastos',
-      'Traslados',
-      'Visitas',
-      'Servicios',
-      'Recorrido',
-    ],
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Entries',
   })
-  entry: string;
+  entry: Entries;
 
   @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
   status: string;
@@ -32,16 +19,8 @@ export class Includeds {
   @Prop({ default: Date.now })
   createdAt?: Date;
 
-  constructor(
-    concept: string,
-    included: string,
-    publish: string,
-    entry: string,
-    status: string,
-  ) {
+  constructor(concept: string, entry: Entries, status: string) {
     this.concept = concept;
-    this.included = included;
-    this.publish = publish;
     this.entry = entry;
     this.status = status;
   }

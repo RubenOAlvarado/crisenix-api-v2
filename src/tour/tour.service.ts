@@ -5,8 +5,8 @@ import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
 import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
-import { BoxLunch } from '@/shared/enums/tour/boxlunch.enum';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
+import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
@@ -21,10 +21,7 @@ import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
-import {
-  createQueryForCatalog,
-  pipelinesMaker,
-} from '@/shared/utilities/tour-query-maker.helper';
+import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { TourtypeService } from '@/tourtype/tourtype.service';
@@ -35,7 +32,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PopulateOptions } from 'mongoose';
 
 @Injectable()
 export class TourService {
@@ -383,9 +380,12 @@ export class TourService {
 
   async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
     try {
-      const query = createQueryForCatalog(catalogName);
+      const query = CatalogQueryFactory.createQuery(catalogName);
 
-      const tour = await this.tourModel.findById(id).populate(query).exec();
+      const tour = await this.tourModel
+        .findById(id)
+        .populate(query as unknown as PopulateOptions)
+        .exec();
 
       if (!tour) {
         throw new BadRequestException('Tour not found.');
@@ -465,7 +465,6 @@ export class TourService {
           portada,
           dias,
           noches,
-          boxLunch,
           lugares,
           lugaresLibres,
           lugaresOcupados,
@@ -497,7 +496,6 @@ export class TourService {
           front: portada ?? '',
           days: dias ?? 1,
           nights: noches ?? 0,
-          boxLunch: (boxLunch ?? BoxLunch.NO) as BoxLunch,
           seating: lugares ?? 0,
           availableSeat: lugaresLibres ?? 0,
           ocuppiedSeat: lugaresOcupados ?? 0,

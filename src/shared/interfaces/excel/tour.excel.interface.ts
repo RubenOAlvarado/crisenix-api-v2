@@ -4,7 +4,6 @@ export interface TourExcel {
   tipo: string;
   dias: number;
   noches: number;
-  boxLunch?: string;
   lugares: number;
   lugaresOcupados?: number;
   lugaresLibres?: number;

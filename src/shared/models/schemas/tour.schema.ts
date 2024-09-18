@@ -27,9 +27,6 @@ export class Tours {
   })
   status: string;
 
-  @Prop({ type: String, enum: ['Sí', 'No', 'Opcional'], default: 'Opcional' })
-  boxLunch: string;
-
   @Prop({ type: Number, required: true })
   seating: number;
 
@@ -113,7 +110,6 @@ export class Tours {
     destination: Destinations,
     code: string,
     status: string,
-    boxLunch: string,
     seating: number,
     initDate: Date,
     transport: Transports,
@@ -146,7 +142,6 @@ export class Tours {
     this.destination = destination;
     this.code = code;
     this.status = status;
-    this.boxLunch = boxLunch;
     this.seating = seating;
     this.initDate = initDate;
     this.transport = transport;

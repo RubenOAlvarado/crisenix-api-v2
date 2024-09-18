@@ -5,7 +5,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
+import { PaginationDTO } from '../dtos/pagination.dto';
 
 const logger = new Logger();
 
@@ -53,4 +54,36 @@ export function handleDocumentsId(objectId?: string | Types.ObjectId) {
     return objectId.toString();
   }
   return objectId as string;
+}
+
+export function statusQueryBuilder(status?: string): PipelineStage | undefined {
+  return status ? { $match: { status } } : undefined;
+}
+
+export function sortQueryBuilder(sort = 'createdAt'): PipelineStage {
+  return {
+    $sort: {
+      [sort]: 1,
+    },
+  };
+}
+
+export function paginationQuery({
+  page,
+  limit,
+}: PaginationDTO): PipelineStage[] {
+  return [
+    {
+      $facet: {
+        docs: [{ $skip: (page - 1) * limit }, { $limit: limit * 1 }],
+        totalDocs: [{ $count: 'total' }],
+      },
+    },
+    {
+      $project: {
+        docs: 1,
+        totalDocs: { $arrayElemAt: ['$totalDocs.total', 0] },
+      },
+    },
+  ];
 }

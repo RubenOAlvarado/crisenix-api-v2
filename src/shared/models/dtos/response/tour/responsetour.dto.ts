@@ -6,10 +6,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AboardHourTransformer } from '@/shared/utilities/transformers/aboardhour.transformer';
 import { ResponseAboardHourDTO } from './responseaboardhour.dto';
 import { ResponseCoordinatorDto } from './response-coordinator.dto';
-import { ResponseIncludedDTO } from '../included/responseIncluded.dto';
 import { ResponseItineraryDTO } from './reponseitinerary.dto';
 import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
-import { IncludedTransformers } from '@/shared/utilities/transformers/included.transformer';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { PriceTransformers } from '@/shared/utilities/transformers/price.transformer';
@@ -24,10 +22,6 @@ export class ResponseTourDTO {
   @Type(() => ResponseDestinationDTO)
   @Expose()
   destination: ResponseDestinationDTO | string;
-
-  @ApiPropertyOptional()
-  @Expose()
-  boxLunch?: string;
 
   @ApiProperty()
   @Expose()
@@ -106,15 +100,6 @@ export class ResponseTourDTO {
   tourType: ResponseTourTypeDTO | string;
 
   @ApiPropertyOptional({
-    type: ResponseIncludedDTO,
-    isArray: true,
-  })
-  @Expose()
-  @Type(() => ResponseIncludedDTO)
-  @IncludedTransformers()
-  includeds?: ResponseIncludedDTO[] | string[];
-
-  @ApiPropertyOptional({
     type: ResponseItineraryDTO,
     isArray: true,
   })
@@ -147,7 +132,6 @@ export class ResponseTourDTO {
     prices: ResponsePriceDTO[] | string[],
     status: string,
     _id?: string,
-    boxLunch?: string,
     availableSeat?: number,
     ocuppiedSeat?: number,
     aboardHour?: ResponseAboardHourDTO[] | string[],
@@ -157,12 +141,10 @@ export class ResponseTourDTO {
     coordinators?: ResponseCoordinatorDto[],
     front?: string,
     recommendations?: string,
-    includeds?: ResponseIncludedDTO[] | string[],
     itineraries?: ResponseItineraryDTO[] | string[],
   ) {
     this._id = _id;
     this.destination = destination;
-    this.boxLunch = boxLunch;
     this.code = code;
     this.seating = seating;
     this.availableSeat = availableSeat;
@@ -178,7 +160,6 @@ export class ResponseTourDTO {
     this.front = front;
     this.recommendations = recommendations;
     this.tourType = tourType;
-    this.includeds = includeds;
     this.itineraries = itineraries;
     this.prices = prices;
     this.status = status;
