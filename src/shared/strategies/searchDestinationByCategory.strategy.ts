@@ -1,11 +1,11 @@
 import { PipelineStage } from 'mongoose';
-import { SearcherDTO } from '../enums/searcher/destination/searcher.dto';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
+import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
 
 export class SearchDestinationByCategory
-  implements SearchStrategy<SearcherDTO>
+  implements SearchStrategy<SearcherDestinationDto>
 {
-  search({ word }: SearcherDTO): PipelineStage[] {
+  search({ word }: SearcherDestinationDto): PipelineStage[] {
     return word
       ? [
           {

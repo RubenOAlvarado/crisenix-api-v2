@@ -7,7 +7,6 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
-import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
 import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
@@ -20,6 +19,7 @@ import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/cre
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
 import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
+import { OriginCitySearcherDto } from '@/shared/dtos/searcher/originCity/searcherOriginCity.dto';
 
 @Injectable()
 export class OriginCityService {
@@ -164,7 +164,9 @@ export class OriginCityService {
     }
   }
 
-  async searcher({ word }: SearcherDTO): Promise<Array<OriginCityLean>> {
+  async searcher({
+    word,
+  }: OriginCitySearcherDto): Promise<Array<OriginCityLean>> {
     try {
       const searchResult = await this.originCityModel
         .find({

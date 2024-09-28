@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TourStatus } from '../../tour/status.enum';
+import { TourStatus } from '../../../enums/tour/status.enum';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 

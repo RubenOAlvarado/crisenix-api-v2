@@ -35,6 +35,20 @@ export class PopulateSubcatalogsStrategy
               preserveNullAndEmptyArrays: true,
             },
           },
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'categories',
+              foreignField: '_id',
+              as: 'categories',
+            },
+          },
+          {
+            $unwind: {
+              path: '$categories',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
         ]
       : [];
   }

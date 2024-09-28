@@ -1,8 +1,7 @@
 import { CategoryService } from '@/category/category.service';
 import { OriginCityService } from '@/origincity/origincity.service';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
-import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
+import { SearcherDestinationDto } from '@/shared/dtos/searcher/destination/searcherDestination.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
@@ -184,25 +183,25 @@ export class DestinationService {
   }
 
   async search(
-    searcherDTO: SearcherDTO,
-    queryParams: PaginationDTO,
+    params: SearcherDestinationDto,
+    query: QueryDTO,
   ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
       this.logger.debug(
-        `searching destination with: ${JSON.stringify(searcherDTO)}`,
+        `Searching destination with: ${JSON.stringify({ params })}`,
       );
-      const pipelines = pipelinesMaker(searcherDTO, queryParams);
+      const pipelines = pipelinesMaker(params, query);
       const result = await this.destinationModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
       if (!docs.length)
         throw new NotFoundException(
-          `Destinations not found with: ${searcherDTO.word} on field: ${searcherDTO.field} .`,
+          `Destinations not found with: ${params.word} on field: ${params.field} .`,
         );
       return createPaginatedObject<DestinationLean>(
         docs,
         totalDocs,
-        queryParams.page,
-        queryParams.limit,
+        query.page,
+        query.limit,
       );
     } catch (e) {
       throw handleErrorsOnServices(

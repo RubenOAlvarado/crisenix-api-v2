@@ -25,9 +25,7 @@ import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { DestinationValidator } from '@/shared/validators/destination.validator';
-import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
+import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
@@ -35,6 +33,7 @@ import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCata
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
+import { SearcherTourDTO } from '@/shared/dtos/searcher/tour/searcherTour.dto';
 
 @ApiBearerAuth()
 @ApiTags('Tour')
@@ -165,13 +164,12 @@ export class TourController {
     description: 'Tours not found.',
   })
   @Public()
-  @Post('search')
-  @ApiBody({ type: SearcherTourDTO })
+  @Get('search/:field/:word/:populate/:sort')
   async searchTours(
-    @Body() body: SearcherTourDTO,
-    @Query() query: PaginationDTO,
+    @Param() params: SearcherTourDTO,
+    @Query() query: PaginatedTourDTO,
   ) {
-    return await this.tourService.searchTours(body, query);
+    return await this.tourService.searchTours(params, query);
   }
 
   @ApiOkResponse({

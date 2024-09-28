@@ -23,16 +23,14 @@ import {
 } from '@nestjs/swagger';
 import { DestinationService } from './destination.service';
 import { Public } from '@/auth/public.decorator';
-import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
-import 'multer';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
+import { SearcherDestinationDto } from '@/shared/dtos/searcher/destination/searcherDestination.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -157,16 +155,12 @@ export class DestinationController {
     description: 'Destinations not found.',
   })
   @Public()
-  @Post('/search')
-  @ApiBody({
-    description: 'Search params in destinations catalog',
-    type: SearcherDTO,
-  })
+  @Get('search/:word/:field/:subCatalog/:sort')
   async search(
-    @Body() searcherDTO: SearcherDTO,
-    @Query() queryDTO: PaginationDTO,
+    @Param() params: SearcherDestinationDto,
+    @Query() queryDTO: QueryDTO,
   ) {
-    return await this.destinationService.search(searcherDTO, queryDTO);
+    return await this.destinationService.search(params, queryDTO);
   }
 
   @ApiOkResponse({
@@ -182,7 +176,7 @@ export class DestinationController {
   @ApiBadRequestResponse({
     description: 'Destination must be in Active status.',
   })
-  @Patch('deletephoto')
+  @Delete('deletephoto')
   @ApiBody({
     description: 'Destination and photo to delete',
     type: PhotoValidator,

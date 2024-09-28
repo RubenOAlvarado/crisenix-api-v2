@@ -1,5 +1,5 @@
 import { PipelineStage } from 'mongoose';
-import { SearcherTourDTO } from '../enums/searcher/tour/searcher.dto';
+import { SearcherTourDTO } from '../dtos/searcher/tour/searcherTour.dto';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
 import { SearchableTourFields } from '../enums/searcher/tour/fields.enum';
 import dayjs from 'dayjs';

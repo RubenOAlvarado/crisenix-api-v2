@@ -3,8 +3,7 @@ import { DestinationService } from '@/destination/destination.service';
 import { PricesService } from '@/prices/prices.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { SalesMove } from '@/shared/enums/sales/salemove.enum';
-import { ChangeTourStatusDTO } from '@/shared/enums/searcher/tour/changeStatus.dto';
-import { SearcherTourDTO } from '@/shared/enums/searcher/tour/searcher.dto';
+import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
@@ -33,6 +32,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PopulateOptions } from 'mongoose';
+import { SearcherTourDTO } from '@/shared/dtos/searcher/tour/searcherTour.dto';
 
 @Injectable()
 export class TourService {

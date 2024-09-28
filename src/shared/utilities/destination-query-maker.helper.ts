@@ -1,6 +1,4 @@
 import { PipelineStage } from 'mongoose';
-import { PaginationDTO } from '../dtos/pagination.dto';
-import { SearcherDTO } from '../enums/searcher/destination/searcher.dto';
 import { QueryBuilder } from './builders/query.builder';
 import {
   paginationQuery,
@@ -10,10 +8,12 @@ import {
 import { SearchStrategyFactory } from '../factories/searchDestinationStrategy.factory';
 import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 import { PopulateSubcatalogsStrategy } from '../strategies/populateDestinationSubCatalogs.strategy';
+import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
+import { QueryDTO } from '../dtos/query.dto';
 
 export function pipelinesMaker(
-  { word, field, status, subCatalog, sort }: SearcherDTO,
-  { page, limit }: PaginationDTO,
+  { field, word, subCatalog, sort }: SearcherDestinationDto,
+  { page, limit, status }: QueryDTO,
 ): PipelineStage[] {
   const builder = new QueryBuilder();
 
@@ -22,7 +22,7 @@ export function pipelinesMaker(
   const searchStrategy = SearchStrategyFactory.getSearchStrategy(
     field as SearchableFields,
   );
-  builder.addStage(searchStrategy.search({ field, word }));
+  builder.addStage(searchStrategy.search({ field, word, subCatalog, sort }));
 
   const populateSubCatalogsStrategy = new PopulateSubcatalogsStrategy();
   builder.addStage(populateSubCatalogsStrategy.search({ subCatalog }));

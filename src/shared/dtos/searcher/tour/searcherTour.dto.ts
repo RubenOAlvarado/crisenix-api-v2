@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SearchableTourFields } from './fields.enum';
+import { SearchableTourFields } from '../../../enums/searcher/tour/fields.enum';
 import {
   IsEnum,
   IsNotEmpty,
@@ -8,10 +8,9 @@ import {
   MaxLength,
   ValidateIf,
 } from 'class-validator';
-import { TourStatus } from '../../tour/status.enum';
 import { Transform } from 'class-transformer';
-import { BooleanString } from '../../boolean-string.type';
-import { SortTourFields } from './sortFields.enum';
+import { BooleanString } from '../../../enums/boolean-string.type';
+import { SortTourFields } from '../../../enums/searcher/tour/sortFields.enum';
 import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
 
 export class SearcherTourDTO {
@@ -24,7 +23,7 @@ export class SearcherTourDTO {
   @IsEnum(SearchableTourFields)
   @IsNotEmpty()
   @IsString()
-  field?: SearchableTourFields;
+  field: SearchableTourFields;
 
   @ApiProperty({
     description:
@@ -38,16 +37,6 @@ export class SearcherTourDTO {
   word: string;
 
   @ApiPropertyOptional({
-    description: 'Tour status to search.',
-    enum: TourStatus,
-    default: TourStatus.ACTIVE,
-  })
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  status?: TourStatus;
-
-  @ApiPropertyOptional({
     description: 'Indicator if we want to populate catalogs for tour.',
     default: false,
   })
@@ -56,7 +45,7 @@ export class SearcherTourDTO {
     message: `The populate value must be either 'true' or 'false'`,
   })
   @Transform(({ value }) => value === 'true', { toPlainOnly: true })
-  populate?: boolean;
+  populate: boolean;
 
   @ApiPropertyOptional({
     description: 'SortField to sort the results.',
@@ -66,9 +55,17 @@ export class SearcherTourDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsEnum(SortTourFields)
-  sort?: SortTourFields;
+  sort: SortTourFields;
 
-  constructor(word: string) {
+  constructor(
+    field: SearchableTourFields,
+    word: string,
+    populate: boolean,
+    sort: SortTourFields,
+  ) {
+    this.field = field;
     this.word = word;
+    this.populate = populate;
+    this.sort = sort;
   }
 }

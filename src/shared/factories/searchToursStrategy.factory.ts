@@ -1,5 +1,5 @@
 import { SearchableTourFields } from '../enums/searcher/tour/fields.enum';
-import { SearcherTourDTO } from '../enums/searcher/tour/searcher.dto';
+import { SearcherTourDTO } from '../dtos/searcher/tour/searcherTour.dto';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
 import { NoSearchStrategy } from '../strategies/noSearch.strategy';
 import { SearchTourByDestinationCategory } from '../strategies/searchTourByDestinationCategory.strategy';

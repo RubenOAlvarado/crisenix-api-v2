@@ -23,8 +23,6 @@ import {
 import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
 import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
 import { QueryDTO } from 'src/shared/dtos/query.dto';
-import { SearcherDTO } from '@/shared/enums/searcher/destination/searcher.dto';
-import 'multer';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
 import { Public } from '@/auth/public.decorator';
@@ -32,6 +30,7 @@ import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
+import { OriginCitySearcherDto } from '@/shared/dtos/searcher/originCity/searcherOriginCity.dto';
 
 @ApiBearerAuth()
 @Controller('origincity')
@@ -149,12 +148,11 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong searching for the origin city.',
   })
-  @Post('search')
-  @ApiBody({
-    description: 'Searcher object',
-    type: SearcherDTO,
-  })
-  async search(@Body() searcherDTO: SearcherDTO): Promise<Array<OriginCities>> {
+  @Public()
+  @Get('search/:word')
+  async search(
+    @Param() searcherDTO: OriginCitySearcherDto,
+  ): Promise<Array<OriginCities>> {
     return await this.originCityService.searcher(searcherDTO);
   }
 
