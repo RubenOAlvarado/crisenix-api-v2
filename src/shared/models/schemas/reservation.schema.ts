@@ -12,9 +12,6 @@ export class Reservations {
   })
   status: string;
 
-  @Prop({ enum: ['MXN', 'USD'], required: true })
-  currency: string;
-
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tours',
@@ -27,29 +24,44 @@ export class Reservations {
     ref: 'User',
     required: true,
   })
-  user: User;
+  user?: User;
+
+  @Prop()
+  clientName?: string;
+
+  @Prop()
+  clientLastName?: string;
+
+  @Prop()
+  clientMotherLastName?: string;
+
+  @Prop()
+  clientEmail?: string;
 
   @Prop({ required: true })
   totalSeats: number;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
-  passenger?: Array<Passengers>;
+  passengers?: Array<Passengers>;
 
   @Prop({ default: Date.now })
-  createdAt?: Date;
+  createdAt: Date;
+
+  @Prop()
+  paymentDeadline: Date;
 
   constructor(
     status: string,
-    currency: string,
     tour: Tours,
-    user: User,
     totalSeats: number,
+    createdAt: Date,
+    paymentDeadline: Date,
   ) {
     this.status = status;
-    this.currency = currency;
     this.tour = tour;
-    this.user = user;
     this.totalSeats = totalSeats;
+    this.createdAt = createdAt;
+    this.paymentDeadline = paymentDeadline;
   }
 }
 export type ReservationDocument = HydratedDocument<Reservations>;

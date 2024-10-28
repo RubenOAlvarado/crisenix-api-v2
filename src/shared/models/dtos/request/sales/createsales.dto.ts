@@ -1,135 +1,63 @@
 import {
   IsDateString,
-  IsEmail,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SalesStatus } from '@/shared/enums/sales/salesstatus.enum';
+import { Currency } from '@/shared/enums/currency.enum';
 
 export class CreateSaleDTO {
   @ApiProperty({
-    description: 'Tour id',
-    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
+    description: 'Reservation ID',
+    required: true,
+    example: '60f4b3b3b3b3b3b3b3b3b3b3',
+    type: String,
   })
   @IsNotEmpty()
   @IsMongoId()
-  tour: string;
-
-  @ApiPropertyOptional({
-    enum: SalesStatus,
-    example: SalesStatus.CHECKED,
-    description: 'Sale status',
-  })
-  @IsOptional()
-  @IsString()
-  status?: SalesStatus;
+  reservation: string;
 
   @ApiProperty({
-    example: 'Juan',
-    description: 'Client name',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(150)
-  clientName: string;
-
-  @ApiProperty({
-    example: 'Perez',
-    description: 'Client last name',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(150)
-  clientLastName: string;
-
-  @ApiPropertyOptional({
-    example: 'Gonzalez',
-    description: 'Client mother last name',
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(150)
-  clientMotherLastName?: string;
-
-  @ApiProperty({
-    description: 'Client email',
-    example: 'test@testing.com',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({
-    description: 'Reserved seats by client',
-    example: 1,
+    description: 'Total amount',
+    required: true,
+    example: 1000,
+    type: Number,
   })
   @IsNotEmpty()
   @IsNumber()
-  @Min(1)
-  reservedSeat: number;
+  total: number;
 
   @ApiProperty({
-    description: 'Reservation date',
-    example: '2020-10-30T00:00:00.000Z',
+    description: 'Currency',
+    required: true,
+    example: Currency.MX,
+    type: String,
+    enum: Currency,
+  })
+  @IsNotEmpty()
+  @IsEnum(Currency)
+  currency: Currency;
+
+  @ApiPropertyOptional({
+    description: 'Payment date',
+    example: '2022-01-01T00:00:00.000Z',
+    type: String,
   })
   @IsNotEmpty()
   @IsDateString()
-  reservationDate: Date;
-
-  @ApiPropertyOptional({
-    description: 'Total payed mount including all seats',
-    example: 100,
-  })
-  @IsOptional()
-  @IsNumber()
-  totalPayedMount?: number;
-
-  @ApiPropertyOptional({
-    description: 'Pay date',
-    example: '2020-10-30T00:00:00.000Z',
-  })
-  @IsNotEmpty()
-  @IsDateString()
-  payDate?: Date;
-
-  @ApiPropertyOptional({
-    description: 'List of passengers ids',
-    example: ['5f9d7a3b9d7a3b9d7a3b9d7a'],
-  })
-  @IsOptional()
-  @IsMongoId({ each: true })
-  passenger?: Array<string>;
-
-  @ApiPropertyOptional({
-    description: 'User id if registered',
-    example: '5f9d7a3b9d7a3b9d7a3b9d7a',
-  })
-  @IsOptional()
-  @IsMongoId()
-  user?: string;
+  paymentDate: Date;
 
   constructor(
-    tour: string,
-    clientName: string,
-    clientLastName: string,
-    email: string,
-    reservedSeat: number,
-    reservationDate: Date,
-    payDate: Date,
+    reservation: string,
+    total: number,
+    currency: Currency,
+    paymentDate: Date,
   ) {
-    this.tour = tour;
-    this.clientName = clientName;
-    this.clientLastName = clientLastName;
-    this.email = email;
-    this.reservedSeat = reservedSeat;
-    this.reservationDate = reservationDate;
-    this.payDate = payDate;
+    this.reservation = reservation;
+    this.total = total;
+    this.currency = currency;
+    this.paymentDate = paymentDate;
   }
 }

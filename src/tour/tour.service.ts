@@ -2,7 +2,6 @@ import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { DestinationService } from '@/destination/destination.service';
 import { PricesService } from '@/prices/prices.service';
 import { PaginationDTO } from '@/shared/dtos/pagination.dto';
-import { SalesMove } from '@/shared/enums/sales/salemove.enum';
 import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
@@ -327,52 +326,6 @@ export class TourService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong validating saled tour.',
-        error,
-      );
-    }
-  }
-
-  async updateTourSeats(
-    tour: TourLean,
-    soldSeats: number,
-    saleMove: SalesMove,
-  ): Promise<void> {
-    try {
-      const { availableSeat = 0, ocuppiedSeat = 0, seating, _id } = tour;
-
-      let newAvailableSeat: number;
-      let newOcuppiedSeat: number;
-
-      if (
-        saleMove === SalesMove.SALE &&
-        availableSeat > 0 &&
-        ocuppiedSeat > 0
-      ) {
-        newAvailableSeat = Math.max(availableSeat - soldSeats, 0);
-        newOcuppiedSeat = Math.min(ocuppiedSeat + soldSeats, seating);
-
-        if (newAvailableSeat <= 0 && newOcuppiedSeat > seating) {
-          throw new BadRequestException(
-            'There are not enough seats available for sale.',
-          );
-        }
-      } else {
-        newAvailableSeat = Math.min(availableSeat + soldSeats, seating);
-        newOcuppiedSeat = Math.max(ocuppiedSeat - soldSeats, 0);
-
-        if (newAvailableSeat > seating) {
-          throw new BadRequestException('Not enough available seats.');
-        }
-      }
-
-      await this.tourModel.findByIdAndUpdate(
-        _id,
-        { availableSeat: newAvailableSeat, ocuppiedSeat: newOcuppiedSeat },
-        { new: true },
-      );
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong updating seats.',
         error,
       );
     }
