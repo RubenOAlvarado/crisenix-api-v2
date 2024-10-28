@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Reservations } from './reservation.schema';
-import { OriginCities } from './origincity.schema';
 import { AboardPoints } from './aboarpoint.schema';
 
 @Schema()
@@ -14,13 +13,6 @@ export class Passengers {
 
   @Prop({ required: true, index: true })
   secondLastName: string;
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'OriginCities',
-    required: true,
-  })
-  originCity: OriginCities;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +43,9 @@ export class Passengers {
   })
   reservation: Reservations;
 
+  @Prop({ required: true })
+  cost: number;
+
   @Prop({ default: Date.now })
   createdAt?: Date;
 
@@ -60,16 +55,16 @@ export class Passengers {
     secondLastName: string,
     base: string,
     reservation: Reservations,
-    originCity: OriginCities,
     aboardPoint: AboardPoints,
+    cost: number,
   ) {
     this.name = name;
     this.lastName = lastName;
     this.secondLastName = secondLastName;
     this.base = base;
     this.reservation = reservation;
-    this.originCity = originCity;
     this.aboardPoint = aboardPoint;
+    this.cost = cost;
   }
 }
 

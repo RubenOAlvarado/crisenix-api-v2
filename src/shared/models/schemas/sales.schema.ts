@@ -1,69 +1,42 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Passengers } from './passenger.schema';
 import type { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
-import { User } from './user.schema';
+import { Reservations } from './reservation.schema';
 
 @Schema()
 export class Sales {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tours', required: true })
   tour: TourLean;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true })
-  user: User;
-
   @Prop({
-    enum: ['RESERVADA', 'PAGADA', 'COMPROBADA', 'CANCELADA', 'RECHAZADA'],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Reservations',
     required: true,
   })
-  status: string;
+  reservation: Reservations;
 
   @Prop({ required: true })
-  clientName: string;
+  total: number;
 
   @Prop({ required: true })
-  clientLastName: string;
-
-  @Prop()
-  clientMotherLastName?: string;
-
-  @Prop()
-  email?: string;
-
-  @Prop({ required: true })
-  reservedSeat: number;
-
-  @Prop({ required: true })
-  reservationDate: Date;
-
-  @Prop()
-  totalPayedMount?: number;
+  paymentDeadline: Date;
 
   @Prop()
   payDate?: Date;
-
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
-  passenger?: Array<Passengers>;
 
   @Prop({ default: Date.now })
   createdAt?: Date;
 
   constructor(
     tour: TourLean,
-    user: User,
-    status: string,
-    clientName: string,
-    clientLastName: string,
-    reservedSeat: number,
-    reservationDate: Date,
+    reservation: Reservations,
+    total: number,
+    paymentDeadline: Date,
   ) {
     this.tour = tour;
-    this.user = user;
-    this.status = status;
-    this.clientName = clientName;
-    this.clientLastName = clientLastName;
-    this.reservedSeat = reservedSeat;
-    this.reservationDate = reservationDate;
+    this.reservation = reservation;
+    this.total = total;
+    this.paymentDeadline = paymentDeadline;
   }
 }
 

@@ -30,6 +30,7 @@ import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { TransfertypeModule } from './transfertype/transfertype.module';
 import { PricesModule } from './prices/prices.module';
+import { ReservationModule } from './reservation/reservation.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { PricesModule } from './prices/prices.module';
     UserModule,
     FileManagerModule,
     PricesModule,
+    ReservationModule,
   ],
   controllers: [AppController],
   providers: [

@@ -86,7 +86,6 @@ export class RolesController {
     description: 'Something went wrong updating role.',
   })
   @Put(':id')
-  @Public()
   @ApiBody({ type: UpdateRoleDTO })
   async updateRole(
     @Body() updateRoleDTO: UpdateRoleDTO,
