@@ -81,7 +81,7 @@ export class CreateReservationsDTO {
   @ValidateIf((o) => !o.user)
   @IsNotEmpty({ message: 'Client email is required when user is not provided' })
   @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format' })
   email?: string;
 
   @ApiProperty({

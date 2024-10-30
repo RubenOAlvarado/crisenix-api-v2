@@ -28,14 +28,14 @@ export class Sales {
   @Prop({ enum: Currency, required: true, default: Currency.MXN })
   currency: Currency;
 
-  @Prop()
+  @Prop({ required: true })
   paymentDate: Date;
 
   @Prop({ enum: SalesStatus, default: SalesStatus.PENDING, required: true })
   status: SalesStatus;
 
   @Prop({ enum: FailureReason, required: false, default: null })
-  declinedReason?: FailureReason;
+  failureReason?: FailureReason;
 
   constructor(
     reservation: Reservations,

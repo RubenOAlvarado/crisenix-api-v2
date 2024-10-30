@@ -12,9 +12,9 @@ export class DeclineSaleDto {
   })
   @IsNotEmpty()
   @IsEnum(FailureReason)
-  reason: FailureReason;
+  failureReason: FailureReason;
 
-  constructor(reason: FailureReason) {
-    this.reason = reason;
+  constructor(failureReason: FailureReason) {
+    this.failureReason = failureReason;
   }
 }
