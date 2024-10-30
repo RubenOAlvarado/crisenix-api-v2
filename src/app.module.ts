@@ -14,7 +14,6 @@ import { TemplatesModule } from './templates/templates.module';
 import { TourtypeModule } from './tourtype/tourtype.module';
 import { TransportsModule } from './transports/transports.module';
 import { DestinationModule } from './destination/destination.module';
-import { EventlogModule } from './eventlog/eventlog.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PrivatetourModule } from './privatetour/privatetour.module';
 import { SalesModule } from './sales/sales.module';
@@ -60,7 +59,6 @@ import { ReservationModule } from './reservation/reservation.module';
     TransfertypeModule,
     TransportsModule,
     DestinationModule,
-    EventlogModule,
     MailerModule,
     PrivatetourModule,
     SalesModule,

@@ -31,7 +31,7 @@ export class CreatePriceDTO {
   @ApiProperty({
     enum: Currency,
     description: 'Currency of the price.',
-    example: Currency.MX,
+    example: Currency.MXN,
   })
   @IsNotEmpty()
   @IsEnum(Currency)
