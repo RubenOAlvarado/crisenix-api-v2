@@ -45,7 +45,7 @@ export class CreateReservationsDTO {
     description: 'Client name',
   })
   @ValidateIf((o) => !o.user)
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Client name is required when user is not provided' })
   @IsString()
   @MaxLength(150)
   clientName?: string;
@@ -55,7 +55,9 @@ export class CreateReservationsDTO {
     description: 'Client last name',
   })
   @ValidateIf((o) => !o.user)
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Client last name is required when user is not provided',
+  })
   @IsString()
   @MaxLength(150)
   clientLastName?: string;
@@ -65,7 +67,9 @@ export class CreateReservationsDTO {
     description: 'Client mother last name',
   })
   @ValidateIf((o) => !o.user)
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Client mother last name is required when user is not provided',
+  })
   @IsString()
   @MaxLength(150)
   clientMotherLastName?: string;
@@ -75,7 +79,7 @@ export class CreateReservationsDTO {
     example: 'test@testing.com',
   })
   @ValidateIf((o) => !o.user)
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Client email is required when user is not provided' })
   @IsString()
   @IsEmail()
   email?: string;
@@ -94,16 +98,17 @@ export class CreateReservationsDTO {
     type: [String],
     isArray: true,
   })
+  @IsOptional()
   @ArrayNotEmpty()
   @IsMongoId({ each: true })
   passengers?: string[];
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Reservation payment deadline',
     example: new Date(),
     type: Date,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Payment deadline is required' })
   @IsDateString()
   paymentDeadline: Date;
 

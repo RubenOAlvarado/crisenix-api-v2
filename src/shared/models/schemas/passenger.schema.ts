@@ -2,8 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Reservations } from './reservation.schema';
 import { AboardPoints } from './aboarpoint.schema';
+import { PriceBase } from '@/shared/enums/priceBase.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Passengers {
   @Prop({ required: true, index: true })
   name: string;
@@ -22,19 +25,11 @@ export class Passengers {
   aboardPoint: AboardPoints;
 
   @Prop({
-    enum: [
-      'general',
-      'singleBase',
-      'doubleBase',
-      'tripleBase',
-      'quadrupleBase',
-      'inapam',
-      'minor',
-    ],
+    enum: PriceBase,
     required: true,
-    default: 'general',
+    default: PriceBase.GENERAL,
   })
-  base: string;
+  base: PriceBase;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -46,14 +41,11 @@ export class Passengers {
   @Prop({ required: true })
   cost: number;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
   constructor(
     name: string,
     lastName: string,
     secondLastName: string,
-    base: string,
+    base: PriceBase,
     reservation: Reservations,
     aboardPoint: AboardPoints,
     cost: number,

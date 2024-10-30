@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { AboardPoints } from './aboarpoint.schema';
+import { Status } from '@/shared/enums/status.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class OriginCities {
   @Prop({ required: true, index: true })
   state: string;
@@ -16,13 +19,10 @@ export class OriginCities {
   })
   aboardPoints?: Array<AboardPoints>;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  constructor(state: string, name: string, status: string) {
+  constructor(state: string, name: string, status: Status) {
     this.state = state;
     this.name = name;
     this.status = status;

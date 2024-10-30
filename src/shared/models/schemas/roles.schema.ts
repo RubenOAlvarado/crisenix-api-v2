@@ -1,21 +1,21 @@
+import { Status } from '@/shared/enums/status.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Roles {
   @Prop({ required: true, index: true })
   description: string;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
-
-  @Prop({ default: Date.now })
-  createdAt?: Date;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
   @Prop({ type: [String], required: true })
   permissions: string[];
 
-  constructor(description: string, status: string, permissions: string[]) {
+  constructor(description: string, status: Status, permissions: string[]) {
     this.description = description;
     this.status = status;
     this.permissions = permissions;

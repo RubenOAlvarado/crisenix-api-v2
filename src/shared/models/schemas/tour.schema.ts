@@ -7,8 +7,11 @@ import { Includeds } from './included.schema';
 import { Classifications } from './classification.schema';
 import { Transports } from './transports.schema';
 import { Prices } from './price.schema';
+import { TourStatus } from '@/shared/enums/tour/status.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Tours {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -22,10 +25,11 @@ export class Tours {
 
   @Prop({
     type: String,
-    enum: ['Activo', 'Inactivo', 'Publicado', 'Cerrado', 'Concluido'],
-    default: 'Activo',
+    enum: TourStatus,
+    default: TourStatus.ACTIVE,
+    required: true,
   })
-  status: string;
+  status: TourStatus;
 
   @Prop({ type: Number, required: true })
   seating: number;
@@ -39,7 +43,7 @@ export class Tours {
   @Prop({ type: Date, required: true, index: true })
   initDate: Date;
 
-  @Prop({ type: Array, default: [] })
+  @Prop({ type: Array })
   aboardHour?: Array<{
     hour: string;
     aboardPoint: AboardPoints;
@@ -61,7 +65,7 @@ export class Tours {
   @Prop({ type: Date, required: true })
   returnDate: Date;
 
-  @Prop({ type: Array, default: [] })
+  @Prop({ type: Array })
   returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>;
 
   @Prop({ type: Array })
@@ -103,13 +107,10 @@ export class Tours {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Prices' }] })
   prices: Array<Prices>;
 
-  @Prop({ type: Date, default: Date.now })
-  createdAt?: Date;
-
   constructor(
     destination: Destinations,
     code: string,
-    status: string,
+    status: TourStatus,
     seating: number,
     initDate: Date,
     transport: Transports,
@@ -137,7 +138,6 @@ export class Tours {
       finishHour: string;
       order: number;
     }>,
-    createdAt?: Date,
   ) {
     this.destination = destination;
     this.code = code;
@@ -159,7 +159,6 @@ export class Tours {
     this.recommendations = recommendations;
     this.includeds = includeds;
     this.itineraries = itineraries;
-    this.createdAt = createdAt;
   }
 }
 

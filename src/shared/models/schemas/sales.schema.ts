@@ -1,8 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Reservations } from './reservation.schema';
+import { SalesStatus } from '@/shared/enums/sales/saleStatus.enum';
+import { Currency } from '@/shared/enums/currency.enum';
+import { FailureReason } from '@/shared/enums/sales/failureReason.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Sales {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -11,30 +16,33 @@ export class Sales {
   })
   reservation: Reservations;
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    validate: {
+      validator: (value: number) => value >= 0,
+      message: 'Total must be positive.',
+    },
+  })
   total: number;
 
-  @Prop({ enum: ['MXN', 'USD'], required: true, default: 'MXN' })
-  currency: string;
+  @Prop({ enum: Currency, required: true, default: Currency.MXN })
+  currency: Currency;
 
   @Prop()
   paymentDate: Date;
 
-  @Prop({ enum: ['PENDING', 'PAID'], default: 'PENDING' })
-  status: string;
+  @Prop({ enum: SalesStatus, default: SalesStatus.PENDING, required: true })
+  status: SalesStatus;
 
-  @Prop()
-  declinedReason?: string;
-
-  @Prop({ default: Date.now })
-  createdAt?: Date;
+  @Prop({ enum: FailureReason, required: false, default: null })
+  declinedReason?: FailureReason;
 
   constructor(
     reservation: Reservations,
     total: number,
-    currency: string,
+    currency: Currency,
     paymentDate: Date,
-    status: string,
+    status: SalesStatus,
   ) {
     this.reservation = reservation;
     this.total = total;
@@ -46,3 +54,10 @@ export class Sales {
 
 export type SalesDocument = HydratedDocument<Sales>;
 export const SalesSchema = SchemaFactory.createForClass(Sales);
+
+SalesSchema.pre('save', function (next) {
+  if (this.status === SalesStatus.PAID && !this.paymentDate) {
+    this.paymentDate = new Date();
+  }
+  next();
+});

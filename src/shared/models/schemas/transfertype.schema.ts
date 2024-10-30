@@ -1,18 +1,18 @@
+import { Status } from '@/shared/enums/status.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class TransferTypes {
   @Prop({ type: String, required: true, index: true })
   name: string;
 
-  @Prop({ type: String, enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ type: Date, default: Date.now })
-  createdAt?: Date;
-
-  constructor(name: string, status: string) {
+  constructor(name: string, status: Status) {
     this.name = name;
     this.status = status;
   }

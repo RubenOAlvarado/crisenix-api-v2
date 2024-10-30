@@ -4,6 +4,7 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
+  IsPositive,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Currency } from '@/shared/enums/currency.enum';
@@ -27,12 +28,13 @@ export class CreateSaleDTO {
   })
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive({ message: 'Total must be greater than 0' })
   total: number;
 
   @ApiProperty({
     description: 'Currency',
     required: true,
-    example: Currency.MX,
+    example: Currency.MXN,
     type: String,
     enum: Currency,
   })
@@ -45,7 +47,7 @@ export class CreateSaleDTO {
     example: '2022-01-01T00:00:00.000Z',
     type: String,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Payment date is required' })
   @IsDateString()
   paymentDate: Date;
 

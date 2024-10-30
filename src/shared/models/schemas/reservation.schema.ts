@@ -3,14 +3,17 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Tours } from './tour.schema';
 import { User } from './user.schema';
 import { Passengers } from './passenger.schema';
+import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Reservations {
   @Prop({
-    enum: ['RESERVADA', 'PAGADA', 'COMPROBADA', 'CANCELADA', 'RECHAZADA'],
+    enum: ReservationStatus,
     required: true,
   })
-  status: string;
+  status: ReservationStatus;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -26,16 +29,44 @@ export class Reservations {
   })
   user?: User;
 
-  @Prop()
+  @Prop({
+    validate: {
+      validator: function (this: Reservations, value: string | undefined) {
+        return this.user != null || (value != null && value.trim().length > 0);
+      },
+      message: 'Client name is required when user is not provided',
+    },
+  })
   clientName?: string;
 
-  @Prop()
+  @Prop({
+    validate: {
+      validator: function (this: Reservations, value: string | undefined) {
+        return this.user != null || (value != null && value.trim().length > 0);
+      },
+      message: 'Client last name is required when user is not provided',
+    },
+  })
   clientLastName?: string;
 
-  @Prop()
+  @Prop({
+    validate: {
+      validator: function (this: Reservations, value: string | undefined) {
+        return this.user != null || (value != null && value.trim().length > 0);
+      },
+      message: 'Client mother last name is required when user is not provided',
+    },
+  })
   clientMotherLastName?: string;
 
-  @Prop()
+  @Prop({
+    validate: {
+      validator: function (this: Reservations, value: string | undefined) {
+        return this.user != null || (value != null && value.trim().length > 0);
+      },
+      message: 'Client email is required when user is not provided',
+    },
+  })
   clientEmail?: string;
 
   @Prop({ required: true })
@@ -44,23 +75,18 @@ export class Reservations {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
   passengers?: Array<Passengers>;
 
-  @Prop({ default: Date.now })
-  createdAt: Date;
-
   @Prop()
   paymentDeadline: Date;
 
   constructor(
-    status: string,
+    status: ReservationStatus,
     tour: Tours,
     totalSeats: number,
-    createdAt: Date,
     paymentDeadline: Date,
   ) {
     this.status = status;
     this.tour = tour;
     this.totalSeats = totalSeats;
-    this.createdAt = createdAt;
     this.paymentDeadline = paymentDeadline;
   }
 }

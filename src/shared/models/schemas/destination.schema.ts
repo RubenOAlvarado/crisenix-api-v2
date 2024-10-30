@@ -3,8 +3,12 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Categories } from './category.schema';
 import { OriginCities } from './origincity.schema';
 import { TransferTypes } from './transfertype.schema';
+import { Status } from '@/shared/enums/status.enum';
+import { Visa } from '@/shared/enums/visa.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Destinations {
   @Prop({ type: String, required: true, index: true, unique: true })
   code: string;
@@ -18,8 +22,8 @@ export class Destinations {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Categories' }] })
   categories?: Array<Categories>;
 
-  @Prop({ type: String, enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OriginCities' }],
@@ -32,8 +36,8 @@ export class Destinations {
   @Prop({ type: Boolean, default: false })
   passport?: boolean;
 
-  @Prop({ type: String, enum: ['Cliente', 'Crisenix', 'N/A'], default: 'N/A' })
-  visa: string;
+  @Prop({ type: String, enum: Visa, default: Visa.NO })
+  visa: Visa;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TransferTypes' }],
@@ -46,10 +50,7 @@ export class Destinations {
   @Prop({ type: Array })
   photos?: Array<string>;
 
-  @Prop({ type: Date, default: Date.now })
-  createdAt?: Date;
-
-  constructor(code: string, name: string, status: string, visa: string) {
+  constructor(code: string, name: string, status: Status, visa: Visa) {
     this.code = code;
     this.name = name;
     this.status = status;

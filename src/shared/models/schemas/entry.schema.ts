@@ -1,28 +1,23 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Entry } from '@/shared/enums/entry.enum';
+import { Status } from '@/shared/enums/status.enum';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
+@Schema({
+  timestamps: true,
+})
 export class Entries {
   @Prop({
-    enum: [
-      'Alimentos',
-      'Actividades',
-      'Gastos',
-      'Traslados',
-      'Visitas',
-      'Servicios',
-      'Recorrido',
-    ],
+    enum: Entry,
     required: true,
+    default: Entry.SERVICIOS,
   })
-  description: string;
+  description: Entry;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  constructor(description: string, status: string) {
+  constructor(description: Entry, status: Status) {
     this.description = description;
     this.status = status;
   }

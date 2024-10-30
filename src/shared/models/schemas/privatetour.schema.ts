@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class PrivateTours {
   @Prop({ required: true })
   name: string;
@@ -32,9 +34,6 @@ export class PrivateTours {
 
   @Prop({ required: true })
   tourDescription: string;
-
-  @Prop({ default: Date.now })
-  createdAt?: Date;
 
   constructor(
     name: string,

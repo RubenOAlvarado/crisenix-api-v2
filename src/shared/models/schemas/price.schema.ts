@@ -1,8 +1,13 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Destinations } from './destination.schema';
 import { OriginCities } from './origincity.schema';
+import { Currency } from '@/shared/enums/currency.enum';
+import { Status } from '@/shared/enums/status.enum';
 
+@Schema({
+  timestamps: true,
+})
 export class Prices {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -18,8 +23,8 @@ export class Prices {
   })
   city: OriginCities;
 
-  @Prop({ required: true, enum: ['MXN', 'USD'], default: 'MXN' })
-  currency: string;
+  @Prop({ required: true, enum: Currency, default: Currency.MXN })
+  currency: Currency;
 
   @Prop()
   general?: number;
@@ -42,19 +47,21 @@ export class Prices {
   @Prop()
   inapam?: number;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status?: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  constructor(destination: Destinations, city: OriginCities, currency: string) {
+  constructor(
+    destination: Destinations,
+    city: OriginCities,
+    currency: Currency,
+    status: Status,
+  ) {
     this.destination = destination;
     this.city = city;
     this.currency = currency;
+    this.status = status;
   }
 }
 
 export type PricesDocument = HydratedDocument<Prices>;
 export const PricesSchema = SchemaFactory.createForClass(Prices);
-PricesSchema.set('strict', false);

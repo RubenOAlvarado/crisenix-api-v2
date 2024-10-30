@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Entries } from './entry.schema';
+import { Status } from '@/shared/enums/status.enum';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Includeds {
   @Prop({ required: true, index: true })
   concept: string;
@@ -13,13 +16,10 @@ export class Includeds {
   })
   entry: Entries;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  constructor(concept: string, entry: Entries, status: string) {
+  constructor(concept: string, entry: Entries, status: Status) {
     this.concept = concept;
     this.entry = entry;
     this.status = status;

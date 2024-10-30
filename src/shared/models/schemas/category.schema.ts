@@ -1,7 +1,10 @@
+import { Status } from '@/shared/enums/status.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Categories {
   @Prop({ required: true, index: true })
   label: string;
@@ -9,13 +12,10 @@ export class Categories {
   @Prop()
   main?: string;
 
-  @Prop({ enum: ['Activo', 'Inactivo'], default: 'Activo' })
-  status: string;
+  @Prop({ enum: Status, default: Status.ACTIVE, required: true })
+  status: Status;
 
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  constructor(label: string, status: string) {
+  constructor(label: string, status: Status) {
     this.label = label;
     this.status = status;
   }
