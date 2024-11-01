@@ -5,13 +5,13 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Query,
 } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationsDTO } from '@/shared/models/dtos/request/reservations/create-reservations.dto';
 import { UpdateReservationsDto } from '@/shared/models/dtos/request/reservations/update-reservations.dto';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -22,6 +22,7 @@ import {
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { QueryDTO } from '@/shared/dtos/query.dto';
+import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
 
 @ApiTags('Reservations')
 @Controller('reservation')
@@ -83,14 +84,17 @@ export class ReservationController {
   }
 
   @ApiOkResponse({
-    description: 'Reservation removed successfully.',
+    description: 'Reservation status changed successfully.',
   })
   @ApiNotFoundResponse({ description: 'Reservation not found.' })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong removing reservation.',
+    description: 'Something went wrong changing reservation status.',
   })
-  @Delete(':id')
-  remove(@Param() params: UrlValidator) {
-    return this.reservationService.remove(params);
+  @ApiBadRequestResponse({
+    description: 'Invalid status provided.',
+  })
+  @Patch('change_status')
+  changeStatus(@Body() data: ChangeStatusDTO) {
+    return this.reservationService.changeStatus(data);
   }
 }

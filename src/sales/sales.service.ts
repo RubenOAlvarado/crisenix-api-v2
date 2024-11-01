@@ -88,10 +88,10 @@ export class SalesService {
     }
   }
 
-  async markSaleAsDeclined(
-    { id }: UrlValidator,
-    { failureReason }: DeclineSaleDto,
-  ): Promise<Sales> {
+  async markSaleAsDeclined({
+    id,
+    failureReason,
+  }: DeclineSaleDto): Promise<Sales> {
     try {
       const sale = await this.validateSale(id);
       const updatedSale = await this.salesModel

@@ -300,37 +300,6 @@ export class TourService {
     return true;
   }
 
-  private async getPOJOTourById(id: string): Promise<TourLean> {
-    try {
-      const tourPOJO = await this.tourModel.findById(id).lean();
-      if (!tourPOJO) throw new NotFoundException('Tour not found.');
-      return tourPOJO;
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong getting POJO tour by id.',
-        error,
-      );
-    }
-  }
-
-  async validateSaledTour(id: string): Promise<TourLean> {
-    try {
-      const tour = await this.getPOJOTourById(id);
-      if (tour.status !== TourStatus.PUBLISH)
-        throw new BadRequestException(
-          'The tour must be in publish status to be saled.',
-        );
-      if (tour.availableSeat === 0)
-        throw new BadRequestException('There are not enough seats available.');
-      return tour;
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong validating saled tour.',
-        error,
-      );
-    }
-  }
-
   async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
     try {
       const query = CatalogQueryFactory.createQuery(catalogName);
@@ -517,6 +486,56 @@ export class TourService {
     } catch (error) {
       throw handleErrorsOnServices(
         `Something went wrong updating tour catalog ${catalogName}.`,
+        error,
+      );
+    }
+  }
+
+  async reserveTourSeats(tourId: string, seats: number): Promise<TourLean> {
+    try {
+      const tour = await this.tourModel.findById(tourId);
+      if (!tour) throw new NotFoundException('Tour not found.');
+      if (tour && seats > tour?.availableSeat)
+        throw new BadRequestException('Not enough seats available.');
+      const updatedTour = await this.tourModel.findByIdAndUpdate(
+        tour._id,
+        {
+          availableSeat: tour?.availableSeat - seats,
+          ocuppiedSeat: tour?.ocuppiedSeat + seats,
+        },
+        { new: true },
+      );
+      if (!updatedTour)
+        throw new NotFoundException('Tour not found after update.');
+      return updatedTour;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong reserving tour seats.',
+        error,
+      );
+    }
+  }
+
+  async releaseTourSeats(tourId: string, seats: number): Promise<TourLean> {
+    try {
+      const tour = await this.tourModel.findById(tourId);
+      if (!tour) throw new NotFoundException('Tour not found.');
+      if (tour && seats > tour?.ocuppiedSeat)
+        throw new BadRequestException('Not enough seats reserved.');
+      const updatedTour = await this.tourModel.findByIdAndUpdate(
+        tour._id,
+        {
+          availableSeat: tour?.availableSeat + seats,
+          ocuppiedSeat: tour?.ocuppiedSeat - seats,
+        },
+        { new: true },
+      );
+      if (!updatedTour)
+        throw new NotFoundException('Tour not found after update.');
+      return updatedTour;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong releasing tour seats.',
         error,
       );
     }

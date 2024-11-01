@@ -26,7 +26,9 @@ export class CreateTourDTO {
     description: 'Destination id',
     example: '5f9d5c2b9d6b280b685d3e4e',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'You cannot create a tour without a destination.',
+  })
   @IsString()
   @IsMongoId()
   destination: string;
@@ -35,7 +37,9 @@ export class CreateTourDTO {
     description: 'Tour code',
     example: 'T-0001',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs a code to be created.',
+  })
   @IsString()
   code: string;
 
@@ -43,7 +47,9 @@ export class CreateTourDTO {
     description: 'Tour seats number',
     example: 20,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs a seating number to be created.',
+  })
   @IsNumber()
   seating: number;
 
@@ -67,7 +73,9 @@ export class CreateTourDTO {
     description: 'Tour initial date',
     example: '2020-10-30T05:00:00.000Z',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs an initial date to be created.',
+  })
   @IsDateString()
   initDate: Date;
 
@@ -106,7 +114,9 @@ export class CreateTourDTO {
     description: 'Tour transport',
     example: '5f9d5c2b9d6b280b685d3e4e',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs a transport to be created.',
+  })
   @IsMongoId()
   transport: string;
 
@@ -114,7 +124,9 @@ export class CreateTourDTO {
     description: 'Tour return date',
     example: '2020-10-30T05:00:00.000Z',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs a return date to be created.',
+  })
   @IsDateString()
   returnDate: Date;
 
@@ -163,7 +175,9 @@ export class CreateTourDTO {
     description: 'Tour type',
     example: '5f9d5c2b9d6b280b685d3e4e',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: 'Tour needs a type to be created.',
+  })
   @IsMongoId()
   tourType: string;
 
@@ -191,11 +205,12 @@ export class CreateTourDTO {
   @ValidateNested({ each: true })
   itineraries?: Array<ItineraryDTO>;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Tour prices',
     type: String,
     isArray: true,
   })
+  @IsOptional()
   @ArrayNotEmpty()
   @IsMongoId({ each: true })
   prices?: Array<string>;

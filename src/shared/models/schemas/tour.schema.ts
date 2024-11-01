@@ -35,10 +35,10 @@ export class Tours {
   seating: number;
 
   @Prop({ type: Number })
-  availableSeat?: number;
+  availableSeat: number;
 
-  @Prop({ type: Number })
-  ocuppiedSeat?: number;
+  @Prop({ type: Number, default: 0 })
+  ocuppiedSeat: number;
 
   @Prop({ type: Date, required: true, index: true })
   initDate: Date;
@@ -117,11 +117,11 @@ export class Tours {
     returnDate: Date,
     tourType: TourTypes,
     prices: Array<Prices>,
-    availableSeat?: number,
-    ocuppiedSeat?: number,
+    availableSeat: number,
+    ocuppiedSeat: number,
+    days: number,
+    nights: number,
     aboardHour?: Array<{ hour: string; aboardPoint: AboardPoints }>,
-    days = 1,
-    nights = 0,
     returnHour?: Array<{ hour: string; aboardPoint: AboardPoints }>,
     coordinators?: Array<{ transport: string; name: string; phone: string }>,
     front?: string,
@@ -164,3 +164,10 @@ export class Tours {
 
 export type TourDocument = HydratedDocument<Tours>;
 export const TourSchema = SchemaFactory.createForClass(Tours);
+
+TourSchema.pre('save', function (next) {
+  if (this.isNew && !this.availableSeat) {
+    this.availableSeat = this.seating;
+  }
+  next();
+});

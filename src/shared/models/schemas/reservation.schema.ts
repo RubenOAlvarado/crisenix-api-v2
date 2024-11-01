@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Tours } from './tour.schema';
 import { User } from './user.schema';
 import { Passengers } from './passenger.schema';
@@ -20,14 +20,14 @@ export class Reservations {
     ref: 'Tours',
     required: true,
   })
-  tour: Tours;
+  tour: Tours | Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   })
-  user?: User;
+  user?: User | Types.ObjectId;
 
   @Prop({
     validate: {
@@ -75,7 +75,7 @@ export class Reservations {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
   passengers?: Array<Passengers>;
 
-  @Prop()
+  @Prop({ required: true })
   paymentDeadline: Date;
 
   constructor(

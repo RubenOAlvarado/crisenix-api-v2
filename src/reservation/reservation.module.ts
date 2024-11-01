@@ -6,6 +6,7 @@ import {
   ReservationSchema,
 } from '@/shared/models/schemas/reservation.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TourModule } from '@/tour/tour.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         schema: ReservationSchema,
       },
     ]),
+    TourModule,
   ],
   controllers: [ReservationController],
   providers: [ReservationService],

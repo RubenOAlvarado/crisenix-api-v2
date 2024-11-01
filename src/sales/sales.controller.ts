@@ -69,8 +69,12 @@ export class SalesController {
   @ApiBadRequestResponse({
     description: 'Sale already paid.',
   })
-  @Patch('mark-as-paid/:id')
-  async markSaleAsPaid(@Param() param: UrlValidator) {
+  @Patch('pay')
+  @ApiBody({
+    description: 'Payment information',
+    type: UrlValidator,
+  })
+  async markSaleAsPaid(@Body() param: UrlValidator) {
     return await this.salesService.markSaleAsPaid(param);
   }
 
@@ -86,15 +90,12 @@ export class SalesController {
   @ApiBadRequestResponse({
     description: 'Sale already declined.',
   })
-  @Patch('mark-as-declined/:id')
+  @Patch('decline')
   @ApiBody({
     description: 'Declined reason',
     type: DeclineSaleDto,
   })
-  async markSaleAsDeclined(
-    @Param() param: UrlValidator,
-    @Body() declineSaleDto: DeclineSaleDto,
-  ) {
-    return await this.salesService.markSaleAsDeclined(param, declineSaleDto);
+  async markSaleAsDeclined(@Body() declineSaleDto: DeclineSaleDto) {
+    return await this.salesService.markSaleAsDeclined(declineSaleDto);
   }
 }

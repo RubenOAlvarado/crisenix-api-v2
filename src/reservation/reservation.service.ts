@@ -1,23 +1,30 @@
 import { QueryDTO } from '@/shared/dtos/query.dto';
+import { ReservationsLean } from '@/shared/interfaces/reservations/reservations.lean.interface';
+import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
 import { CreateReservationsDTO } from '@/shared/models/dtos/request/reservations/create-reservations.dto';
 import { UpdateReservationsDto } from '@/shared/models/dtos/request/reservations/update-reservations.dto';
 import { Reservations } from '@/shared/models/schemas/reservation.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { TourService } from '@/tour/tour.service';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ChangeReservationStatus } from './changeReservationStatus';
 
 @Injectable()
 export class ReservationService {
   constructor(
     @InjectModel(Reservations.name)
     private readonly reservationModel: Model<Reservations>,
+    private readonly tourService: TourService,
   ) {}
 
-  create(createReservationDto: CreateReservationsDTO) {
+  async create(createReservationDto: CreateReservationsDTO) {
     try {
       const newReservation = new this.reservationModel(createReservationDto);
+      const { tour, totalSeats } = createReservationDto;
+      await this.tourService.reserveTourSeats(tour, totalSeats);
       return newReservation.save();
     } catch (error) {
       throw handleErrorsOnServices(
@@ -27,10 +34,14 @@ export class ReservationService {
     }
   }
 
-  findAll({ limit, page, status }: QueryDTO) {
+  async findAll({
+    limit,
+    page,
+    status,
+  }: QueryDTO): Promise<ReservationsLean[]> {
     try {
       const query = status ? { status } : {};
-      const reservations = this.reservationModel
+      const reservations = await this.reservationModel
         .find(query)
         .limit(limit)
         .skip(page * limit)
@@ -47,9 +58,9 @@ export class ReservationService {
     }
   }
 
-  findOne({ id }: UrlValidator) {
+  async findOne({ id }: UrlValidator): Promise<ReservationsLean> {
     try {
-      const reservation = this.reservationModel
+      const reservation = await this.reservationModel
         .findById(id)
         .select({
           __v: 0,
@@ -67,9 +78,12 @@ export class ReservationService {
     }
   }
 
-  update({ id }: UrlValidator, updateReservationDto: UpdateReservationsDto) {
+  async update(
+    { id }: UrlValidator,
+    updateReservationDto: UpdateReservationsDto,
+  ): Promise<ReservationsLean> {
     try {
-      const updatedReservation = this.reservationModel.findByIdAndUpdate(
+      const updatedReservation = await this.reservationModel.findByIdAndUpdate(
         id,
         updateReservationDto,
         { new: true },
@@ -84,18 +98,18 @@ export class ReservationService {
     }
   }
 
-  remove({ id }: UrlValidator) {
+  async changeStatus({ id, status }: ChangeStatusDTO) {
     try {
-      const removedReservation = this.reservationModel.findByIdAndUpdate(
+      const command = new ChangeReservationStatus(
+        this.reservationModel,
+        this.tourService,
         id,
-        { status: 'inactive' },
-        { new: true },
+        status,
       );
-      if (!removedReservation) throw new Error('Reservation not found.');
-      return 'Reservation removed successfully.';
+      return command.execute();
     } catch (error) {
       throw handleErrorsOnServices(
-        'Something went wrong removing reservation.',
+        'Something went wrong changing reservation status.',
         error,
       );
     }
