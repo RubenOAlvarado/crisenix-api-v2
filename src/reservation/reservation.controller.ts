@@ -37,8 +37,8 @@ export class ReservationController {
   })
   @Post()
   @ApiBody({ type: CreateReservationsDTO })
-  create(@Body() createReservationDto: CreateReservationsDTO) {
-    return this.reservationService.create(createReservationDto);
+  async create(@Body() createReservationDto: CreateReservationsDTO) {
+    return await this.reservationService.create(createReservationDto);
   }
 
   @ApiOkResponse({
@@ -50,8 +50,8 @@ export class ReservationController {
   })
   @Public()
   @Get()
-  findAll(@Query() query: QueryDTO) {
-    return this.reservationService.findAll(query);
+  async findAll(@Query() query: QueryDTO) {
+    return await this.reservationService.findAll(query);
   }
 
   @ApiOkResponse({
@@ -63,8 +63,8 @@ export class ReservationController {
   })
   @Public()
   @Get(':id')
-  findOne(@Param() params: UrlValidator) {
-    return this.reservationService.findOne(params);
+  async findOne(@Param() params: UrlValidator) {
+    return await this.reservationService.findOne(params);
   }
 
   @ApiOkResponse({
@@ -76,11 +76,11 @@ export class ReservationController {
   })
   @ApiBody({ type: UpdateReservationsDto })
   @Patch(':id')
-  update(
+  async update(
     @Param() params: UrlValidator,
     @Body() updateReservationDto: UpdateReservationsDto,
   ) {
-    return this.reservationService.update(params, updateReservationDto);
+    return await this.reservationService.update(params, updateReservationDto);
   }
 
   @ApiOkResponse({
@@ -94,7 +94,7 @@ export class ReservationController {
     description: 'Invalid status provided.',
   })
   @Patch('change_status')
-  changeStatus(@Body() data: ChangeStatusDTO) {
-    return this.reservationService.changeStatus(data);
+  async changeStatus(@Body() data: ChangeStatusDTO) {
+    return await this.reservationService.changeStatus(data);
   }
 }
