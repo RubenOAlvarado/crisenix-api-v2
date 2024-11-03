@@ -1,7 +1,7 @@
 ## Description
 
 Backend API for crisenix app. 
-© Algorithm Apps.
+© Ruben Alvarado.
 
 ## Installation
 
@@ -46,8 +46,8 @@ $ localhost:3000/api
 ## Stay in touch
 
 - Author - [Ruben O. Alvarado](https://github.com/RubenOAlvarado)
-- Website - [Algorithm Apps](https://algorithmapps.com.mx/)
-- Twitter - [munditower](https://twitter.com/munditower)
+- Instagram - [Ruben O. Alvarado](https://www.instagram.com/alvaradorubo/)
+- Gitlab - [Munditoro](https://gitlab.com/Munditoro)
 
 ## License
 
