@@ -29,7 +29,6 @@ import { DescriptionDTO } from '@/shared/models/dtos/request/role/findByDescript
 import { Public } from '@/auth/public.decorator';
 
 @ApiTags('Roles')
-// @ApiBearerAuth()
 @Controller('roles')
 export class RolesController {
   constructor(private rolesService: RolesService) {}
@@ -41,7 +40,7 @@ export class RolesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating role.',
   })
-  @Post('create')
+  @Post()
   @Public()
   @ApiBody({ type: CreateRoleDTO })
   async createRole(@Body() createRoleDTO: CreateRoleDTO) {

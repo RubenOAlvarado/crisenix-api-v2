@@ -37,8 +37,8 @@ export class PricesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating Price.',
   })
-  @Post('create')
-  @ApiBody({ type: CreatePriceDTO })
+  @Post()
+  @ApiBody({ type: CreatePriceDTO, description: 'Price object' })
   async createPrice(@Body() createPriceDTO: CreatePriceDTO) {
     return await this.pricesService.createPrice(createPriceDTO);
   }

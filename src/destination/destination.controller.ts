@@ -8,7 +8,6 @@ import {
   Post,
   Query,
   Put,
-  Delete,
   Patch,
 } from '@nestjs/common';
 import {
@@ -31,6 +30,8 @@ import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/u
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { SearcherDestinationDto } from '@/shared/dtos/searcher/destination/searcherDestination.dto';
+import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { SubCatalogDto } from '@/shared/dtos/searcher/destination/subCatalog.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
@@ -46,7 +47,7 @@ export class DestinationController {
     description: 'Something went wrong creating the destination.',
   })
   @ApiBody({ type: CreateDestinationDTO })
-  @Post('/create')
+  @Post()
   async create(@Body() createDestinationDTO: CreateDestinationDTO) {
     return await this.destinationService.create(createDestinationDTO);
   }
@@ -63,6 +64,61 @@ export class DestinationController {
     return await this.destinationService.findAll(queryDTO);
   }
 
+  @ApiPaginatedResponse(ResponseDestinationDTO)
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong searching the destinations.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destinations not found.',
+  })
+  @Public()
+  @Get('search')
+  async search(@Query() queryDTO: SearcherDestinationDto) {
+    return await this.destinationService.search(queryDTO);
+  }
+
+  @ApiOkResponse({
+    description: 'Destination photos successfully deleted.',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong deleting the destination photos.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destination not found.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Destination must be in Active status.',
+  })
+  @Patch(':id/photos')
+  @ApiBody({
+    description: 'Photo or photos to delete',
+    type: PhotoValidator,
+  })
+  async deletePhoto(
+    @Param() param: UrlValidator,
+    @Body() photoValidator: PhotoValidator,
+  ): Promise<string> {
+    await this.destinationService.deletePhotos(param, photoValidator);
+    return 'Destination photos successfully deleted.';
+  }
+
+  @ApiOkResponse({
+    description: 'Destination cities found.',
+    type: ResponseOriginCityDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the destination cities.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Destination not found.',
+  })
+  @Public()
+  @Get(':id/cities')
+  async findCities(@Param() urlValidator: UrlValidator) {
+    return await this.destinationService.findCities(urlValidator);
+  }
+
   @ApiOkResponse({
     description: 'The destination has been found.',
     type: ResponseDestinationDTO,
@@ -75,23 +131,11 @@ export class DestinationController {
   })
   @Get(':id')
   @Public()
-  async findOne(@Param() urlValidator: UrlValidator) {
-    return await this.destinationService.findOne(urlValidator);
-  }
-
-  @ApiOkResponse({
-    description: 'The destination have been found.',
-    type: ResponseDestinationDTO,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the destination.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destination not found.',
-  })
-  @Get('web/:id')
-  async findOneWeb(@Param() urlValidator: UrlValidator) {
-    return await this.destinationService.findOneWeb(urlValidator);
+  async findOne(
+    @Param() urlValidator: UrlValidator,
+    @Query() query: SubCatalogDto,
+  ) {
+    return await this.destinationService.findOne(urlValidator, query);
   }
 
   @ApiOkResponse({
@@ -118,87 +162,23 @@ export class DestinationController {
   }
 
   @ApiOkResponse({
-    description: 'Destination successfully deleted.',
+    description: 'Destination status successfully changed.',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting the destination.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destination not found.',
-  })
-  @Delete('/:id')
-  async delete(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.destinationService.delete(urlValidator);
-    return 'Destination successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'Destination successfully reactivated.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong reactivating the destination.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destination not found.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.destinationService.reactivate(urlValidator);
-    return 'Destination successfully reactivated.';
-  }
-
-  @ApiPaginatedResponse(ResponseDestinationDTO)
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong searching the destinations.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destinations not found.',
-  })
-  @Public()
-  @Get('search/:word/:field/:subCatalog/:sort')
-  async search(
-    @Param() params: SearcherDestinationDto,
-    @Query() queryDTO: QueryDTO,
-  ) {
-    return await this.destinationService.search(params, queryDTO);
-  }
-
-  @ApiOkResponse({
-    description: 'Destination photos successfully deleted.',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting the destination photos.',
+    description: 'Something went wrong changing the destination status.',
   })
   @ApiNotFoundResponse({
     description: 'Destination not found.',
   })
   @ApiBadRequestResponse({
-    description: 'Destination must be in Active status.',
+    description: 'Wrong new status.',
   })
-  @Delete('deletephoto')
-  @ApiBody({
-    description: 'Destination and photo to delete',
-    type: PhotoValidator,
-  })
-  async deletePhoto(@Body() photoValidator: PhotoValidator): Promise<string> {
-    await this.destinationService.deletePhotos(photoValidator);
-    return 'Destination photos successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'Destination cities found.',
-    type: ResponseOriginCityDTO,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the destination cities.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destination not found.',
-  })
-  @Public()
-  @Get('cities/:id')
-  async findCities(@Param() urlValidator: UrlValidator) {
-    return await this.destinationService.findCities(urlValidator);
+  @Patch(':id/change_status')
+  async delete(
+    @Param() urlValidator: UrlValidator,
+    @Query() status: StatusDTO,
+  ): Promise<string> {
+    await this.destinationService.changeStatus(urlValidator, status);
+    return 'Destination successfully deleted.';
   }
 }

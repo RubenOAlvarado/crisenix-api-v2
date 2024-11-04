@@ -21,8 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { Public } from '@/auth/public.decorator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { QueryDTO } from '@/shared/dtos/query.dto';
 import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
+import { QueryReservationStatusDTO } from '@/shared/models/dtos/request/reservations/query-reservations.dto';
 
 @ApiTags('Reservations')
 @Controller('reservation')
@@ -50,7 +50,7 @@ export class ReservationController {
   })
   @Public()
   @Get()
-  async findAll(@Query() query: QueryDTO) {
+  async findAll(@Query() query: QueryReservationStatusDTO) {
     return await this.reservationService.findAll(query);
   }
 

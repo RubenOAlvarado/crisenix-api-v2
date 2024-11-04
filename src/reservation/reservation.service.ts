@@ -1,4 +1,3 @@
-import { QueryDTO } from '@/shared/dtos/query.dto';
 import { ReservationsLean } from '@/shared/interfaces/reservations/reservations.lean.interface';
 import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
 import { CreateReservationsDTO } from '@/shared/models/dtos/request/reservations/create-reservations.dto';
@@ -11,6 +10,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ChangeReservationStatus } from './changeReservationStatus';
+import { QueryReservationStatusDTO } from '@/shared/models/dtos/request/reservations/query-reservations.dto';
 
 @Injectable()
 export class ReservationService {
@@ -38,7 +38,7 @@ export class ReservationService {
     limit,
     page,
     status,
-  }: QueryDTO): Promise<ReservationsLean[]> {
+  }: QueryReservationStatusDTO): Promise<ReservationsLean[]> {
     try {
       const query = status ? { status } : {};
       const reservations = await this.reservationModel

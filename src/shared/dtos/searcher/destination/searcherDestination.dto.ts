@@ -1,15 +1,10 @@
 import { SearchableFields } from '@/shared/enums/searcher/destination/fields.enum';
 import { SortFields } from '@/shared/enums/searcher/destination/sortFields.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBooleanString,
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { QueryDTO } from '../../query.dto';
 
-export class SearcherDestinationDto {
+export class SearcherDestinationDto extends QueryDTO {
   @ApiProperty({
     description:
       'value to search, it could be anything that we want to type in the front',
@@ -17,7 +12,7 @@ export class SearcherDestinationDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  word: string;
+  word!: string;
 
   @ApiProperty({
     description: 'Field to search',
@@ -28,15 +23,7 @@ export class SearcherDestinationDto {
   @IsEnum(SearchableFields)
   @IsNotEmpty()
   @IsString()
-  field: SearchableFields;
-
-  @ApiProperty({
-    description: 'Indicator if we want to load sub catalogs for destination.',
-    default: false,
-  })
-  @IsNotEmpty()
-  @IsBooleanString()
-  subCatalog: boolean;
+  field!: SearchableFields;
 
   @ApiProperty({
     description: 'SortField to sort the results.',
@@ -45,17 +32,5 @@ export class SearcherDestinationDto {
   })
   @IsNotEmpty()
   @IsEnum(SortFields)
-  sort: SortFields;
-
-  constructor(
-    word: string,
-    field: SearchableFields,
-    subCatalog: boolean,
-    sort: SortFields,
-  ) {
-    this.word = word;
-    this.field = field;
-    this.subCatalog = subCatalog;
-    this.sort = sort;
-  }
+  sort!: SortFields;
 }

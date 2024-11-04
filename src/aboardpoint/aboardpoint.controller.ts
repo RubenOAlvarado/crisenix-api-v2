@@ -39,7 +39,7 @@ export class AboardPointController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the aboard point.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'Aboard point object',
     type: CreateAboardPointDTO,
@@ -115,7 +115,7 @@ export class AboardPointController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting the aboard point.',
   })
-  @Delete(':id/delete')
+  @Delete(':id')
   async delete(@Param() param: UrlValidator): Promise<string> {
     await this.service.delete(param);
     return 'The aboard point has been successfully deleted.';

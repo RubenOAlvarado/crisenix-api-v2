@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class PaginationDTO {
   @ApiProperty({
@@ -9,9 +9,9 @@ export class PaginationDTO {
     type: Number,
   })
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  page: number;
+  page!: number;
 
   @ApiProperty({
     default: 10,
@@ -19,12 +19,7 @@ export class PaginationDTO {
     type: Number,
   })
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  limit: number;
-
-  constructor(page: number, limit: number) {
-    this.page = page;
-    this.limit = limit;
-  }
+  limit!: number;
 }

@@ -9,7 +9,6 @@ import { User } from '@/shared/models/schemas/user.schema';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { RolesService } from '@/roles/roles.service';
-import { QueryDTO } from '@/shared/dtos/query.dto';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { UserLean } from '@/shared/interfaces/user/user.lean.interface';
 import { FirebaseService } from '@/shared/services/firebase.service';
@@ -26,6 +25,7 @@ import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.
 import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
 import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
 import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
+import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -108,7 +108,7 @@ export class UserService {
   async getDbUsers({
     page,
     limit,
-  }: QueryDTO): Promise<PaginateResult<UserLean>> {
+  }: PaginationDTO): Promise<PaginateResult<UserLean>> {
     try {
       const docs = await this.userModel
         .find()

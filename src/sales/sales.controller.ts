@@ -26,7 +26,7 @@ export class SalesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating sale.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'Sale object',
     type: CreateSaleDTO,

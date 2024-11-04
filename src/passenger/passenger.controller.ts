@@ -38,25 +38,9 @@ export class PassengerController {
     description: 'Passenger object',
     type: CreatePassengerDTO,
   })
-  @Post('create')
+  @Post()
   async create(@Body() createPassengerDTO: CreatePassengerDTO) {
     return await this.passengerService.create(createPassengerDTO);
-  }
-
-  @ApiCreatedResponse({
-    description: 'Passengers registered by tour.',
-    type: ResponsePassengerDTO,
-    isArray: true,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong fetching the passengers.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Tours does not have any passengers registered.',
-  })
-  @Get('getByTour/:id')
-  async getByTour(@Param() { id }: UrlValidator) {
-    return await this.passengerService.getByTour(id);
   }
 
   @ApiCreatedResponse({

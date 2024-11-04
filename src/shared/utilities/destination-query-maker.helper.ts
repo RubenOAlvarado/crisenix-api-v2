@@ -9,12 +9,16 @@ import { SearchStrategyFactory } from '../factories/searchDestinationStrategy.fa
 import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 import { PopulateSubcatalogsStrategy } from '../strategies/populateDestinationSubCatalogs.strategy';
 import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
-import { QueryDTO } from '../dtos/query.dto';
 
-export function pipelinesMaker(
-  { field, word, subCatalog, sort }: SearcherDestinationDto,
-  { page, limit, status }: QueryDTO,
-): PipelineStage[] {
+export function pipelinesMaker({
+  field,
+  word,
+  subCatalog,
+  sort,
+  page,
+  limit,
+  status,
+}: SearcherDestinationDto): PipelineStage[] {
   const builder = new QueryBuilder();
 
   builder.addStage(statusQueryBuilder(status));
@@ -22,7 +26,17 @@ export function pipelinesMaker(
   const searchStrategy = SearchStrategyFactory.getSearchStrategy(
     field as SearchableFields,
   );
-  builder.addStage(searchStrategy.search({ field, word, subCatalog, sort }));
+  builder.addStage(
+    searchStrategy.search({
+      field,
+      word,
+      subCatalog,
+      sort,
+      page,
+      limit,
+      status,
+    }),
+  );
 
   const populateSubCatalogsStrategy = new PopulateSubcatalogsStrategy();
   builder.addStage(populateSubCatalogsStrategy.search({ subCatalog }));

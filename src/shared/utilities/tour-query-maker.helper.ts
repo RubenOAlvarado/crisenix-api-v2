@@ -8,7 +8,6 @@ import {
   sortQueryBuilder,
   statusQueryBuilder,
 } from './helpers';
-import { PaginatedTourDTO } from '../models/dtos/response/tour/paginatedTour.dto';
 
 export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
   if (populate) {
@@ -29,17 +28,24 @@ export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
   return [];
 }
 
-export function pipelinesMaker(
-  { field, word, populate, sort }: SearcherTourDTO,
-  { page, limit, status }: PaginatedTourDTO,
-): PipelineStage[] {
+export function pipelinesMaker({
+  field,
+  word,
+  populate,
+  sort,
+  page,
+  limit,
+  status,
+}: SearcherTourDTO): PipelineStage[] {
   const builder = new QueryBuilder();
   builder.addStage(statusQueryBuilder(status));
 
   const searchStrategy = SearchToursStrategyFactory.getSearchQuery(
     field as SearchableTourFields,
   );
-  builder.addStage(searchStrategy.search({ field, word, populate, sort }));
+  builder.addStage(
+    searchStrategy.search({ field, word, populate, sort, status, page, limit }),
+  );
 
   builder.addStage(populateSubcatalogsQuery(populate));
   builder.addStage(sortQueryBuilder(sort));

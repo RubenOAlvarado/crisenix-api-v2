@@ -10,13 +10,15 @@ import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.i
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
-import { Destinations } from '@/shared/models/schemas/destination.schema';
+import {
+  DestinationDocument,
+  Destinations,
+} from '@/shared/models/schemas/destination.schema';
 import { pipelinesMaker } from '@/shared/utilities/destination-query-maker.helper';
 import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
-import { DestinationValidator } from '@/shared/validators/destination.validator';
 import { PhotoValidator } from '@/shared/validators/photo.validator';
 import { UrlValidator } from '@/shared/validators/urlValidator.dto';
 import { TransfertypeService } from '@/transfertype/transfertype.service';
@@ -27,7 +29,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Query } from 'mongoose';
+import { filterOutPhotos } from './destinations.helper';
+import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { SubCatalogDto } from '@/shared/dtos/searcher/destination/subCatalog.dto';
+
+type PopulateConfig = {
+  path: string;
+  populate?: PopulateConfig;
+  select?: Record<string, number>;
+};
+
+interface QueryOptions {
+  page?: number;
+  limit?: number;
+  status?: string;
+  shouldPopulate?: boolean;
+}
 
 @Injectable()
 export class DestinationService {
@@ -40,6 +58,68 @@ export class DestinationService {
   ) {}
 
   private readonly logger = new Logger(DestinationService.name);
+
+  private readonly defaultExcludedFields = { __v: 0, createdAt: 0 };
+
+  private readonly defaultPopulateOptions: PopulateConfig[] = [
+    {
+      path: 'originCities',
+      populate: {
+        path: 'aboardPoints',
+      },
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'categories',
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'transferTypes',
+      select: this.defaultExcludedFields,
+    },
+  ];
+
+  private async buildQuery({
+    page,
+    limit,
+    shouldPopulate = false,
+    filter = {},
+  }: QueryOptions & { filter: Record<string, any> }): Promise<
+    DestinationLean[]
+  > {
+    let query = this.destinationModel
+      .find(filter)
+      .select(this.defaultExcludedFields);
+
+    if (page && limit) {
+      query = query.limit(limit).skip((page - 1) * limit);
+    }
+
+    if (shouldPopulate) {
+      query = this.applyPopulateOptions(query);
+    }
+
+    return await query.lean();
+  }
+
+  private applyPopulateOptions(
+    query: Query<DestinationDocument[], DestinationDocument>,
+  ): Query<DestinationDocument[], DestinationDocument> {
+    return this.defaultPopulateOptions.reduce(
+      (acc, populateOption) => acc.populate(populateOption),
+      query,
+    );
+  }
+
+  async getValidatedDestination(id: string, status: Status = Status.ACTIVE) {
+    const destination = await this.destinationModel.findById(id);
+    if (!destination) throw new NotFoundException('Destination not found.');
+    if (status === Status.INACTIVE && destination.status !== Status.ACTIVE)
+      throw new BadRequestException('Destination must be in active status.');
+    if (status === Status.ACTIVE && destination.status !== Status.INACTIVE)
+      throw new BadRequestException('Destination must be in inactive status.');
+    return destination;
+  }
 
   async create(
     createDestinationDTO: CreateDestinationDTO,
@@ -61,26 +141,18 @@ export class DestinationService {
     page,
     limit,
     status,
+    subCatalog,
   }: QueryDTO): Promise<PaginateResult<Destinations>> {
     try {
-      const query = status ? { status } : {};
-      const docs = await this.destinationModel
-        .find(query)
-        .limit(limit * 1)
-        .skip((page - 1) * limit)
-        .populate({
-          path: 'originCities',
-          populate: {
-            path: 'aboardPoints',
-          },
-          select: { __v: 0, createdAt: 0 },
-        })
-        .populate('categories', { __v: 0, createdAt: 0 })
-        .populate('transferTypes', { __v: 0, createdAt: 0 })
-        .select({ __v: 0, createdAt: 0 })
-        .lean();
+      const filter = status ? { status } : {};
+      const docs = await this.buildQuery({
+        page,
+        limit,
+        filter,
+        shouldPopulate: subCatalog,
+      });
       if (!docs.length) throw new NotFoundException('Destinations not found.');
-      const totalDocs = await this.destinationModel.countDocuments(query);
+      const totalDocs = await this.destinationModel.countDocuments(filter);
       return createPaginatedObject<Destinations>(docs, totalDocs, page, limit);
     } catch (error) {
       throw handleErrorsOnServices(
@@ -90,38 +162,18 @@ export class DestinationService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<DestinationLean> {
+  async findOne(
+    { id }: UrlValidator,
+    { subCatalog }: SubCatalogDto,
+  ): Promise<DestinationLean> {
     try {
-      const destination = await this.destinationModel
-        .findById(id)
-        .populate({
-          path: 'originCities',
-          populate: {
-            path: 'aboardPoints',
-          },
-        })
-        .populate('categories')
-        .populate('transferTypes')
-        .select({ __v: 0, createdAt: 0 })
-        .lean();
-      if (!destination) throw new NotFoundException('Destination not found.');
-      return destination;
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while finding destination.',
-        error,
-      );
-    }
-  }
-
-  async findOneWeb({ id }: UrlValidator): Promise<DestinationLean> {
-    try {
-      const destination = await this.destinationModel
-        .findById(id)
-        .select({ __v: 0, createdAt: 0 })
-        .lean();
-      if (!destination) throw new NotFoundException('Destination not found.');
-      return destination;
+      const destination = await this.buildQuery({
+        filter: { _id: id },
+        shouldPopulate: subCatalog,
+      });
+      if (!destination[0])
+        throw new NotFoundException('Destination not found.');
+      return destination[0];
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while finding destination.',
@@ -150,14 +202,18 @@ export class DestinationService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<void> {
+  async changeStatus(
+    { id }: UrlValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      const destination = await this.destinationModel.findByIdAndUpdate(
+      const destinationToUpdate = await this.getValidatedDestination(
         id,
-        { status: Status.INACTIVE },
-        { new: true },
+        status,
       );
-      if (!destination) throw new NotFoundException('Destination not found.');
+      destinationToUpdate.status =
+        status === Status.ACTIVE ? Status.INACTIVE : Status.ACTIVE;
+      await destinationToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while deleting destination.',
@@ -166,36 +222,19 @@ export class DestinationService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<void> {
-    try {
-      const destination = await this.destinationModel.findByIdAndUpdate(
-        id,
-        { status: Status.ACTIVE },
-        { new: true },
-      );
-      if (!destination) throw new NotFoundException('Destination not found.');
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while reactivating destination.',
-        error,
-      );
-    }
-  }
-
   async search(
-    params: SearcherDestinationDto,
-    query: QueryDTO,
+    query: SearcherDestinationDto,
   ): Promise<PaginateResult<DestinationLean> | Array<DestinationLean>> {
     try {
       this.logger.debug(
-        `Searching destination with: ${JSON.stringify({ params })}`,
+        `Searching destination with: ${JSON.stringify({ query })}`,
       );
-      const pipelines = pipelinesMaker(params, query);
+      const pipelines = pipelinesMaker(query);
       const result = await this.destinationModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
       if (!docs.length)
         throw new NotFoundException(
-          `Destinations not found with: ${params.word} on field: ${params.field} .`,
+          `Destinations not found with: ${query.word} on field: ${query.field} .`,
         );
       return createPaginatedObject<DestinationLean>(
         docs,
@@ -211,38 +250,17 @@ export class DestinationService {
     }
   }
 
-  async deletePhotos({
-    photo: photoToDelete,
-    destination,
-  }: PhotoValidator): Promise<void> {
+  async deletePhotos(
+    { id }: UrlValidator,
+    { photos: photosToDelete }: PhotoValidator,
+  ): Promise<void> {
     try {
-      const destinationToUpdate = await this.destinationModel.findById(
-        destination,
+      const destinationToUpdate = await this.getValidatedDestination(id);
+      destinationToUpdate.photos = filterOutPhotos(
+        destinationToUpdate?.photos,
+        photosToDelete,
       );
-
-      if (!destinationToUpdate) {
-        throw new NotFoundException('Destination not found.');
-      }
-
-      if (destinationToUpdate.status !== Status.ACTIVE) {
-        throw new BadRequestException('Destination must be in active status.');
-      }
-
-      const { photos } = destinationToUpdate;
-
-      if (!photos || !photos.includes(photoToDelete)) {
-        throw new BadRequestException(
-          'Photo does not belong to the requested destination.',
-        );
-      }
-
-      const updatedPhotos = photos.filter(
-        (current) => current !== photoToDelete,
-      );
-
-      await this.destinationModel.findByIdAndUpdate(destination, {
-        photos: updatedPhotos,
-      });
+      await destinationToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices('Error deleting destination photos.', error);
     }
@@ -325,26 +343,6 @@ export class DestinationService {
     }
 
     return mappedDTO;
-  }
-
-  async validateFromTour({
-    destination,
-  }: DestinationValidator): Promise<boolean> {
-    try {
-      const destinationToValidate = await this.destinationModel.findById(
-        destination,
-      );
-
-      if (!destinationToValidate)
-        throw new NotFoundException('Destination not found.');
-
-      if (destinationToValidate.status !== Status.ACTIVE)
-        throw new BadRequestException('Destination must be in Active status.');
-
-      return true;
-    } catch (error) {
-      throw handleErrorsOnServices('Error validating destination.', error);
-    }
   }
 
   async validateFromTourExcel(code?: string): Promise<string> {

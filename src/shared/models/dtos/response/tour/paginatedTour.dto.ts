@@ -13,9 +13,4 @@ export class PaginatedTourDTO extends PaginationDTO {
   @IsNotEmpty()
   @IsString()
   status?: TourStatus;
-
-  constructor(page: number, limit: number, status?: TourStatus) {
-    super(page, limit);
-    this.status = status;
-  }
 }

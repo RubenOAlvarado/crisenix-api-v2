@@ -28,7 +28,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const isDevelopmentOrQaEnvironment = NODE_ENV !== NodeEnvs.production;
 

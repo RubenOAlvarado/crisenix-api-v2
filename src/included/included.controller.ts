@@ -42,7 +42,7 @@ export class IncludedController {
     description: 'Something went wrong creating the included service.',
   })
   @ApiBody({ type: CreateIncludedDTO })
-  @Post('create')
+  @Post()
   async create(@Body() createIncludedDTO: CreateIncludedDTO) {
     return await this.includedService.create(createIncludedDTO);
   }

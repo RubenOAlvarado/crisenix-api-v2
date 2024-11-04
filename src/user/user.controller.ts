@@ -44,7 +44,7 @@ export class UserController {
   @ApiBadRequestResponse({
     description: 'Password is required in order to register user on firebase.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'User object',
     type: WebUserDTO,
@@ -60,7 +60,7 @@ export class UserController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the users profiles.',
   })
-  @Get('all')
+  @Get()
   async getUsers(@Query() query: PaginationDTO) {
     return await this.userService.getDbUsers(query);
   }

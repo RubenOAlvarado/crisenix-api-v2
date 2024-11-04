@@ -26,7 +26,7 @@ export class PrivatetourController {
     description: 'Private Tour object',
     type: CreatePrivatetourDto,
   })
-  @Post('create')
+  @Post()
   async create(@Body() createPrivateTourDto: CreatePrivatetourDto) {
     return await this.privateTourService.create(createPrivateTourDto);
   }

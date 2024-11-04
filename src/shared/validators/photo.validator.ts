@@ -1,27 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsString, IsUrl } from 'class-validator';
 
 export class PhotoValidator {
   @ApiProperty({
-    description: 'url from the photo to delete',
-    example: 'https://www.google.com',
+    description: 'Photos to be deleted',
+    example: ['https://www.example.com/photo.jpg'],
+    isArray: true,
+    type: String,
   })
-  @IsNotEmpty()
-  @IsString()
-  @IsUrl()
-  photo: string;
+  @IsArray()
+  @ArrayNotEmpty({ message: 'Photos should not be empty' })
+  @IsString({ each: true })
+  @IsUrl({ require_protocol: true }, { each: true })
+  photos: string[];
 
-  @ApiProperty({
-    description: 'Destination id that this photo belongs to.',
-    example: '60f1b2b3e6b2f1b2b3e6b2f1',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsMongoId({ message: 'It must be a mongo id' })
-  destination: string;
-
-  constructor(photo: string, destination: string) {
-    this.photo = photo;
-    this.destination = destination;
+  constructor(photos: string[]) {
+    this.photos = photos;
   }
 }

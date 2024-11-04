@@ -40,7 +40,7 @@ export class CategoryController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the category.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({ description: 'Category object', type: CreateCategoryDTO })
   async create(@Body() createCategoryDTO: CreateCategoryDTO) {
     return await this.categoryService.create(createCategoryDTO);

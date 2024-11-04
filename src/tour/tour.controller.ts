@@ -49,7 +49,7 @@ export class TourController {
     description: 'Something went wrong creating tour.',
   })
   @ApiBody({ type: CreateTourDTO })
-  @Post('create')
+  @Post()
   async createTour(@Body() tour: CreateTourDTO) {
     return await this.tourService.createTour(tour);
   }
@@ -96,7 +96,7 @@ export class TourController {
     description: 'Tours not found.',
   })
   @Public()
-  @Get('')
+  @Get()
   async getTours(@Query() query: PaginatedTourDTO) {
     return await this.tourService.findAll(query);
   }
@@ -114,9 +114,9 @@ export class TourController {
     description: 'Tour does not exist.',
   })
   @Public()
-  @Get('get-catalog/:catalogName/:id')
-  async getTourCatalog(@Param() param: GetTourCatalogDTO) {
-    return await this.tourService.getTourCatalog(param);
+  @Get('get_catalog')
+  async getTourCatalog(@Query() query: GetTourCatalogDTO) {
+    return await this.tourService.getTourCatalog(query);
   }
 
   @ApiOkResponse({
@@ -164,12 +164,9 @@ export class TourController {
     description: 'Tours not found.',
   })
   @Public()
-  @Get('search/:field/:word/:populate/:sort')
-  async searchTours(
-    @Param() params: SearcherTourDTO,
-    @Query() query: PaginatedTourDTO,
-  ) {
-    return await this.tourService.searchTours(params, query);
+  @Get('search')
+  async searchTours(@Query() query: SearcherTourDTO) {
+    return await this.tourService.searchTours(query);
   }
 
   @ApiOkResponse({
@@ -186,8 +183,8 @@ export class TourController {
     description: `Tour status can't be changed because it's invalid or it's already in the required status.`,
   })
   @Public()
-  @Patch('change-status/:newStatus/:id')
-  async changeTourStatus(@Param() param: ChangeTourStatusDTO) {
+  @Patch('change_status')
+  async changeTourStatus(@Body() param: ChangeTourStatusDTO) {
     return await this.tourService.changeTourStatus(param);
   }
 
@@ -203,7 +200,7 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'You sent an invalid catalog name or incorrect values.',
   })
-  @Patch('update-catalog')
+  @Patch('update_catalog')
   @ApiBody({
     description: 'The catalog name and the new values to be updated.',
     type: UpdateTourCatalogDTO,

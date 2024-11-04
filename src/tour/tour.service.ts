@@ -1,7 +1,6 @@
 import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { DestinationService } from '@/destination/destination.service';
 import { PricesService } from '@/prices/prices.service';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
 import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
@@ -160,9 +159,8 @@ export class TourService {
     destination,
   }: DestinationValidator): Promise<TourLean> {
     try {
-      const validDestination = await this.destinationService.validateFromTour({
-        destination,
-      });
+      const validDestination =
+        await this.destinationService.getValidatedDestination(destination);
       if (validDestination) {
         const tour = await this.tourModel
           .findOne({ destination })
@@ -345,18 +343,22 @@ export class TourService {
   }
 
   async searchTours(
-    body: SearcherTourDTO,
-    { page, limit }: PaginationDTO,
+    query: SearcherTourDTO,
   ): Promise<PaginateResult<TourLean> | Array<TourLean>> {
     try {
-      const pipelines = pipelinesMaker(body, { page, limit });
+      const pipelines = pipelinesMaker(query);
       const result = await this.tourModel.aggregate(pipelines);
       const { docs, totalDocs } = result[0];
       if (docs.length === 0)
         throw new NotFoundException(
-          `Tours not found with ${JSON.stringify(body)}`,
+          `Tours not found with ${JSON.stringify(query)}`,
         );
-      return createPaginatedObject<TourLean>(docs, totalDocs, page, limit);
+      return createPaginatedObject<TourLean>(
+        docs,
+        totalDocs,
+        query.page,
+        query.limit,
+      );
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while searching tours.',

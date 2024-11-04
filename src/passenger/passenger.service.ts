@@ -31,17 +31,6 @@ export class PassengerService {
     }
   }
 
-  async getByTour(tourId: string): Promise<PassengerDocument[]> {
-    try {
-      return await this.passengerModel.find({ tour: tourId });
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong fetching passengers.',
-        error,
-      );
-    }
-  }
-
   async getById(id: string): Promise<Passengers> {
     try {
       const passenger = await this.passengerModel.findById(id);

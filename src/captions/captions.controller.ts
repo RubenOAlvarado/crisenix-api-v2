@@ -39,7 +39,7 @@ export class CaptionsController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the caption.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'Caption creation object',
     type: CreateCaptionDTO,

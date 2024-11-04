@@ -40,7 +40,7 @@ export class ClassificationController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the classification.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'Classification object',
     type: CreateClassificationDTO,

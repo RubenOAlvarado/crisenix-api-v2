@@ -46,7 +46,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating the origin city.',
   })
-  @Post('create')
+  @Post()
   @ApiBody({
     description: 'Origin city object',
     type: CreateOriginCityDTO,
