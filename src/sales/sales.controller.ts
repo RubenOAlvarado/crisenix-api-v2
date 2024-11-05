@@ -36,28 +36,6 @@ export class SalesController {
   }
 
   @ApiOkResponse({
-    description: 'Sale found successfully.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the sale.',
-  })
-  @Get(':id')
-  async getSaleById(@Param() param: IdValidator) {
-    return await this.salesService.findOne(param);
-  }
-
-  @ApiOkResponse({
-    description: 'Sales found successfully.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the sales by reservation id.',
-  })
-  @Get('reservation/:id')
-  async getSaleByReservationId(@Param() param: IdValidator) {
-    return await this.salesService.findSalesByReservationId(param);
-  }
-
-  @ApiOkResponse({
     description: 'Sale marked as paid successfully.',
   })
   @ApiInternalServerErrorResponse({
@@ -97,5 +75,27 @@ export class SalesController {
   })
   async markSaleAsDeclined(@Body() declineSaleDto: DeclineSaleDto) {
     return await this.salesService.markSaleAsDeclined(declineSaleDto);
+  }
+
+  @ApiOkResponse({
+    description: 'Sale found successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the sale.',
+  })
+  @Get(':id')
+  async getSaleById(@Param() param: IdValidator) {
+    return await this.salesService.findOne(param);
+  }
+
+  @ApiOkResponse({
+    description: 'Sales found successfully.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the sales by reservation id.',
+  })
+  @Get('by_reservation/:id')
+  async getSaleByReservationId(@Param() param: IdValidator) {
+    return await this.salesService.findSalesByReservationId(param);
   }
 }

@@ -102,20 +102,4 @@ export class PricesController {
     await this.pricesService.inactivatePrice(params);
     return 'Price inactivated successfully.';
   }
-
-  @ApiOkResponse({
-    type: String,
-    description: 'Price reactivated successfully.',
-  })
-  @ApiNotFoundResponse({ description: 'Price not found.' })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong reactivating Price.',
-  })
-  @ApiBadRequestResponse({ description: 'Price already active.' })
-  @Patch('reactivate/:id')
-  async reactivatePrice(@Param() params: IdValidator) {
-    await this.pricesService.reactivatePrice(params);
-
-    return 'Price reactivated successfully.';
-  }
 }

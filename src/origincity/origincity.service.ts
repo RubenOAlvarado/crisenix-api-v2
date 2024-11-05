@@ -20,6 +20,7 @@ import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/upd
 import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
 import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @Injectable()
 export class OriginCityService {
@@ -91,15 +92,16 @@ export class OriginCityService {
     }
   }
 
-  private async validateOriginCity(id: string): Promise<boolean> {
+  private async validateOriginCity(id: string, status: string = Status.ACTIVE) {
     try {
-      const validOrigin = await this.originCityModel.findById(id).lean();
-      if (!validOrigin)
-        throw new NotFoundException(`OriginCity ${id} was not found`);
-      if (validOrigin.status !== Status.ACTIVE)
+      const city = await this.originCityModel.findById(id);
+      if (!city) throw new NotFoundException(`OriginCity ${id} was not found`);
+      if (status === Status.INACTIVE && city.status !== Status.ACTIVE)
         throw new BadRequestException('OriginCity must be in active status');
+      if (status === Status.ACTIVE && city.status !== Status.INACTIVE)
+        throw new BadRequestException('OriginCity must be in inactive status');
 
-      return true;
+      return city;
     } catch (e) {
       throw handleErrorsOnServices(
         'Something went wrong validating origin city.',
@@ -113,7 +115,6 @@ export class OriginCityService {
     updateOriginCity: UpdateOriginCityDTO,
   ): Promise<OriginCityLean> {
     try {
-      await this.validateOriginCity(id);
       const updatedOriginCity = await this.originCityModel.findByIdAndUpdate(
         id,
         updateOriginCity,
@@ -132,33 +133,18 @@ export class OriginCityService {
     }
   }
 
-  async delete({ id }: IdValidator): Promise<void> {
+  async changeStatus(
+    { id }: IdValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      if (await this.validateOriginCity(id))
-        await this.originCityModel.findByIdAndUpdate(
-          id,
-          { status: Status.INACTIVE },
-          { new: true },
-        );
+      const cityToUpdate = await this.validateOriginCity(id, status);
+      cityToUpdate.status =
+        status === Status.ACTIVE ? Status.ACTIVE : Status.INACTIVE;
+      await cityToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong validating origin city.',
-        error,
-      );
-    }
-  }
-
-  async reactivate({ id }: IdValidator): Promise<void> {
-    try {
-      if (await this.validateOriginCity(id))
-        await this.originCityModel.findByIdAndUpdate(
-          id,
-          { status: Status.ACTIVE },
-          { new: true },
-        );
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong reactivating origin city.',
         error,
       );
     }
@@ -194,12 +180,11 @@ export class OriginCityService {
     { aboardPoints }: UpdateOriginCityDTO,
   ): Promise<void> {
     try {
-      if (await this.validateOriginCity(id))
-        await this.originCityModel.findByIdAndUpdate(
-          id,
-          { $push: { aboardPoints } },
-          { new: true },
-        );
+      await this.originCityModel.findByIdAndUpdate(
+        id,
+        { $push: { aboardPoints } },
+        { new: true },
+      );
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong adding aboard points to origin city.',

@@ -77,7 +77,7 @@ export class RolesController {
   }
 
   @ApiOkResponse({
-    type: ResponseRoleDTO,
+    type: String,
     description: 'Role updated successfully.',
   })
   @ApiNotFoundResponse({ description: 'Role not found.' })
@@ -90,7 +90,8 @@ export class RolesController {
     @Body() updateRoleDTO: UpdateRoleDTO,
     @Param() params: IdValidator,
   ) {
-    return await this.rolesService.updateRole(updateRoleDTO, params);
+    await this.rolesService.updateRole(updateRoleDTO, params);
+    return 'Role updated successfully.';
   }
 
   @ApiOkResponse({
@@ -102,26 +103,10 @@ export class RolesController {
     description: 'Something went wrong updating role.',
   })
   @ApiBadRequestResponse({ description: 'Role already inactive.' })
-  @Delete(':id')
-  async inactiveRole(@Param() params: IdValidator) {
-    await this.rolesService.inactivateRole(params);
+  @Patch(':id/changes_status')
+  async changeStatus(@Param() params: IdValidator, @Query() query: StatusDTO) {
+    await this.rolesService.changeStatus(params, query);
     return 'Role inactivated successfully.';
-  }
-
-  @ApiOkResponse({
-    type: String,
-    description: 'Role reactivated successfully.',
-  })
-  @ApiNotFoundResponse({ description: 'Role not found.' })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong reactivating role.',
-  })
-  @ApiBadRequestResponse({ description: 'Role already active.' })
-  @Patch('reactivate/:id')
-  async reactivateRole(@Param() params: IdValidator) {
-    await this.rolesService.reactiveRole(params);
-
-    return 'Role reactivated successfully.';
   }
 
   @ApiOkResponse({

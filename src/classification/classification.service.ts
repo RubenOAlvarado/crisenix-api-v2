@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @Injectable()
 export class ClassificationService {
@@ -18,6 +20,21 @@ export class ClassificationService {
     @InjectModel(Classifications.name)
     private readonly classificationModel: Model<Classifications>,
   ) {}
+
+  private async validateClassification(
+    id: string,
+    status: string = Status.ACTIVE,
+  ) {
+    const classification = await this.classificationModel.findById(id);
+    if (!classification)
+      throw new NotFoundException('classification not found.');
+    if (status === Status.INACTIVE && classification.status !== Status.ACTIVE)
+      throw new BadRequestException('classification is already inactive.');
+    if (status === Status.ACTIVE && classification.status !== Status.INACTIVE)
+      throw new BadRequestException('classification is already active.');
+
+    return classification;
+  }
 
   async create(
     createClassificationDTO: CreateClassificationDTO,
@@ -91,45 +108,21 @@ export class ClassificationService {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async changeStatus(
+    { id }: IdValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      const classification = await this.findOne(id);
-      if (!classification)
-        throw new NotFoundException('classification not found.');
-      if (classification.status === Status.INACTIVE)
-        throw new BadRequestException('classification already deleted.');
-      await this.classificationModel.findByIdAndUpdate(
+      const classificationToUpdate = await this.validateClassification(
         id,
-        { status: Status.INACTIVE },
-        {
-          new: true,
-        },
+        status,
       );
+      classificationToUpdate.status =
+        status === Status.ACTIVE ? Status.ACTIVE : Status.INACTIVE;
+      await classificationToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while deleting classification.',
-        error,
-      );
-    }
-  }
-
-  async reactivate(id: string): Promise<void> {
-    try {
-      const classification = await this.findOne(id);
-      if (!classification)
-        throw new NotFoundException('classification not found.');
-      if (classification.status === Status.ACTIVE)
-        throw new BadRequestException('classification already active.');
-      await this.classificationModel.findByIdAndUpdate(
-        id,
-        { status: Status.ACTIVE },
-        {
-          new: true,
-        },
-      );
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while reactivating classification.',
         error,
       );
     }

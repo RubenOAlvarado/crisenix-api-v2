@@ -99,19 +99,6 @@ export class PricesService {
     }
   }
 
-  async reactivatePrice({ id }: IdValidator): Promise<void> {
-    try {
-      await this.priceModel
-        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
-        .exec();
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while reactivating price.',
-        error,
-      );
-    }
-  }
-
   async insertPricesBunch(prices: PricesExcel[]): Promise<void> {
     try {
       const pricesDTO: CreatePriceDTO[] = await this.mapDTO(prices);

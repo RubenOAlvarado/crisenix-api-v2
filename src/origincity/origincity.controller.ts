@@ -1,4 +1,5 @@
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
@@ -21,7 +22,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
-import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedResponse.dto';
@@ -31,6 +31,8 @@ import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/cre
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
 import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiBearerAuth()
 @Controller('origincity')
@@ -55,22 +57,6 @@ export class OriginCityController {
     return await this.originCityService.create(createOriginCityDTO);
   }
 
-  @ApiOkResponse({
-    description: 'The origin city has been found.',
-    type: ResponseOriginCityDTO,
-  })
-  @ApiNotFoundResponse({
-    description: 'Origin city not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the origin city.',
-  })
-  @Get(':id')
-  @Public()
-  async findOne(@Param() IdValidator: IdValidator) {
-    return await this.originCityService.findOne(IdValidator);
-  }
-
   @ApiPaginatedResponse(ResponseOriginCityDTO)
   @ApiNotFoundResponse({ description: 'No origin cities registered.' })
   @ApiInternalServerErrorResponse({
@@ -80,61 +66,6 @@ export class OriginCityController {
   @Get()
   async findAll(@Query() queryDTO: QueryDTO) {
     return await this.originCityService.findAll(queryDTO);
-  }
-
-  @ApiOkResponse({
-    description: 'The origin city has been successfully updated.',
-    type: ResponseOriginCityDTO,
-  })
-  @ApiNotFoundResponse({
-    description: 'Origin city not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong updating the origin city.',
-  })
-  @Put(':id')
-  @ApiBody({
-    description: 'Origin city object',
-    type: UpdateOriginCityDTO,
-  })
-  async update(
-    @Param() IdValidator: IdValidator,
-    @Body() updateOriginCityDTO: UpdateOriginCityDTO,
-  ) {
-    return await this.originCityService.update(
-      IdValidator,
-      updateOriginCityDTO,
-    );
-  }
-
-  @ApiOkResponse({
-    description: 'The origin city has been successfully deleted.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Origin city not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting the origin city.',
-  })
-  @Delete(':id')
-  async delete(@Param() IdValidator: IdValidator): Promise<string> {
-    await this.originCityService.delete(IdValidator);
-    return 'The origin city has been successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'The origin city has been successfully activated.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Origin city not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong activating the origin city.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() IdValidator: IdValidator): Promise<string> {
-    await this.originCityService.reactivate(IdValidator);
-    return 'The origin city has been successfully activated.';
   }
 
   @ApiOkResponse({
@@ -157,6 +88,65 @@ export class OriginCityController {
   }
 
   @ApiOkResponse({
+    description: 'The origin city has been found.',
+    type: ResponseOriginCityDTO,
+  })
+  @ApiNotFoundResponse({
+    description: 'Origin city not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding the origin city.',
+  })
+  @Get(':id')
+  @Public()
+  async findOne(@Param() IdValidator: IdValidator) {
+    return await this.originCityService.findOne(IdValidator);
+  }
+
+  @ApiOkResponse({
+    description: 'The origin city has been successfully updated.',
+    type: ResponseOriginCityDTO,
+  })
+  @ApiNotFoundResponse({
+    description: 'Origin city not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong updating the origin city.',
+  })
+  @Put(':id')
+  @ApiBody({
+    description: 'Origin city object',
+    type: UpdateOriginCityDTO,
+  })
+  async update(
+    @Param() param: IdValidator,
+    @Body() updateOriginCityDTO: UpdateOriginCityDTO,
+  ) {
+    return await this.originCityService.update(param, updateOriginCityDTO);
+  }
+
+  @ApiOkResponse({
+    description: 'The origin city status has been successfully changed.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Origin city not found.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong changing the origin city status.',
+  })
+  @ApiBadRequestResponse({
+    description: 'The status is invalid.',
+  })
+  @Patch(':id')
+  async changeStatus(
+    @Param() param: IdValidator,
+    @Query() query: StatusDTO,
+  ): Promise<string> {
+    await this.originCityService.changeStatus(param, query);
+    return 'The origin city status has been successfully changed.';
+  }
+
+  @ApiOkResponse({
     description:
       'The aboard point/s has been successfully added to the origin city.',
   })
@@ -166,7 +156,7 @@ export class OriginCityController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong adding the aboard point/s.',
   })
-  @Patch('addpoints/:id')
+  @Patch(':id/addPoints')
   @ApiBody({
     description: 'Array of aboard points ids',
     type: AddAboardPointsDTO,

@@ -44,6 +44,22 @@ export class PassengerController {
   }
 
   @ApiCreatedResponse({
+    description: 'Passengers fetched successfully.',
+    type: ResponsePassengerDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passengers.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Passengers not found.',
+  })
+  @Get()
+  async getAll() {
+    return await this.passengerService.getAll();
+  }
+
+  @ApiCreatedResponse({
     description: 'Passenger fetched successfully.',
     type: ResponsePassengerDTO,
   })
@@ -88,36 +104,5 @@ export class PassengerController {
     @Body() updatePassengerDTO: CreatePassengerDTO,
   ) {
     return await this.passengerService.update(id, updatePassengerDTO);
-  }
-
-  @ApiCreatedResponse({
-    description: 'Passenger reactivated successfully.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong reactivating the passenger.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Passenger not found.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: IdValidator) {
-    await this.passengerService.reactivate(id);
-    return 'Passenger reactivated successfully.';
-  }
-
-  @ApiCreatedResponse({
-    description: 'Passengers fetched successfully.',
-    type: ResponsePassengerDTO,
-    isArray: true,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong fetching the passengers.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Passengers not found.',
-  })
-  @Get()
-  async getAll() {
-    return await this.passengerService.getAll();
   }
 }

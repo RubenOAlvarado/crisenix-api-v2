@@ -1,4 +1,3 @@
-import { Status } from '@/shared/enums/status.enum';
 import {
   CaptionDocument,
   Captions,
@@ -16,6 +15,7 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
 import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
+import { Status } from '@/shared/enums/status.enum';
 
 @Injectable()
 export class CaptionsService {
@@ -85,10 +85,17 @@ export class CaptionsService {
     }
   }
 
-  async delete({ id }: IdValidator): Promise<void> {
+  async changeStatus(
+    { id }: IdValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      const caption = await this.captionModel.findByIdAndDelete(id);
-      if (!caption) throw new NotFoundException(`Caption ${id} not found`);
+      const captionToUpdate = await this.validateCaption(id, status);
+      await this.captionModel.findByIdAndUpdate(
+        captionToUpdate._id,
+        { status },
+        { new: true },
+      );
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong deleting the caption',
@@ -97,44 +104,23 @@ export class CaptionsService {
     }
   }
 
-  async reactivate({ id }: IdValidator): Promise<void> {
+  private async validateCaption(
+    id: string,
+    status: string = Status.ACTIVE,
+  ): Promise<CaptionDocument> {
     try {
-      const validCaption = await this.findOne({ id });
-      if (!validCaption) throw new NotFoundException('Caption not found');
-      if (validCaption.status === Status.ACTIVE)
-        throw new BadRequestException('Caption already active');
-      await this.captionModel.findByIdAndUpdate(
-        id,
-        { status: Status.ACTIVE },
-        { new: true },
-      );
+      const caption = await this.captionModel.findById(id);
+      if (!caption) throw new NotFoundException(`Caption ${id} not found`);
+      if (status === Status.INACTIVE && caption.status !== Status.ACTIVE)
+        throw new BadRequestException('Caption is already inactive');
+      if (status === Status.ACTIVE && caption.status !== Status.INACTIVE)
+        throw new BadRequestException('Caption is already active');
+      return caption;
     } catch (error) {
       throw handleErrorsOnServices(
-        'Something went wrong reactivating the caption',
+        'Something went wrong validating the caption',
         error,
       );
     }
   }
-
-  /* async loadFromExcel(file: Express.Multer.File): Promise<void> {
-    try {
-      const jsonObject = this.filer.excelToJson(file.path);
-      const captions: CreateCaptionDTO[] = this.mapJsonToDTO(jsonObject);
-      await this.captionModel.insertMany(captions);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong loading the captions',
-        error,
-      );
-    }
-  } */
-
-  /* private mapJsonToDTO(jsonObject: any): CreateCaptionDTO[] {
-    return jsonObject.map((caption: Captions) => {
-      return {
-        name: caption.name,
-        status: caption.status,
-      };
-    });
-  } */
 }

@@ -26,6 +26,7 @@ import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
 import { UpdateClassificationDTO } from '@/shared/models/dtos/request/classification/updateclasification.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Classification')
 @ApiBearerAuth()
@@ -120,28 +121,12 @@ export class ClassificationController {
   @ApiBadRequestResponse({
     description: 'classification already deleted.',
   })
-  @Delete(':id')
-  async delete(@Param() { id }: IdValidator): Promise<string> {
-    await this.classificationService.delete(id);
+  @Patch(':id/changes_status')
+  async delete(
+    @Param() param: IdValidator,
+    @Query() query: StatusDTO,
+  ): Promise<string> {
+    await this.classificationService.changeStatus(param, query);
     return 'The classification was deleted successfully.';
-  }
-
-  @ApiOkResponse({
-    description: 'The classification was reactivated successfully.',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong activating classification.',
-  })
-  @ApiNotFoundResponse({
-    description: 'classification not found.',
-  })
-  @ApiBadRequestResponse({
-    description: 'classification already active.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: IdValidator): Promise<string> {
-    await this.classificationService.reactivate(id);
-    return 'The classification was reactivated successfully.';
   }
 }

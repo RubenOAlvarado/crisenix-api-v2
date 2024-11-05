@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -117,28 +118,12 @@ export class CaptionsController {
   @ApiNotFoundResponse({
     description: 'Caption not found.',
   })
-  @Delete(':id')
-  async delete(@Param() params: IdValidator): Promise<string> {
-    await this.captionService.delete(params);
+  @Patch(':id/changes_status')
+  async delete(
+    @Param() params: IdValidator,
+    @Query() query: StatusDTO,
+  ): Promise<string> {
+    await this.captionService.changeStatus(params, query);
     return 'The caption has been successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'The caption has been successfully deactivated.',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong activating the caption.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Caption not found.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Caption already active.',
-  })
-  @Put('reactivate/:id')
-  async activate(@Param() params: IdValidator): Promise<string> {
-    await this.captionService.reactivate(params);
-    return 'The caption has been successfully reactivated.';
   }
 }

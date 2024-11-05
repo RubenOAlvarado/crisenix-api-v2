@@ -26,6 +26,7 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Category')
 @ApiBearerAuth()
@@ -102,40 +103,24 @@ export class CategoryController {
   }
 
   @ApiOkResponse({
-    description: 'The category was deleted successfully.',
+    description: 'The category status was changed successfully.',
     type: String,
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting category.',
+    description: 'Something went wrong changing category status.',
   })
   @ApiNotFoundResponse({
     description: 'Category not found.',
   })
   @ApiBadRequestResponse({
-    description: 'Category already deleted.',
+    description: 'Wrong status.',
   })
-  @Delete(':id')
-  async delete(@Param() { id }: IdValidator): Promise<string> {
-    await this.categoryService.delete(id);
-    return 'The category was deleted successfully.';
-  }
-
-  @ApiOkResponse({
-    description: 'The category was reactivated successfully.',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong activating category.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Category not found.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Category already active.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: IdValidator): Promise<string> {
-    await this.categoryService.reactivate(id);
-    return 'The category was reactivated successfully.';
+  @Patch(':id/changes_status')
+  async delete(
+    @Param() param: IdValidator,
+    @Query() query: StatusDTO,
+  ): Promise<string> {
+    await this.categoryService.changeStatus(param, query);
+    return 'The category status was changed successfully.';
   }
 }

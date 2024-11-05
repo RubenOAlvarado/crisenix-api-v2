@@ -12,6 +12,7 @@ import {
 import { AboardpointService } from './aboardpoint.service';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
@@ -106,7 +107,7 @@ export class AboardPointController {
   }
 
   @ApiOkResponse({
-    description: 'The aboard point has been successfully deleted.',
+    description: 'The aboard point status has been successfully changed.',
     type: String,
   })
   @ApiNotFoundResponse({
@@ -115,25 +116,15 @@ export class AboardPointController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong deleting the aboard point.',
   })
-  @Delete(':id')
-  async delete(@Param() param: IdValidator): Promise<string> {
-    await this.service.delete(param);
-    return 'The aboard point has been successfully deleted.';
-  }
-
-  @ApiOkResponse({
-    description: 'The aboard point has been successfully reactivated.',
-    type: String,
+  @ApiBadRequestResponse({
+    description: 'Wrong status sended.',
   })
-  @ApiNotFoundResponse({
-    description: 'Aboard point not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong reactivating the aboard point.',
-  })
-  @Patch('reactivate/:id')
-  async reactivate(@Param() param: IdValidator): Promise<string> {
-    await this.service.reactivate(param);
-    return 'The aboard point has been successfully reactivated.';
+  @Patch(':id/changes_status')
+  async delete(
+    @Param() param: IdValidator,
+    @Query() status: StatusDTO,
+  ): Promise<string> {
+    await this.service.changeStatus(param, status);
+    return 'The aboard point status has been successfully changed.';
   }
 }

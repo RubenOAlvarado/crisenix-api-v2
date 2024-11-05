@@ -15,6 +15,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @Injectable()
 export class CategoryService {
@@ -22,6 +24,17 @@ export class CategoryService {
     @InjectModel(Categories.name)
     private readonly categoryModel: Model<Categories>,
   ) {}
+
+  async validateCategory(id: string, status: string = Status.ACTIVE) {
+    const category = await this.categoryModel.findById(id);
+    if (!category) throw new NotFoundException('Category not found.');
+    if (status === Status.INACTIVE && category.status !== Status.ACTIVE)
+      throw new BadRequestException('Category is already inactive.');
+    if (status === Status.ACTIVE && category.status !== Status.INACTIVE)
+      throw new BadRequestException('Category is already active.');
+
+    return category;
+  }
 
   async create(
     createCategoryDTO: CreateCategoryDTO,
@@ -89,43 +102,18 @@ export class CategoryService {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async changeStatus(
+    { id }: IdValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      const category = await this.findOne(id);
-      if (!category) throw new NotFoundException('Category not found.');
-      if (category.status === Status.INACTIVE)
-        throw new BadRequestException('Category already deleted.');
-      await this.categoryModel.findByIdAndUpdate(
-        id,
-        { status: Status.INACTIVE },
-        {
-          new: true,
-        },
-      );
+      const categoryToUpdate = await this.validateCategory(id, status);
+      categoryToUpdate.status =
+        status === Status.ACTIVE ? Status.ACTIVE : Status.INACTIVE;
+      await categoryToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while deleting category.',
-        error,
-      );
-    }
-  }
-
-  async reactivate(id: string): Promise<void> {
-    try {
-      const category = await this.findOne(id);
-      if (!category) throw new NotFoundException('Category not found.');
-      if (category.status === Status.ACTIVE)
-        throw new BadRequestException('Category already active.');
-      await this.categoryModel.findByIdAndUpdate(
-        id,
-        { status: Status.ACTIVE },
-        {
-          new: true,
-        },
-      );
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while reactivating category.',
         error,
       );
     }

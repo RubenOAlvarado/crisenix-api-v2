@@ -2,7 +2,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
@@ -21,6 +20,17 @@ export class RolesService {
   constructor(
     @InjectModel(Roles.name) private readonly roleModel: Model<Roles>,
   ) {}
+
+  private async validateRole(id: string, status: string = Status.ACTIVE) {
+    const role = await this.roleModel.findById(id);
+    if (!role) throw new NotFoundException('Role not found.');
+    if (status === Status.INACTIVE && role.status !== Status.ACTIVE)
+      throw new BadRequestException('Role is already inactive.');
+    if (status === Status.ACTIVE && role.status !== Status.INACTIVE)
+      throw new BadRequestException('Role is already active.');
+
+    return role;
+  }
 
   async createRole(createRoleDTO: CreateRoleDTO): Promise<Roles> {
     try {
@@ -66,74 +76,29 @@ export class RolesService {
   async updateRole(
     updateRoleDTO: UpdateRoleDTO,
     { id }: IdValidator,
-  ): Promise<Roles | undefined> {
+  ): Promise<void> {
     try {
-      if (await this.validateRole(id)) {
-        const updatedRole = await this.roleModel.findByIdAndUpdate(
-          id,
-          updateRoleDTO,
-          {
-            new: true,
-          },
-        );
-        if (!updatedRole) throw new NotFoundException(`Role not found.`);
-        return updatedRole;
-      }
-      return;
+      const updatedRole = await this.roleModel.findByIdAndUpdate(
+        id,
+        updateRoleDTO,
+        {
+          new: true,
+        },
+      );
+      if (!updatedRole) throw new NotFoundException(`Role not found.`);
     } catch (e) {
       throw handleErrorsOnServices('Something went wrong updating role.', e);
     }
   }
 
-  async inactivateRole({ id }: IdValidator): Promise<void> {
+  async changeStatus({ id }: IdValidator, { status }: StatusDTO) {
     try {
-      if (await this.validateRole(id)) {
-        await this.roleModel.findByIdAndUpdate(
-          id,
-          { status: Status.INACTIVE },
-          { new: true },
-        );
-      }
-    } catch (e) {
-      throw new InternalServerErrorException('Error inactivating role');
-    }
-  }
-
-  private async validateRole(id: string): Promise<boolean> {
-    try {
-      const validRole = await this.roleModel.findById(id);
-      if (!validRole) throw new NotFoundException(`Role not found.`);
-      if (validRole.status !== Status.ACTIVE)
-        throw new BadRequestException('Role must be in active status.');
-
-      return true;
+      const roleToUpdate = await this.validateRole(id, status);
+      roleToUpdate.status =
+        status === Status.ACTIVE ? Status.ACTIVE : Status.INACTIVE;
+      await roleToUpdate.save();
     } catch (e) {
       throw handleErrorsOnServices('Something went wrong validating Role.', e);
-    }
-  }
-
-  async reactiveRole({ id }: IdValidator): Promise<void> {
-    try {
-      const validRole = await this.getRoleById({ id });
-
-      if (validRole) {
-        if (validRole.status === Status.INACTIVE) {
-          await this.roleModel.findByIdAndUpdate(
-            id,
-            { status: Status.ACTIVE },
-            { new: true },
-          );
-        } else {
-          throw new BadRequestException('Role already active.');
-        }
-      } else {
-        throw new NotFoundException(`Role not found`);
-      }
-    } catch (e) {
-      throw handleErrorsOnServices(
-        'Something went wrong reactivating Role.',
-        e,
-      );
     }
   }
 

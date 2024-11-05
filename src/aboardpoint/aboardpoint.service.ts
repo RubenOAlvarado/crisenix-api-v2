@@ -77,10 +77,6 @@ export class AboardpointService {
     updateAboardPointDTO: UpdateAboardPointDTO,
   ): Promise<AboardPointLean | null> {
     try {
-      if (!(await this.validateAboardPoint({ id }))) {
-        return null;
-      }
-
       const updatedAboardPoint = await this.aboardPointModel.findByIdAndUpdate(
         id,
         updateAboardPointDTO,
@@ -96,14 +92,15 @@ export class AboardpointService {
     }
   }
 
-  async delete({ id }: IdValidator) {
+  async changeStatus(
+    { id }: IdValidator,
+    { status }: StatusDTO,
+  ): Promise<void> {
     try {
-      if (!(await this.validateAboardPoint({ id }))) return;
-      await this.aboardPointModel.findByIdAndUpdate(
-        id,
-        { status: Status.INACTIVE },
-        { new: true },
-      );
+      const aboardPointToUpdate = await this.validateAboardPoint(id, status);
+      aboardPointToUpdate.status =
+        status === Status.ACTIVE ? Status.ACTIVE : Status.INACTIVE;
+      await aboardPointToUpdate.save();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong deleting aboard point.',
@@ -112,44 +109,24 @@ export class AboardpointService {
     }
   }
 
-  async reactivate({ id }: IdValidator): Promise<void> {
+  private async validateAboardPoint(
+    id: string,
+    status: string = Status.ACTIVE,
+  ) {
     try {
-      const inactiveAboardPoint = await this.findOne({ id });
+      const aboardPoint = await this.aboardPointModel.findById(id);
 
-      if (!inactiveAboardPoint) {
-        throw new NotFoundException('Aboard point not found.');
-      }
+      if (!aboardPoint) throw new NotFoundException('Aboard point not found.');
 
-      if (inactiveAboardPoint.status !== Status.INACTIVE) {
-        throw new BadRequestException(
-          'Aboard point is already in active status.',
-        );
-      }
-
-      await this.aboardPointModel
-        .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
-        .exec();
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong reactivating aboard point.',
-        error,
-      );
-    }
-  }
-
-  private async validateAboardPoint({ id }: IdValidator): Promise<boolean> {
-    try {
-      const foundAboardPoint = await this.aboardPointModel.findById(id).lean();
-
-      if (!foundAboardPoint) {
-        throw new NotFoundException('Aboard point not found.');
-      }
-
-      if (foundAboardPoint.status !== Status.ACTIVE) {
+      if (status === Status.INACTIVE && aboardPoint.status !== Status.ACTIVE)
         throw new BadRequestException('Aboard point must be in active status.');
-      }
 
-      return true;
+      if (status === Status.ACTIVE && aboardPoint.status !== Status.INACTIVE)
+        throw new BadRequestException(
+          'Aboard point must be in inactive status.',
+        );
+
+      return aboardPoint;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong validating aboard point.',

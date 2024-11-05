@@ -48,9 +48,7 @@ export class PassengerService {
 
   async delete(id: string): Promise<void> {
     try {
-      const passenger = await this.passengerModel.findByIdAndUpdate(id, {
-        status: Status.INACTIVE,
-      });
+      const passenger = await this.passengerModel.findByIdAndDelete(id);
       if (!passenger) {
         throw new NotFoundException('Passenger not found.');
       }
@@ -90,22 +88,6 @@ export class PassengerService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong fetching passengers.',
-        error,
-      );
-    }
-  }
-
-  async reactivate(id: string): Promise<void> {
-    try {
-      const passenger = await this.passengerModel.findByIdAndUpdate(id, {
-        status: Status.ACTIVE,
-      });
-      if (!passenger) {
-        throw new NotFoundException('Passenger not found.');
-      }
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong reactivating passenger.',
         error,
       );
     }
