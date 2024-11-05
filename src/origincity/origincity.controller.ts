@@ -13,7 +13,6 @@ import { OriginCityService } from './origincity.service';
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,

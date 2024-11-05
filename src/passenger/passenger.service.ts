@@ -1,4 +1,3 @@
-import { Status } from '@/shared/enums/status.enum';
 import { CreatePassengerDTO } from '@/shared/models/dtos/request/passenger/createpassenger.dto';
 import {
   PassengerDocument,
