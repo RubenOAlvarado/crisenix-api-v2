@@ -3,9 +3,9 @@ import { OriginCityService } from '@/origincity/origincity.service';
 import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
-import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
+import { DestinationLean } from '@/shared/types/destination/destination.type';
 import { DestinationsExcel } from '@/shared/interfaces/excel/destinations.excel.interface';
-import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
+import { OriginCityLean } from '@/shared/types/origincity/originCity.lean.type';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
@@ -33,19 +33,8 @@ import { filterOutPhotos } from './destinations.helper';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destination/searcherDestination.dto';
-
-type PopulateConfig = {
-  path: string;
-  populate?: PopulateConfig;
-  select?: Record<string, number>;
-};
-
-interface QueryOptions {
-  page?: number;
-  limit?: number;
-  status?: string;
-  shouldPopulate?: boolean;
-}
+import { PopulateConfig } from '@/shared/types/populateConfig.types';
+import { CustomQueryOptions } from '@/shared/interfaces/queryOptions.interface';
 
 @Injectable()
 export class DestinationService {
@@ -84,7 +73,7 @@ export class DestinationService {
     limit,
     shouldPopulate = false,
     filter = {},
-  }: QueryOptions & { filter: Record<string, any> }): Promise<
+  }: CustomQueryOptions & { filter: Record<string, any> }): Promise<
     DestinationLean[]
   > {
     let query = this.destinationModel

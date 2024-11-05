@@ -1,4 +1,4 @@
-import { ReservationsLean } from '@/shared/interfaces/reservations/reservations.lean.interface';
+import { ReservationsLean } from '@/shared/types/reservations/reservations.lean.type';
 import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
 import { CreateReservationsDTO } from '@/shared/models/dtos/request/reservations/create-reservations.dto';
 import { UpdateReservationsDto } from '@/shared/models/dtos/request/reservations/update-reservations.dto';

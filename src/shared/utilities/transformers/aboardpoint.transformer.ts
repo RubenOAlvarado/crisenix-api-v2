@@ -2,7 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { Expose, Transform } from 'class-transformer';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
+import { AboardPointLean } from '@/shared/types/aboardPoint/aboardPoint.lean.type';
 import { handleDocumentsId } from '../helpers';
 
 export const aboardPointsTransformer = ({

@@ -1,4 +1,4 @@
-import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
+import { TourLean } from '@/shared/types/tour/tour.lean.type';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { ResponseTourTypeDTO } from '@/shared/models/dtos/response/tourType/responseTourType.dto';
 import { applyDecorators } from '@nestjs/common';

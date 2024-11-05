@@ -1,5 +1,5 @@
 import { Status } from '@/shared/enums/status.enum';
-import { ClassificationLean } from '@/shared/interfaces/classification/classification.lean.interface';
+import { ClassificationLean } from '@/shared/types/classification/classification.lean.type';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
 import { UpdateClassificationDTO } from '@/shared/models/dtos/request/classification/updateclasification.dto';
 import { Classifications } from '@/shared/models/schemas/classification.schema';

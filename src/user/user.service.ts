@@ -10,7 +10,7 @@ import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Status } from '@/shared/enums/status.enum';
 import { RolesService } from '@/roles/roles.service';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { UserLean } from '@/shared/interfaces/user/user.lean.interface';
+import { UserLean } from '@/shared/types/user/user.lean.type';
 import { FirebaseService } from '@/shared/services/firebase.service';
 import { UserRoles } from '@/shared/enums/roles';
 import {
@@ -18,7 +18,7 @@ import {
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
 import { UserRecord } from 'firebase-admin/auth';
-import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
+import { RolesLean } from '@/shared/types/roles/roles.lean.type';
 import { CreateUserDTO } from '@/shared/models/dtos/request/user/createuser.dto';
 import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
 import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.dto';

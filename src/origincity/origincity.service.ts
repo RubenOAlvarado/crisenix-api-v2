@@ -1,4 +1,4 @@
-import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
+import { OriginCityLean } from '@/shared/types/origincity/originCity.lean.type';
 import {
   BadRequestException,
   Injectable,

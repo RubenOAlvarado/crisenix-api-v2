@@ -2,7 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { Expose, Transform } from 'class-transformer';
 import { ResponseTransferTypeDTO } from '@/shared/models/dtos/response/translationType/responseTranslationType.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { TransferTypeLean } from '@/shared/interfaces/transferType/transferType.lean.interface';
+import { TransferTypeLean } from '@/shared/types/transferType/transferType.lean.type';
 import { handleDocumentsId } from '../helpers';
 
 export const transferTypeTransformer = ({

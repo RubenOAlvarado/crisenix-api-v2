@@ -10,7 +10,7 @@ import { Roles } from 'src/shared/models/schemas/roles.schema';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Status } from 'src/shared/enums/status.enum';
-import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
+import { RolesLean } from '@/shared/types/roles/roles.lean.type';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateRoleDTO } from '@/shared/models/dtos/request/role/createrole.dto';
 import { UpdateRoleDTO } from '@/shared/models/dtos/request/role/updaterole.dto';

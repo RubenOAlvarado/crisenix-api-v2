@@ -1,4 +1,4 @@
-import { AboardPointLean } from '@/shared/interfaces/aboardPoint/aboardPoint.lean.interface';
+import { AboardPointLean } from '@/shared/types/aboardPoint/aboardPoint.lean.type';
 import { AboardPointExcel } from '@/shared/interfaces/excel/aboardPoint.excel.interface';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';

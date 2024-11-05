@@ -1,6 +1,6 @@
 import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
-import { ChangeReservationStatusCommand } from '@/shared/interfaces/reservations/changeReservationStatus.interface';
-import { ReservationsLean } from '@/shared/interfaces/reservations/reservations.lean.interface';
+import { ChangeReservationStatusCommand } from '@/shared/interfaces/changeReservationStatus.interface';
+import { ReservationsLean } from '@/shared/types/reservations/reservations.lean.type';
 import { Reservations } from '@/shared/models/schemas/reservation.schema';
 import { TourService } from '@/tour/tour.service';
 import { NotFoundException } from '@nestjs/common';

@@ -1,5 +1,5 @@
 import { Status } from '@/shared/enums/status.enum';
-import { CategoryLean } from '@/shared/interfaces/category/category.lean.interface';
+import { CategoryLean } from '@/shared/types/category/category.lean.type';
 import { CategoryExcel } from '@/shared/interfaces/excel/category.excel.interface';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';

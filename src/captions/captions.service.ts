@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CaptionsLean } from '@/shared/interfaces/captions/captions.lean.interface';
+import { CaptionsLean } from '@/shared/types/captions/captions.lean.type';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';

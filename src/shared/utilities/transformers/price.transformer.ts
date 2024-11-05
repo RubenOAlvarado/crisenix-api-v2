@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { applyDecorators } from '@nestjs/common';
 import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
 import { Currency } from '@/shared/enums/currency.enum';
-import { PricesLean } from '@/shared/interfaces/prices/prices.lean.interface';
+import { PricesLean } from '@/shared/types/prices/prices.lean.type';
 import { handleDocumentsId } from '../helpers';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 

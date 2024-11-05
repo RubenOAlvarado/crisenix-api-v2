@@ -5,7 +5,7 @@ import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { TourLean } from '@/shared/interfaces/tour/tour.lean.interface';
+import { TourLean } from '@/shared/types/tour/tour.lean.type';
 import { AboardHourDTO } from '@/shared/models/dtos/request/tour/aboardhour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';

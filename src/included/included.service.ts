@@ -2,7 +2,7 @@ import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Entry } from '@/shared/enums/entry.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { IncludedExcel } from '@/shared/interfaces/excel/included.excel.interface';
-import { IncludedLean } from '@/shared/interfaces/included/included.lean.interface';
+import { IncludedLean } from '@/shared/types/included/included.lean.type';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
 import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';

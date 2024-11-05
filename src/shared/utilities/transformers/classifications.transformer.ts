@@ -1,4 +1,4 @@
-import { ClassificationLean } from '@/shared/interfaces/classification/classification.lean.interface';
+import { ClassificationLean } from '@/shared/types/classification/classification.lean.type';
 import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { handleDocumentsId } from '../helpers';
 import { applyDecorators } from '@nestjs/common';

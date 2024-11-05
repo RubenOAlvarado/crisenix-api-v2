@@ -2,7 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { Expose, Transform } from 'class-transformer';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { OriginCityLean } from '@/shared/interfaces/origincity/originCity.lean.interface';
+import { OriginCityLean } from '@/shared/types/origincity/originCity.lean.type';
 import { handleDocumentsId } from '../helpers';
 
 export const originCityTransformer = ({
