@@ -11,7 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
 import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { DeclineSaleDto } from '@/shared/models/dtos/request/sales/declineSale.dto';
 
 @ApiBearerAuth()
@@ -42,7 +42,7 @@ export class SalesController {
     description: 'Something went wrong finding the sale.',
   })
   @Get(':id')
-  async getSaleById(@Param() param: UrlValidator) {
+  async getSaleById(@Param() param: IdValidator) {
     return await this.salesService.findOne(param);
   }
 
@@ -53,7 +53,7 @@ export class SalesController {
     description: 'Something went wrong finding the sales by reservation id.',
   })
   @Get('reservation/:id')
-  async getSaleByReservationId(@Param() param: UrlValidator) {
+  async getSaleByReservationId(@Param() param: IdValidator) {
     return await this.salesService.findSalesByReservationId(param);
   }
 
@@ -72,9 +72,9 @@ export class SalesController {
   @Patch('pay')
   @ApiBody({
     description: 'Payment information',
-    type: UrlValidator,
+    type: IdValidator,
   })
-  async markSaleAsPaid(@Body() param: UrlValidator) {
+  async markSaleAsPaid(@Body() param: IdValidator) {
     return await this.salesService.markSaleAsPaid(param);
   }
 

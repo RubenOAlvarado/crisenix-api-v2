@@ -4,7 +4,7 @@ import { CreateReservationsDTO } from '@/shared/models/dtos/request/reservations
 import { UpdateReservationsDto } from '@/shared/models/dtos/request/reservations/update-reservations.dto';
 import { Reservations } from '@/shared/models/schemas/reservation.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { TourService } from '@/tour/tour.service';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -58,7 +58,7 @@ export class ReservationService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<ReservationsLean> {
+  async findOne({ id }: IdValidator): Promise<ReservationsLean> {
     try {
       const reservation = await this.reservationModel
         .findById(id)
@@ -79,7 +79,7 @@ export class ReservationService {
   }
 
   async update(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updateReservationDto: UpdateReservationsDto,
   ): Promise<ReservationsLean> {
     try {

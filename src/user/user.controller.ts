@@ -20,9 +20,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { PaginationDTO } from '@/shared/models/dtos/searcher/pagination.dto';
 import { ResponseWebUserDTO } from '@/shared/models/dtos/response/user/response-webuser.dto';
 import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
 import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
@@ -80,7 +80,7 @@ export class UserController {
     type: UpdateWebUserDTO,
   })
   async updateWebUser(
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
     @Body() updateWebUserDTO: UpdateWebUserDTO,
   ) {
     return await this.userService.updateWebUser(params, updateWebUserDTO);
@@ -97,7 +97,7 @@ export class UserController {
     description: 'Something went wrong deleting the user.',
   })
   @Delete(':id')
-  async deleteWebUser(@Param() params: UrlValidator) {
+  async deleteWebUser(@Param() params: IdValidator) {
     await this.userService.deletedWebUser(params);
     return 'The user has been successfully deleted.';
   }
@@ -113,7 +113,7 @@ export class UserController {
     description: 'Something went wrong finding the user profiles.',
   })
   @Get(':id')
-  async getProfiles(@Param() params: UrlValidator) {
+  async getProfiles(@Param() params: IdValidator) {
     return await this.userService.getWebUser(params);
   }
 
@@ -129,7 +129,7 @@ export class UserController {
     description: 'Something went wrong finding the user profile.',
   })
   @Get('profile/:id')
-  async getUserProfile(@Param() params: UrlValidator) {
+  async getUserProfile(@Param() params: IdValidator) {
     return await this.userService.getDbUserById(params);
   }
 
@@ -162,7 +162,7 @@ export class UserController {
   })
   async updateProfile(
     @Body() updateUserDTO: UpdateUserDTO,
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
   ) {
     return await this.userService.updateDbUser(params, updateUserDTO);
   }
@@ -177,7 +177,7 @@ export class UserController {
     description: 'Something went wrong deleting the user profile.',
   })
   @Delete('profile/:id')
-  async deleteProfile(@Param() params: UrlValidator) {
+  async deleteProfile(@Param() params: IdValidator) {
     await this.userService.deleteDbUser(params);
     return 'The user profile has been successfully deleted.';
   }

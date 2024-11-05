@@ -1,4 +1,4 @@
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { PaginationDTO } from '@/shared/models/dtos/searcher/pagination.dto';
 import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';

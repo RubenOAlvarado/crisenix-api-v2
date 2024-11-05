@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { QueryDTO } from 'src/shared/dtos/query.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
 import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import {
   createPaginatedObject,
   handleErrorsOnServices,
@@ -19,7 +19,7 @@ import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/cre
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
 import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
-import { OriginCitySearcherDto } from '@/shared/dtos/searcher/originCity/searcherOriginCity.dto';
+import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 
 @Injectable()
 export class OriginCityService {
@@ -43,7 +43,7 @@ export class OriginCityService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<OriginCityLean> {
+  async findOne({ id }: IdValidator): Promise<OriginCityLean> {
     try {
       const city = await this.originCityModel
         .findById(id)
@@ -109,7 +109,7 @@ export class OriginCityService {
   }
 
   async update(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updateOriginCity: UpdateOriginCityDTO,
   ): Promise<OriginCityLean> {
     try {
@@ -132,7 +132,7 @@ export class OriginCityService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<void> {
+  async delete({ id }: IdValidator): Promise<void> {
     try {
       if (await this.validateOriginCity(id))
         await this.originCityModel.findByIdAndUpdate(
@@ -148,7 +148,7 @@ export class OriginCityService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<void> {
+  async reactivate({ id }: IdValidator): Promise<void> {
     try {
       if (await this.validateOriginCity(id))
         await this.originCityModel.findByIdAndUpdate(
@@ -190,7 +190,7 @@ export class OriginCityService {
   }
 
   async addAboardPoints(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     { aboardPoints }: UpdateOriginCityDTO,
   ): Promise<void> {
     try {

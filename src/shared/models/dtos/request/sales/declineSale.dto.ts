@@ -1,9 +1,9 @@
 import { FailureReason } from '@/shared/enums/sales/failureReason.enum';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
-export class DeclineSaleDto extends UrlValidator {
+export class DeclineSaleDto extends IdValidator {
   @ApiProperty({
     description: 'Reason for declining the sale',
     required: true,

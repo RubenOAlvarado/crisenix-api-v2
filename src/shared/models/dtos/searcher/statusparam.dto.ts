@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Status } from '../enums/status.enum';
+import { Status } from '../../../enums/status.enum';
 
 export class StatusDTO {
   @ApiPropertyOptional({

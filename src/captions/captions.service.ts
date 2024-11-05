@@ -3,7 +3,7 @@ import {
   CaptionDocument,
   Captions,
 } from '@/shared/models/schemas/captions.schema';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import {
   BadRequestException,
   Injectable,
@@ -12,7 +12,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CaptionsLean } from '@/shared/interfaces/captions/captions.lean.interface';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
 import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updatecaption.dto';
@@ -52,7 +52,7 @@ export class CaptionsService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<CaptionsLean> {
+  async findOne({ id }: IdValidator): Promise<CaptionsLean> {
     try {
       const caption = await this.captionModel
         .findById(id)
@@ -68,7 +68,7 @@ export class CaptionsService {
     }
   }
 
-  async update({ id }: UrlValidator, updateCaptionDTO: UpdateCaptionDTO) {
+  async update({ id }: IdValidator, updateCaptionDTO: UpdateCaptionDTO) {
     try {
       const caption = await this.captionModel.findByIdAndUpdate(
         id,
@@ -85,7 +85,7 @@ export class CaptionsService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<void> {
+  async delete({ id }: IdValidator): Promise<void> {
     try {
       const caption = await this.captionModel.findByIdAndDelete(id);
       if (!caption) throw new NotFoundException(`Caption ${id} not found`);
@@ -97,7 +97,7 @@ export class CaptionsService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<void> {
+  async reactivate({ id }: IdValidator): Promise<void> {
     try {
       const validCaption = await this.findOne({ id });
       if (!validCaption) throw new NotFoundException('Caption not found');

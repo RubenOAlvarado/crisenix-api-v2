@@ -21,21 +21,21 @@ import {
   Query,
 } from '@nestjs/common';
 import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
-import { QueryDTO } from 'src/shared/dtos/query.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
+import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedResponse.dto';
 import { Public } from '@/auth/public.decorator';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
-import { OriginCitySearcherDto } from '@/shared/dtos/searcher/originCity/searcherOriginCity.dto';
+import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 
 @ApiBearerAuth()
 @Controller('origincity')
 @ApiTags('Origin City')
-@ApiExtraModels(PaginatedDTO)
+@ApiExtraModels(PaginatedResponseDTO)
 export class OriginCityController {
   constructor(private readonly originCityService: OriginCityService) {}
 
@@ -67,8 +67,8 @@ export class OriginCityController {
   })
   @Get(':id')
   @Public()
-  async findOne(@Param() urlValidator: UrlValidator) {
-    return await this.originCityService.findOne(urlValidator);
+  async findOne(@Param() IdValidator: IdValidator) {
+    return await this.originCityService.findOne(IdValidator);
   }
 
   @ApiPaginatedResponse(ResponseOriginCityDTO)
@@ -98,11 +98,11 @@ export class OriginCityController {
     type: UpdateOriginCityDTO,
   })
   async update(
-    @Param() urlValidator: UrlValidator,
+    @Param() IdValidator: IdValidator,
     @Body() updateOriginCityDTO: UpdateOriginCityDTO,
   ) {
     return await this.originCityService.update(
-      urlValidator,
+      IdValidator,
       updateOriginCityDTO,
     );
   }
@@ -117,8 +117,8 @@ export class OriginCityController {
     description: 'Something went wrong deleting the origin city.',
   })
   @Delete(':id')
-  async delete(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.originCityService.delete(urlValidator);
+  async delete(@Param() IdValidator: IdValidator): Promise<string> {
+    await this.originCityService.delete(IdValidator);
     return 'The origin city has been successfully deleted.';
   }
 
@@ -132,8 +132,8 @@ export class OriginCityController {
     description: 'Something went wrong activating the origin city.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.originCityService.reactivate(urlValidator);
+  async reactivate(@Param() IdValidator: IdValidator): Promise<string> {
+    await this.originCityService.reactivate(IdValidator);
     return 'The origin city has been successfully activated.';
   }
 
@@ -173,10 +173,10 @@ export class OriginCityController {
     isArray: true,
   })
   async addPoints(
-    @Param() urlValidator: UrlValidator,
+    @Param() IdValidator: IdValidator,
     @Body() aboardPointsDTO: AddAboardPointsDTO,
   ): Promise<string> {
-    await this.originCityService.addAboardPoints(urlValidator, aboardPointsDTO);
+    await this.originCityService.addAboardPoints(IdValidator, aboardPointsDTO);
     return 'The aboard point/s has been successfully added to the origin city.';
   }
 }

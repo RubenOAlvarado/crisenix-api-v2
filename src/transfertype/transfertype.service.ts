@@ -2,7 +2,7 @@ import { Status } from '@/shared/enums/status.enum';
 import { TransferTypeExcel } from '@/shared/interfaces/excel/transferType.excel.interface';
 import { TransferTypes } from '@/shared/models/schemas/transfertype.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import {
   BadRequestException,
   Injectable,
@@ -20,7 +20,7 @@ export class TransfertypeService {
 
   async getTransferType({
     id,
-  }: UrlValidator): Promise<TransferTypes & { _id: ObjectId }> {
+  }: IdValidator): Promise<TransferTypes & { _id: ObjectId }> {
     try {
       const transferType = (await this.transferModel
         .findById(id)

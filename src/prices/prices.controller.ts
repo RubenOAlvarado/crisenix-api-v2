@@ -21,7 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
 import { Public } from '@/auth/public.decorator';
 @ApiBearerAuth()
@@ -67,7 +67,7 @@ export class PricesController {
     description: 'Something went wrong looking Price.',
   })
   @Get(':id')
-  async findPrice(@Param() params: UrlValidator) {
+  async findPrice(@Param() params: IdValidator) {
     return await this.pricesService.getPriceById(params);
   }
 
@@ -83,7 +83,7 @@ export class PricesController {
   @ApiBody({ type: UpdatePriceDTO })
   async updatePrice(
     @Body() updatePriceDTO: UpdatePriceDTO,
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
   ) {
     return await this.pricesService.updatePrice(params, updatePriceDTO);
   }
@@ -98,7 +98,7 @@ export class PricesController {
   })
   @ApiBadRequestResponse({ description: 'Price already inactive.' })
   @Delete(':id')
-  async inactivePrice(@Param() params: UrlValidator) {
+  async inactivePrice(@Param() params: IdValidator) {
     await this.pricesService.inactivatePrice(params);
     return 'Price inactivated successfully.';
   }
@@ -113,7 +113,7 @@ export class PricesController {
   })
   @ApiBadRequestResponse({ description: 'Price already active.' })
   @Patch('reactivate/:id')
-  async reactivatePrice(@Param() params: UrlValidator) {
+  async reactivatePrice(@Param() params: IdValidator) {
     await this.pricesService.reactivatePrice(params);
 
     return 'Price reactivated successfully.';

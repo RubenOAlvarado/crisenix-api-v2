@@ -1,4 +1,4 @@
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { PaginationDTO } from '@/shared/models/dtos/searcher/pagination.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';

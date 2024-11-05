@@ -6,7 +6,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '@/shared/models/schemas/user.schema';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Status } from '@/shared/enums/status.enum';
 import { RolesService } from '@/roles/roles.service';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
@@ -25,7 +25,7 @@ import { CreateFbUserDTO } from '@/shared/models/dtos/request/user/createfbuser.
 import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
 import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto';
 import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
-import { PaginationDTO } from '@/shared/dtos/pagination.dto';
+import { PaginationDTO } from '@/shared/models/dtos/searcher/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -70,7 +70,7 @@ export class UserService {
     await this.firebaseService.setCustomUserClaims(uid);
   }
 
-  async getDbUserById({ id }: UrlValidator): Promise<UserLean> {
+  async getDbUserById({ id }: IdValidator): Promise<UserLean> {
     try {
       const profile = await this.userModel
         .findById(id)
@@ -126,7 +126,7 @@ export class UserService {
   }
 
   async updateDbUser(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updateUserDTO: UpdateUserDTO,
   ): Promise<User> {
     try {
@@ -144,7 +144,7 @@ export class UserService {
     }
   }
 
-  async deleteDbUser({ id }: UrlValidator): Promise<UserLean> {
+  async deleteDbUser({ id }: IdValidator): Promise<UserLean> {
     try {
       const deletedAt = new Date();
       const deletedUser = await this.userModel.findByIdAndUpdate(
@@ -205,7 +205,7 @@ export class UserService {
     }
   }
 
-  async getWebUser(params: UrlValidator): Promise<ResponseWebUserDTO> {
+  async getWebUser(params: IdValidator): Promise<ResponseWebUserDTO> {
     try {
       const user = await this.getDbUserById(params);
       if (!user) throw new NotFoundException('No user profile found.');
@@ -217,7 +217,7 @@ export class UserService {
   }
 
   async updateWebUser(
-    param: UrlValidator,
+    param: IdValidator,
     updateWebUserDTO: UpdateWebUserDTO,
   ): Promise<ResponseWebUserDTO> {
     try {
@@ -237,7 +237,7 @@ export class UserService {
     }
   }
 
-  async deletedWebUser(params: UrlValidator): Promise<void> {
+  async deletedWebUser(params: IdValidator): Promise<void> {
     try {
       const deletdDbUser = await this.deleteDbUser(params);
       if (!deletdDbUser) throw new NotFoundException('User not found.');

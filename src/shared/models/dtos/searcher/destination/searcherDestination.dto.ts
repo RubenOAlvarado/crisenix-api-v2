@@ -1,8 +1,8 @@
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { SearchableFields } from '@/shared/enums/searcher/destination/fields.enum';
 import { SortFields } from '@/shared/enums/searcher/destination/sortFields.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { QueryDTO } from '../../query.dto';
 
 export class SearcherDestinationDto extends QueryDTO {
   @ApiProperty({

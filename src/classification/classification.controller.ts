@@ -21,8 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { ClassificationService } from './classification.service';
 import { Public } from '@/auth/public.decorator';
-import { QueryDTO } from '@/shared/dtos/query.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ResponseClassificationDTO } from '@/shared/models/dtos/response/classifications/responseclassifications.dto';
 import { CreateClassificationDTO } from '@/shared/models/dtos/request/classification/createclassification.dto';
 import { UpdateClassificationDTO } from '@/shared/models/dtos/request/classification/updateclasification.dto';
@@ -77,7 +77,7 @@ export class ClassificationController {
     description: 'classification not found.',
   })
   @Get(':id')
-  async findOne(@Param() { id }: UrlValidator) {
+  async findOne(@Param() { id }: IdValidator) {
     return await this.classificationService.findOne(id);
   }
 
@@ -97,7 +97,7 @@ export class ClassificationController {
     type: UpdateClassificationDTO,
   })
   async update(
-    @Param() { id }: UrlValidator,
+    @Param() { id }: IdValidator,
     @Body() updateclassificationDTO: UpdateClassificationDTO,
   ) {
     const updatedclassification = await this.classificationService.update(
@@ -121,7 +121,7 @@ export class ClassificationController {
     description: 'classification already deleted.',
   })
   @Delete(':id')
-  async delete(@Param() { id }: UrlValidator): Promise<string> {
+  async delete(@Param() { id }: IdValidator): Promise<string> {
     await this.classificationService.delete(id);
     return 'The classification was deleted successfully.';
   }
@@ -140,7 +140,7 @@ export class ClassificationController {
     description: 'classification already active.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: UrlValidator): Promise<string> {
+  async reactivate(@Param() { id }: IdValidator): Promise<string> {
     await this.classificationService.reactivate(id);
     return 'The classification was reactivated successfully.';
   }

@@ -7,7 +7,7 @@ import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.d
 import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
 import { Prices } from '@/shared/models/schemas/price.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -52,7 +52,7 @@ export class PricesService {
   }
 
   async updatePrice(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updatePriceDTO: UpdatePriceDTO,
   ): Promise<Prices> {
     try {
@@ -71,7 +71,7 @@ export class PricesService {
     }
   }
 
-  async getPriceById({ id }: UrlValidator): Promise<Prices> {
+  async getPriceById({ id }: IdValidator): Promise<Prices> {
     try {
       const price = await this.priceModel.findById(id).exec();
       if (!price) {
@@ -86,7 +86,7 @@ export class PricesService {
     }
   }
 
-  async inactivatePrice({ id }: UrlValidator): Promise<void> {
+  async inactivatePrice({ id }: IdValidator): Promise<void> {
     try {
       await this.priceModel
         .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
@@ -99,7 +99,7 @@ export class PricesService {
     }
   }
 
-  async reactivatePrice({ id }: UrlValidator): Promise<void> {
+  async reactivatePrice({ id }: IdValidator): Promise<void> {
     try {
       await this.priceModel
         .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })

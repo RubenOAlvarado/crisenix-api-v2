@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TourStatus } from '../../../enums/tour/status.enum';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { TourStatus } from '@/shared/enums/tour/status.enum';
 
-export class ChangeTourStatusDTO extends UrlValidator {
+export class ChangeTourStatusDTO extends IdValidator {
   @ApiProperty({
     description: 'Tour status to change.',
     enum: TourStatus,

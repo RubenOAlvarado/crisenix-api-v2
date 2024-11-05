@@ -19,7 +19,7 @@ import {
 import { PassengerService } from './passenger.service';
 import { ResponsePassengerDTO } from '@/shared/models/dtos/response/passenger/response-passenger.dto';
 import { CreatePassengerDTO } from '@/shared/models/dtos/request/passenger/createpassenger.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 
 @ApiBearerAuth()
 @ApiTags('Passenger')
@@ -54,7 +54,7 @@ export class PassengerController {
     description: 'Passenger not found.',
   })
   @Get(':id')
-  async getById(@Param() { id }: UrlValidator) {
+  async getById(@Param() { id }: IdValidator) {
     return await this.passengerService.getById(id);
   }
 
@@ -68,7 +68,7 @@ export class PassengerController {
     description: 'Passenger not found.',
   })
   @Delete(':id')
-  async delete(@Param() { id }: UrlValidator) {
+  async delete(@Param() { id }: IdValidator) {
     await this.passengerService.delete(id);
     return 'Passenger deleted successfully.';
   }
@@ -84,7 +84,7 @@ export class PassengerController {
   })
   @Put(':id')
   async update(
-    @Param() { id }: UrlValidator,
+    @Param() { id }: IdValidator,
     @Body() updatePassengerDTO: CreatePassengerDTO,
   ) {
     return await this.passengerService.update(id, updatePassengerDTO);
@@ -100,7 +100,7 @@ export class PassengerController {
     description: 'Passenger not found.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: UrlValidator) {
+  async reactivate(@Param() { id }: IdValidator) {
     await this.passengerService.reactivate(id);
     return 'Passenger reactivated successfully.';
   }

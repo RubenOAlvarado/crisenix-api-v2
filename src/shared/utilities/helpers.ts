@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PipelineStage, Types } from 'mongoose';
-import { PaginationDTO } from '../dtos/pagination.dto';
+import { PaginationDTO } from '../models/dtos/searcher/pagination.dto';
 
 const logger = new Logger();
 

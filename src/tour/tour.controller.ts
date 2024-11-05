@@ -23,9 +23,8 @@ import {
 import { TourService } from './tour.service';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
 import { Public } from '@/auth/public.decorator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { DestinationValidator } from '@/shared/validators/destination.validator';
-import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { DestinationValidator } from '@/shared/models/dtos/validators/destination.validator';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
@@ -33,7 +32,8 @@ import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCata
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
-import { SearcherTourDTO } from '@/shared/dtos/searcher/tour/searcherTour.dto';
+import { SearcherTourDTO } from '@/shared/models/dtos/searcher/tour/searcherTour.dto';
+import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeStatus.dto';
 
 @ApiBearerAuth()
 @ApiTags('Tour')
@@ -66,7 +66,7 @@ export class TourController {
   })
   @Public()
   @Get(':id')
-  async getTourById(@Param() param: UrlValidator) {
+  async getTourById(@Param() param: IdValidator) {
     return await this.tourService.findOne(param);
   }
 
@@ -134,7 +134,7 @@ export class TourController {
   })
   @ApiBody({ type: UpdateTourDTO })
   @Put(':id')
-  async updateTour(@Param() param: UrlValidator, @Body() tour: UpdateTourDTO) {
+  async updateTour(@Param() param: IdValidator, @Body() tour: UpdateTourDTO) {
     return await this.tourService.updateTour(param, tour);
   }
 
@@ -151,7 +151,7 @@ export class TourController {
     description: 'Tour does not exist.',
   })
   @Delete(':id')
-  async deleteTour(@Param() param: UrlValidator) {
+  async deleteTour(@Param() param: IdValidator) {
     await this.tourService.deleteTour(param);
     return 'Tour deleted successfully.';
   }

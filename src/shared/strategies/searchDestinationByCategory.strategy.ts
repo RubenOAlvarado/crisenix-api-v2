@@ -1,6 +1,6 @@
 import { PipelineStage } from 'mongoose';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
-import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
+import { SearcherDestinationDto } from '../models/dtos/searcher/destination/searcherDestination.dto';
 
 export class SearchDestinationByCategory
   implements SearchStrategy<SearcherDestinationDto>

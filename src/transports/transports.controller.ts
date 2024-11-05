@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { TransportsService } from './transports.service';
 import { Public } from '@/auth/public.decorator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { CreateTransportsDTO } from '@/shared/models/dtos/request/transports/createtransports.dto';
 
 @ApiTags('Transports')
@@ -27,7 +27,7 @@ export class TransportsController {
   })
   @Public()
   @Get(':id')
-  async getTransport(@Param() param: UrlValidator) {
+  async getTransport(@Param() param: IdValidator) {
     return await this.transportsService.getTransport(param);
   }
 }

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 
-export class PaginatedDTO<T> {
+export class PaginatedResponseDTO<T> {
   constructor(
     docs: T[],
     totalDocs: number,

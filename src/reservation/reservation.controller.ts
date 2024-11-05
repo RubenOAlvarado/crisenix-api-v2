@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@/auth/public.decorator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/change-status.dto';
 import { QueryReservationStatusDTO } from '@/shared/models/dtos/request/reservations/query-reservations.dto';
 
@@ -63,7 +63,7 @@ export class ReservationController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() params: UrlValidator) {
+  async findOne(@Param() params: IdValidator) {
     return await this.reservationService.findOne(params);
   }
 
@@ -77,7 +77,7 @@ export class ReservationController {
   @ApiBody({ type: UpdateReservationsDto })
   @Patch(':id')
   async update(
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
     @Body() updateReservationDto: UpdateReservationsDto,
   ) {
     return await this.reservationService.update(params, updateReservationDto);

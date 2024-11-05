@@ -1,7 +1,6 @@
 import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { DestinationService } from '@/destination/destination.service';
 import { PricesService } from '@/prices/prices.service';
-import { ChangeTourStatusDTO } from '@/shared/dtos/searcher/tour/changeStatus.dto';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
@@ -19,8 +18,8 @@ import {
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
 import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
-import { DestinationValidator } from '@/shared/validators/destination.validator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { DestinationValidator } from '@/shared/models/dtos/validators/destination.validator';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { TourtypeService } from '@/tourtype/tourtype.service';
 import { TransportsService } from '@/transports/transports.service';
 import {
@@ -30,7 +29,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PopulateOptions } from 'mongoose';
-import { SearcherTourDTO } from '@/shared/dtos/searcher/tour/searcherTour.dto';
+import { SearcherTourDTO } from '@/shared/models/dtos/searcher/tour/searcherTour.dto';
+import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeStatus.dto';
 
 @Injectable()
 export class TourService {
@@ -96,7 +96,7 @@ export class TourService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<TourLean> {
+  async findOne({ id }: IdValidator): Promise<TourLean> {
     try {
       const tour = await this.tourModel
         .findById(id)
@@ -200,7 +200,7 @@ export class TourService {
     }
   }
 
-  async updateTour({ id }: UrlValidator, updateTourDTO: UpdateTourDTO) {
+  async updateTour({ id }: IdValidator, updateTourDTO: UpdateTourDTO) {
     try {
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         id,
@@ -325,7 +325,7 @@ export class TourService {
     }
   }
 
-  async deleteTour({ id }: UrlValidator): Promise<void> {
+  async deleteTour({ id }: IdValidator): Promise<void> {
     try {
       const tour = await this.tourModel.findById(id);
       if (!tour) throw new NotFoundException('Tour not found.');
@@ -468,11 +468,11 @@ export class TourService {
     data,
   }: UpdateTourCatalogDTO): Promise<any> {
     try {
-      const isUrlValidator =
+      const isIdValidator =
         catalogName === 'includeds' || catalogName === 'prices';
 
-      const transformedData = isUrlValidator
-        ? data.map(({ id }: UrlValidator) => id)
+      const transformedData = isIdValidator
+        ? data.map(({ id }: IdValidator) => id)
         : data;
       const update = { $set: { [catalogName]: transformedData } };
       const tour = await this.tourModel

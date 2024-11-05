@@ -1,4 +1,4 @@
-import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
+import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedResponse.dto';
 import {
   Body,
   Controller,
@@ -21,16 +21,16 @@ import {
 } from '@nestjs/swagger';
 import { IncludedService } from './included.service';
 import { Public } from '@/auth/public.decorator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { QueryDTO } from '@/shared/dtos/query.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/responseIncluded.dto';
 import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
 import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
 
 @Controller('included')
 @ApiTags('Included')
-@ApiExtraModels(PaginatedDTO)
+@ApiExtraModels(PaginatedResponseDTO)
 export class IncludedController {
   constructor(private readonly includedService: IncludedService) {}
 
@@ -59,8 +59,8 @@ export class IncludedController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() urlValidator: UrlValidator) {
-    return await this.includedService.findOne(urlValidator);
+  async findOne(@Param() IdValidator: IdValidator) {
+    return await this.includedService.findOne(IdValidator);
   }
 
   @ApiPaginatedResponse(ResponseIncludedDTO)
@@ -87,10 +87,10 @@ export class IncludedController {
   @Put(':id')
   @ApiBody({ type: UpdateIncludedDTO })
   async update(
-    @Param() urlValidator: UrlValidator,
+    @Param() IdValidator: IdValidator,
     @Body() updateItineraryDTO: UpdateIncludedDTO,
   ) {
-    return await this.includedService.update(urlValidator, updateItineraryDTO);
+    return await this.includedService.update(IdValidator, updateItineraryDTO);
   }
 
   @ApiOkResponse({
@@ -104,8 +104,8 @@ export class IncludedController {
     description: 'Something went wrong deleting the included service.',
   })
   @Delete(':id')
-  async delete(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.includedService.delete(urlValidator);
+  async delete(@Param() IdValidator: IdValidator): Promise<string> {
+    await this.includedService.delete(IdValidator);
     return 'Included service deleted successfully.';
   }
 
@@ -120,8 +120,8 @@ export class IncludedController {
     description: 'Something went wrong reactivating the included service.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() urlValidator: UrlValidator): Promise<string> {
-    await this.includedService.reactivate(urlValidator);
+  async reactivate(@Param() IdValidator: IdValidator): Promise<string> {
+    await this.includedService.reactivate(IdValidator);
     return 'Included service reactivated successfully.';
   }
 }

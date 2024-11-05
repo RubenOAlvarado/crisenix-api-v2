@@ -1,6 +1,6 @@
-import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
 import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
+import { SearcherDestinationDto } from '../models/dtos/searcher/destination/searcherDestination.dto';
 import { DefaultDestinationSearcher } from '../strategies/defaultDestinationSearcher.category';
 import { SearchDestinationByCategory } from '../strategies/searchDestinationByCategory.strategy';
 

@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AboardpointService } from './aboardpoint.service';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -20,7 +20,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UrlValidator } from '../shared/validators/urlValidator.dto';
+import { IdValidator } from '../shared/models/dtos/validators/id.validator';
 import { Public } from '@/auth/public.decorator';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
@@ -75,7 +75,7 @@ export class AboardPointController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() param: UrlValidator) {
+  async findOne(@Param() param: IdValidator) {
     return await this.service.findOne(param);
   }
 
@@ -95,7 +95,7 @@ export class AboardPointController {
     type: UpdateAboardPointDTO,
   })
   async update(
-    @Param() param: UrlValidator,
+    @Param() param: IdValidator,
     @Body() updateAboardPointDTO: UpdateAboardPointDTO,
   ) {
     const updatedAboardpoint = await this.service.update(
@@ -116,7 +116,7 @@ export class AboardPointController {
     description: 'Something went wrong deleting the aboard point.',
   })
   @Delete(':id')
-  async delete(@Param() param: UrlValidator): Promise<string> {
+  async delete(@Param() param: IdValidator): Promise<string> {
     await this.service.delete(param);
     return 'The aboard point has been successfully deleted.';
   }
@@ -132,7 +132,7 @@ export class AboardPointController {
     description: 'Something went wrong reactivating the aboard point.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() param: UrlValidator): Promise<string> {
+  async reactivate(@Param() param: IdValidator): Promise<string> {
     await this.service.reactivate(param);
     return 'The aboard point has been successfully reactivated.';
   }

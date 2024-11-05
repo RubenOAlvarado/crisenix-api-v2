@@ -1,5 +1,4 @@
 import { SearchableTourFields } from '../enums/searcher/tour/fields.enum';
-import { SearcherTourDTO } from '../dtos/searcher/tour/searcherTour.dto';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
 import { NoSearchStrategy } from '../strategies/noSearch.strategy';
 import { SearchTourByDestinationCategory } from '../strategies/searchTourByDestinationCategory.strategy';
@@ -7,6 +6,7 @@ import { SearchTourByIncludedServiceStrategy } from '../strategies/searchTourByI
 import { SearchTourByInitDateStrategy } from '../strategies/searchTourByInitDate.strategy';
 import { SearchByTourParamsStrategy } from '../strategies/searchByTourParams.strategy';
 import { SearchByTourTypeStrategy } from '../strategies/searchByTourType.strategy';
+import { SearcherTourDTO } from '../models/dtos/searcher/tour/searcherTour.dto';
 
 export class SearchToursStrategyFactory {
   static getSearchQuery(

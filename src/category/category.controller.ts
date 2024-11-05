@@ -20,8 +20,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
-import { QueryDTO } from '@/shared/dtos/query.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Public } from '@/auth/public.decorator';
 import { ResponseCategoryDTO } from '@/shared/models/dtos/response/category/responsecategory.dto';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
@@ -74,7 +74,7 @@ export class CategoryController {
     description: 'Category not found.',
   })
   @Get(':id')
-  async findOne(@Param() { id }: UrlValidator) {
+  async findOne(@Param() { id }: IdValidator) {
     return await this.categoryService.findOne(id);
   }
 
@@ -91,7 +91,7 @@ export class CategoryController {
   @Put(':id')
   @ApiBody({ description: 'Category object', type: UpdateCategoryDTO })
   async update(
-    @Param() { id }: UrlValidator,
+    @Param() { id }: IdValidator,
     @Body() updateCategoryDTO: UpdateCategoryDTO,
   ) {
     const updatedCategory = await this.categoryService.update(
@@ -115,7 +115,7 @@ export class CategoryController {
     description: 'Category already deleted.',
   })
   @Delete(':id')
-  async delete(@Param() { id }: UrlValidator): Promise<string> {
+  async delete(@Param() { id }: IdValidator): Promise<string> {
     await this.categoryService.delete(id);
     return 'The category was deleted successfully.';
   }
@@ -134,7 +134,7 @@ export class CategoryController {
     description: 'Category already active.',
   })
   @Patch('reactivate/:id')
-  async reactivate(@Param() { id }: UrlValidator): Promise<string> {
+  async reactivate(@Param() { id }: IdValidator): Promise<string> {
     await this.categoryService.reactivate(id);
     return 'The category was reactivated successfully.';
   }

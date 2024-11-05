@@ -1,4 +1,4 @@
-import { QueryDTO } from '@/shared/dtos/query.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Entry } from '@/shared/enums/entry.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { IncludedExcel } from '@/shared/interfaces/excel/included.excel.interface';
@@ -11,7 +11,7 @@ import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -35,7 +35,7 @@ export class IncludedService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<IncludedLean> {
+  async findOne({ id }: IdValidator): Promise<IncludedLean> {
     try {
       const included = await this.includedModel
         .findById(id)
@@ -78,7 +78,7 @@ export class IncludedService {
   }
 
   async update(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     body: UpdateIncludedDTO,
   ): Promise<IncludedLean> {
     try {
@@ -96,7 +96,7 @@ export class IncludedService {
     }
   }
 
-  async delete({ id }: UrlValidator): Promise<void> {
+  async delete({ id }: IdValidator): Promise<void> {
     try {
       const included = await this.includedModel
         .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
@@ -111,7 +111,7 @@ export class IncludedService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<void> {
+  async reactivate({ id }: IdValidator): Promise<void> {
     try {
       const included = await this.includedModel
         .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })

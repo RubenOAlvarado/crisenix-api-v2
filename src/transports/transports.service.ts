@@ -2,7 +2,7 @@ import { TransportsExcel } from '@/shared/interfaces/excel/transports.excel.inte
 import { CreateTransportsDTO } from '@/shared/models/dtos/request/transports/createtransports.dto';
 import { Transports } from '@/shared/models/schemas/transports.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { TransfertypeService } from '@/transfertype/transfertype.service';
 import {
   Injectable,
@@ -20,7 +20,7 @@ export class TransportsService {
     private transferTypeService: TransfertypeService,
   ) {}
 
-  async getTransport({ id }: UrlValidator): Promise<Transports> {
+  async getTransport({ id }: IdValidator): Promise<Transports> {
     try {
       const transport = await this.transportModel
         .findById(id)

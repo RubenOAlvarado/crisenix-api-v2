@@ -20,8 +20,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
-import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { ResponseRoleDTO } from '@/shared/models/dtos/response/role/response-role.dto';
 import { CreateRoleDTO } from '@/shared/models/dtos/request/role/createrole.dto';
 import { UpdateRoleDTO } from '@/shared/models/dtos/request/role/updaterole.dto';
@@ -72,7 +72,7 @@ export class RolesController {
   })
   @Public()
   @Get(':id')
-  async findRole(@Param() params: UrlValidator) {
+  async findRole(@Param() params: IdValidator) {
     return await this.rolesService.getRoleById(params);
   }
 
@@ -88,7 +88,7 @@ export class RolesController {
   @ApiBody({ type: UpdateRoleDTO })
   async updateRole(
     @Body() updateRoleDTO: UpdateRoleDTO,
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
   ) {
     return await this.rolesService.updateRole(updateRoleDTO, params);
   }
@@ -103,7 +103,7 @@ export class RolesController {
   })
   @ApiBadRequestResponse({ description: 'Role already inactive.' })
   @Delete(':id')
-  async inactiveRole(@Param() params: UrlValidator) {
+  async inactiveRole(@Param() params: IdValidator) {
     await this.rolesService.inactivateRole(params);
     return 'Role inactivated successfully.';
   }
@@ -118,7 +118,7 @@ export class RolesController {
   })
   @ApiBadRequestResponse({ description: 'Role already active.' })
   @Patch('reactivate/:id')
-  async reactivateRole(@Param() params: UrlValidator) {
+  async reactivateRole(@Param() params: IdValidator) {
     await this.rolesService.reactiveRole(params);
 
     return 'Role reactivated successfully.';

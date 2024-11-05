@@ -1,7 +1,6 @@
 import { CategoryService } from '@/category/category.service';
 import { OriginCityService } from '@/origincity/origincity.service';
-import { QueryDTO } from '@/shared/dtos/query.dto';
-import { SearcherDestinationDto } from '@/shared/dtos/searcher/destination/searcherDestination.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
 import { DestinationLean } from '@/shared/interfaces/destination/destination.interface';
@@ -19,8 +18,8 @@ import {
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
-import { PhotoValidator } from '@/shared/validators/photo.validator';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { PhotoValidator } from '@/shared/models/dtos/validators/photo.validator';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { TransfertypeService } from '@/transfertype/transfertype.service';
 import {
   BadRequestException,
@@ -31,8 +30,9 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Query } from 'mongoose';
 import { filterOutPhotos } from './destinations.helper';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
-import { SubCatalogDto } from '@/shared/dtos/searcher/destination/subCatalog.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
+import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destination/searcherDestination.dto';
 
 type PopulateConfig = {
   path: string;
@@ -141,7 +141,7 @@ export class DestinationService {
     page,
     limit,
     status,
-    subCatalog,
+    shouldPopulate,
   }: QueryDTO): Promise<PaginateResult<Destinations>> {
     try {
       const filter = status ? { status } : {};
@@ -149,7 +149,7 @@ export class DestinationService {
         page,
         limit,
         filter,
-        shouldPopulate: subCatalog,
+        shouldPopulate,
       });
       if (!docs.length) throw new NotFoundException('Destinations not found.');
       const totalDocs = await this.destinationModel.countDocuments(filter);
@@ -163,13 +163,13 @@ export class DestinationService {
   }
 
   async findOne(
-    { id }: UrlValidator,
-    { subCatalog }: SubCatalogDto,
+    { id }: IdValidator,
+    { shouldPopulate }: FetchOptionsDto,
   ): Promise<DestinationLean> {
     try {
       const destination = await this.buildQuery({
         filter: { _id: id },
-        shouldPopulate: subCatalog,
+        shouldPopulate,
       });
       if (!destination[0])
         throw new NotFoundException('Destination not found.');
@@ -183,7 +183,7 @@ export class DestinationService {
   }
 
   async update(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updateDestinationDTO: UpdateDestinationDTO,
   ): Promise<DestinationLean> {
     try {
@@ -203,7 +203,7 @@ export class DestinationService {
   }
 
   async changeStatus(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     { status }: StatusDTO,
   ): Promise<void> {
     try {
@@ -251,7 +251,7 @@ export class DestinationService {
   }
 
   async deletePhotos(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     { photos: photosToDelete }: PhotoValidator,
   ): Promise<void> {
     try {
@@ -266,7 +266,7 @@ export class DestinationService {
     }
   }
 
-  async findCities({ id }: UrlValidator): Promise<OriginCityLean> {
+  async findCities({ id }: IdValidator): Promise<OriginCityLean> {
     try {
       const destination = await this.destinationModel
         .findById(id)

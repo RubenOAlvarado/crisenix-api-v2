@@ -1,5 +1,4 @@
 import { PipelineStage } from 'mongoose';
-import { SearcherTourDTO } from '../dtos/searcher/tour/searcherTour.dto';
 import { QueryBuilder } from './builders/query.builder';
 import { SearchToursStrategyFactory } from '../factories/searchToursStrategy.factory';
 import { SearchableTourFields } from '../enums/searcher/tour/fields.enum';
@@ -8,6 +7,7 @@ import {
   sortQueryBuilder,
   statusQueryBuilder,
 } from './helpers';
+import { SearcherTourDTO } from '../models/dtos/searcher/tour/searcherTour.dto';
 
 export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
   if (populate) {

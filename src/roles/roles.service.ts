@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Roles } from 'src/shared/models/schemas/roles.schema';
-import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { Status } from 'src/shared/enums/status.enum';
 import { RolesLean } from '@/shared/interfaces/roles/roles.lean.interface';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
@@ -46,7 +46,7 @@ export class RolesService {
     }
   }
 
-  async getRoleById({ id }: UrlValidator): Promise<RolesLean> {
+  async getRoleById({ id }: IdValidator): Promise<RolesLean> {
     try {
       const role = await this.roleModel
         .findById(id)
@@ -65,7 +65,7 @@ export class RolesService {
 
   async updateRole(
     updateRoleDTO: UpdateRoleDTO,
-    { id }: UrlValidator,
+    { id }: IdValidator,
   ): Promise<Roles | undefined> {
     try {
       if (await this.validateRole(id)) {
@@ -85,7 +85,7 @@ export class RolesService {
     }
   }
 
-  async inactivateRole({ id }: UrlValidator): Promise<void> {
+  async inactivateRole({ id }: IdValidator): Promise<void> {
     try {
       if (await this.validateRole(id)) {
         await this.roleModel.findByIdAndUpdate(
@@ -112,7 +112,7 @@ export class RolesService {
     }
   }
 
-  async reactiveRole({ id }: UrlValidator): Promise<void> {
+  async reactiveRole({ id }: IdValidator): Promise<void> {
     try {
       const validRole = await this.getRoleById({ id });
 

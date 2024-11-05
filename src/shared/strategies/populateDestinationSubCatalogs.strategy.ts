@@ -2,10 +2,10 @@ import { PipelineStage } from 'mongoose';
 import { SearchStrategy } from '../interfaces/search.strategy.interface';
 
 export class PopulateSubcatalogsStrategy
-  implements SearchStrategy<{ subCatalog?: boolean }>
+  implements SearchStrategy<{ shouldPopulate?: boolean }>
 {
-  search({ subCatalog }: { subCatalog?: boolean }): PipelineStage[] {
-    return subCatalog
+  search({ shouldPopulate }: { shouldPopulate?: boolean }): PipelineStage[] {
+    return shouldPopulate
       ? [
           {
             $lookup: {

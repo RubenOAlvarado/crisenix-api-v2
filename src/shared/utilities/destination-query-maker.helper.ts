@@ -8,12 +8,12 @@ import {
 import { SearchStrategyFactory } from '../factories/searchDestinationStrategy.factory';
 import { SearchableFields } from '../enums/searcher/destination/fields.enum';
 import { PopulateSubcatalogsStrategy } from '../strategies/populateDestinationSubCatalogs.strategy';
-import { SearcherDestinationDto } from '../dtos/searcher/destination/searcherDestination.dto';
+import { SearcherDestinationDto } from '../models/dtos/searcher/destination/searcherDestination.dto';
 
 export function pipelinesMaker({
   field,
   word,
-  subCatalog,
+  shouldPopulate,
   sort,
   page,
   limit,
@@ -30,7 +30,7 @@ export function pipelinesMaker({
     searchStrategy.search({
       field,
       word,
-      subCatalog,
+      shouldPopulate,
       sort,
       page,
       limit,
@@ -39,7 +39,7 @@ export function pipelinesMaker({
   );
 
   const populateSubCatalogsStrategy = new PopulateSubcatalogsStrategy();
-  builder.addStage(populateSubCatalogsStrategy.search({ subCatalog }));
+  builder.addStage(populateSubCatalogsStrategy.search({ shouldPopulate }));
 
   builder.addStage(sortQueryBuilder(sort));
   builder.addStage(paginationQuery({ page, limit }));

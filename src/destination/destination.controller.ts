@@ -1,5 +1,5 @@
-import { PaginatedDTO } from '@/shared/dtos/paginated.dto';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
+import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedResponse.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import {
   Controller,
   Get,
@@ -23,19 +23,19 @@ import {
 import { DestinationService } from './destination.service';
 import { Public } from '@/auth/public.decorator';
 import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { QueryDTO } from '@/shared/dtos/query.dto';
-import { PhotoValidator } from '@/shared/validators/photo.validator';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
+import { PhotoValidator } from '@/shared/models/dtos/validators/photo.validator';
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
-import { SearcherDestinationDto } from '@/shared/dtos/searcher/destination/searcherDestination.dto';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
-import { SubCatalogDto } from '@/shared/dtos/searcher/destination/subCatalog.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destination/searcherDestination.dto';
+import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 
 @Controller('destination')
 @ApiTags('Destination')
-@ApiExtraModels(PaginatedDTO)
+@ApiExtraModels(PaginatedResponseDTO)
 export class DestinationController {
   constructor(private readonly destinationService: DestinationService) {}
 
@@ -96,7 +96,7 @@ export class DestinationController {
     type: PhotoValidator,
   })
   async deletePhoto(
-    @Param() param: UrlValidator,
+    @Param() param: IdValidator,
     @Body() photoValidator: PhotoValidator,
   ): Promise<string> {
     await this.destinationService.deletePhotos(param, photoValidator);
@@ -115,8 +115,8 @@ export class DestinationController {
   })
   @Public()
   @Get(':id/cities')
-  async findCities(@Param() urlValidator: UrlValidator) {
-    return await this.destinationService.findCities(urlValidator);
+  async findCities(@Param() IdValidator: IdValidator) {
+    return await this.destinationService.findCities(IdValidator);
   }
 
   @ApiOkResponse({
@@ -132,10 +132,10 @@ export class DestinationController {
   @Get(':id')
   @Public()
   async findOne(
-    @Param() urlValidator: UrlValidator,
-    @Query() query: SubCatalogDto,
+    @Param() IdValidator: IdValidator,
+    @Query() query: FetchOptionsDto,
   ) {
-    return await this.destinationService.findOne(urlValidator, query);
+    return await this.destinationService.findOne(IdValidator, query);
   }
 
   @ApiOkResponse({
@@ -151,11 +151,11 @@ export class DestinationController {
   @ApiBody({ type: UpdateDestinationDTO })
   @Put('/:id')
   async update(
-    @Param() urlValidator: UrlValidator,
+    @Param() IdValidator: IdValidator,
     @Body() updateDestinationDTO: UpdateDestinationDTO,
   ) {
     const updatedDestination = await this.destinationService.update(
-      urlValidator,
+      IdValidator,
       updateDestinationDTO,
     );
     return updatedDestination;
@@ -175,10 +175,10 @@ export class DestinationController {
   })
   @Patch(':id/change_status')
   async delete(
-    @Param() urlValidator: UrlValidator,
+    @Param() IdValidator: IdValidator,
     @Query() status: StatusDTO,
   ): Promise<string> {
-    await this.destinationService.changeStatus(urlValidator, status);
+    await this.destinationService.changeStatus(IdValidator, status);
     return 'Destination successfully deleted.';
   }
 }

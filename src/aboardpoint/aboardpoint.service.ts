@@ -10,13 +10,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { StatusDTO } from 'src/shared/dtos/statusparam.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { Status } from 'src/shared/enums/status.enum';
 import {
   AboardPoints,
   AboardPointDocument,
 } from 'src/shared/models/schemas/aboarpoint.schema';
-import { UrlValidator } from 'src/shared/validators/urlValidator.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 @Injectable()
 export class AboardpointService {
   constructor(
@@ -38,7 +38,7 @@ export class AboardpointService {
     }
   }
 
-  async findOne({ id }: UrlValidator): Promise<AboardPointLean> {
+  async findOne({ id }: IdValidator): Promise<AboardPointLean> {
     try {
       const aboardPoint = await this.aboardPointModel
         .findById(id)
@@ -73,7 +73,7 @@ export class AboardpointService {
   }
 
   async update(
-    { id }: UrlValidator,
+    { id }: IdValidator,
     updateAboardPointDTO: UpdateAboardPointDTO,
   ): Promise<AboardPointLean | null> {
     try {
@@ -96,7 +96,7 @@ export class AboardpointService {
     }
   }
 
-  async delete({ id }: UrlValidator) {
+  async delete({ id }: IdValidator) {
     try {
       if (!(await this.validateAboardPoint({ id }))) return;
       await this.aboardPointModel.findByIdAndUpdate(
@@ -112,7 +112,7 @@ export class AboardpointService {
     }
   }
 
-  async reactivate({ id }: UrlValidator): Promise<void> {
+  async reactivate({ id }: IdValidator): Promise<void> {
     try {
       const inactiveAboardPoint = await this.findOne({ id });
 
@@ -137,7 +137,7 @@ export class AboardpointService {
     }
   }
 
-  private async validateAboardPoint({ id }: UrlValidator): Promise<boolean> {
+  private async validateAboardPoint({ id }: IdValidator): Promise<boolean> {
     try {
       const foundAboardPoint = await this.aboardPointModel.findById(id).lean();
 

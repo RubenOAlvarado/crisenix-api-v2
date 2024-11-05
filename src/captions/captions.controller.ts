@@ -19,8 +19,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CaptionsService } from './captions.service';
-import { UrlValidator } from '@/shared/validators/urlValidator.dto';
-import { StatusDTO } from '@/shared/dtos/statusparam.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { Public } from '@/auth/public.decorator';
 import { CreateCaptionDTO } from '@/shared/models/dtos/request/captions/createcaption.dto';
 import { ResponseCaptionsDTO } from '@/shared/models/dtos/response/captions/responseCaptions.dto';
@@ -77,7 +77,7 @@ export class CaptionsController {
   })
   @Public()
   @Get(':id')
-  async findOne(@Param() params: UrlValidator) {
+  async findOne(@Param() params: IdValidator) {
     return await this.captionService.findOne(params);
   }
 
@@ -97,7 +97,7 @@ export class CaptionsController {
     type: UpdateCaptionDTO,
   })
   async update(
-    @Param() params: UrlValidator,
+    @Param() params: IdValidator,
     @Body() updateCaptionDTO: UpdateCaptionDTO,
   ) {
     const updatedCaption = await this.captionService.update(
@@ -118,7 +118,7 @@ export class CaptionsController {
     description: 'Caption not found.',
   })
   @Delete(':id')
-  async delete(@Param() params: UrlValidator): Promise<string> {
+  async delete(@Param() params: IdValidator): Promise<string> {
     await this.captionService.delete(params);
     return 'The caption has been successfully deleted.';
   }
@@ -137,7 +137,7 @@ export class CaptionsController {
     description: 'Caption already active.',
   })
   @Put('reactivate/:id')
-  async activate(@Param() params: UrlValidator): Promise<string> {
+  async activate(@Param() params: IdValidator): Promise<string> {
     await this.captionService.reactivate(params);
     return 'The caption has been successfully reactivated.';
   }

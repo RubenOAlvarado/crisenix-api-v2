@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SearchableTourFields } from '../../../enums/searcher/tour/fields.enum';
 import {
   IsEnum,
   IsNotEmpty,
@@ -10,10 +9,11 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { BooleanString } from '../../../enums/boolean-string.type';
-import { SortTourFields } from '../../../enums/searcher/tour/sortFields.enum';
 import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
+import { SearchableTourFields } from '@/shared/enums/searcher/tour/fields.enum';
+import { BooleanString } from '@/shared/enums/boolean-string.type';
+import { SortTourFields } from '@/shared/enums/searcher/tour/sortFields.enum';
 
 export class SearcherTourDTO {
   @ApiPropertyOptional({
