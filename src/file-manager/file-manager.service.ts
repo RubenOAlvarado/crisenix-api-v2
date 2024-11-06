@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { DestinationService } from '@/destination/destination.service';
-import { handleErrorsOnServices } from '@/shared/utilities/helpers';
+/* import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { TourService } from '@/tour/tour.service';
 import { Injectable } from '@nestjs/common';
 import { WorkBook, readFile } from 'xlsx';
@@ -14,16 +12,12 @@ import { PricesService } from '@/prices/prices.service';
 @Injectable()
 export class FileManagerService {
   constructor(
-    private destinationService: DestinationService,
     private tourService: TourService,
     private priceService: PricesService,
   ) {}
 
   validSheetName = ['Destinos', 'Tours', 'Precios'];
   services: { [key: string]: (jsonObject: any) => Promise<void> } = {
-    Destinos: this.destinationService.insertDestinationsBunch.bind(
-      this.destinationService,
-    ),
     Tours: this.tourService.insertToursBunch.bind(this.tourService),
     Precios: this.priceService.insertPricesBunch.bind(this.priceService),
   };
@@ -81,3 +75,4 @@ export class FileManagerService {
     await loadDocument(priceSheetData, name, this.services);
   }
 }
+ */

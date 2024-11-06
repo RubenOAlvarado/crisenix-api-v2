@@ -4,9 +4,9 @@ import { Status } from '@/shared/enums/status.enum';
 import { IncludedExcel } from '@/shared/interfaces/excel/included.excel.interface';
 import { IncludedLean } from '@/shared/types/included/included.lean.type';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
-import { CreateIncludedDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
-import { UpdateIncludedDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
-import { Includeds } from '@/shared/models/schemas/included.schema';
+import { CreateIncludedServiceDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
+import { UpdateIncludedServiceDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
+import { IncludedServices } from '@/shared/models/schemas/included.schema';
 import {
   createPaginatedObject,
   handleErrorsOnServices,
@@ -17,15 +17,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class IncludedService {
+export class IncludedServicesService {
   constructor(
-    @InjectModel(Includeds.name)
-    private readonly includedModel: Model<Includeds>,
+    @InjectModel(IncludedServices.name)
+    private readonly includedServicesModel: Model<IncludedServices>,
   ) {}
 
-  async create(createIncludedDTO: CreateIncludedDTO): Promise<IncludedLean> {
+  async create(
+    createIncludedDTO: CreateIncludedServiceDTO,
+  ): Promise<IncludedLean> {
     try {
-      const createdIncluded = new this.includedModel(createIncludedDTO);
+      const createdIncluded = new this.includedServicesModel(createIncludedDTO);
       return await createdIncluded.save();
     } catch (error) {
       throw handleErrorsOnServices(
@@ -37,7 +39,7 @@ export class IncludedService {
 
   async findOne({ id }: IdValidator): Promise<IncludedLean> {
     try {
-      const included = await this.includedModel
+      const included = await this.includedServicesModel
         .findById(id)
         .populate('lodging')
         .select({ __v: 0, createdAt: 0 })
@@ -59,7 +61,7 @@ export class IncludedService {
   }: QueryDTO): Promise<PaginateResult<IncludedLean>> {
     try {
       const query = status ? { status } : {};
-      const docs = await this.includedModel
+      const docs = await this.includedServicesModel
         .find(query)
         .limit(limit * 1)
         .skip((page - 1) * limit)
@@ -67,7 +69,9 @@ export class IncludedService {
         .lean();
       if (!docs.length)
         throw new NotFoundException('No included services registered.');
-      const totalDocs = await this.includedModel.countDocuments(query).exec();
+      const totalDocs = await this.includedServicesModel
+        .countDocuments(query)
+        .exec();
       return createPaginatedObject<IncludedLean>(docs, totalDocs, page, limit);
     } catch (error) {
       throw handleErrorsOnServices(
@@ -79,10 +83,10 @@ export class IncludedService {
 
   async update(
     { id }: IdValidator,
-    body: UpdateIncludedDTO,
+    body: UpdateIncludedServiceDTO,
   ): Promise<IncludedLean> {
     try {
-      const included = await this.includedModel
+      const included = await this.includedServicesModel
         .findByIdAndUpdate(id, body, { new: true })
         .select({ __v: 0, createdAt: 0 })
         .lean();
@@ -98,7 +102,7 @@ export class IncludedService {
 
   async delete({ id }: IdValidator): Promise<void> {
     try {
-      const included = await this.includedModel
+      const included = await this.includedServicesModel
         .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
         .select({ __v: 0, createdAt: 0 })
         .lean();
@@ -113,7 +117,7 @@ export class IncludedService {
 
   async reactivate({ id }: IdValidator): Promise<void> {
     try {
-      const included = await this.includedModel
+      const included = await this.includedServicesModel
         .findByIdAndUpdate(id, { status: Status.ACTIVE }, { new: true })
         .exec();
       if (!included) throw new NotFoundException('Included service not found.');
@@ -127,8 +131,8 @@ export class IncludedService {
 
   async insertManyFromExcel(includedArray: any[]): Promise<void> {
     try {
-      const includeds = this.mapToDTO(includedArray);
-      await this.includedModel.insertMany(includeds);
+      const includedServices = this.mapToDTO(includedArray);
+      await this.includedServicesModel.insertMany(includedServices);
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong inserting included services',
@@ -137,8 +141,10 @@ export class IncludedService {
     }
   }
 
-  private mapToDTO(includeds: IncludedExcel[]): CreateIncludedDTO[] {
-    return includeds.map((included) => {
+  private mapToDTO(
+    IncludedServices: IncludedExcel[],
+  ): CreateIncludedServiceDTO[] {
+    return IncludedServices.map((included) => {
       const response = {
         concept: included.concepto,
         included: included.incluido,

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { TransferTypes } from './transfertype.schema';
 import { Status } from '@/shared/enums/status.enum';
 
@@ -7,11 +7,11 @@ import { Status } from '@/shared/enums/status.enum';
   timestamps: true,
 })
 export class Transports {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   name: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'TransferTypes',
     required: true,
   })

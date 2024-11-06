@@ -1,5 +1,4 @@
 import { AboardPointLean } from '@/shared/types/aboardPoint/aboardPoint.lean.type';
-import { AboardPointExcel } from '@/shared/interfaces/excel/aboardPoint.excel.interface';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
@@ -135,66 +134,18 @@ export class AboardpointService {
     }
   }
 
-  async mapFromNameToObjectId(
-    aboardPoints?: string[],
-  ): Promise<string[] | undefined> {
-    if (!aboardPoints?.length && aboardPoints !== null) {
-      return;
-    }
-
+  async findByOriginCity({ id }: IdValidator): Promise<Array<AboardPointLean>> {
     try {
-      const mappedAboardPoints: string[] = [];
-      for (const aboardPoint of aboardPoints) {
-        const foundAboardPoint = await this.findByName(aboardPoint.trim());
-        if (!foundAboardPoint) {
-          throw new NotFoundException(`Aboard point ${aboardPoint} not found.`);
-        }
-        mappedAboardPoints.push(foundAboardPoint?._id?.toString());
-      }
-      return mappedAboardPoints;
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong mapping aboard points.',
-        error,
-      );
-    }
-  }
-
-  async findByName(name?: string): Promise<AboardPointLean> {
-    try {
-      if (!name) {
-        throw new BadRequestException('Name is required.');
-      }
-      const foundAboardPoint = await this.aboardPointModel
-        .findOne({ name })
+      const aboardPoints = await this.aboardPointModel
+        .find({ originCity: id })
         .select({ __v: 0, createdAt: 0 })
         .lean();
-      if (!foundAboardPoint) {
-        throw new NotFoundException(`Aboard point ${name} not found.`);
-      }
-      return foundAboardPoint;
+      if (aboardPoints.length === 0)
+        throw new NotFoundException('No aboard points found');
+      return aboardPoints;
     } catch (error) {
       throw handleErrorsOnServices(
-        'Something went wrong finding aboard point by name.',
-        error,
-      );
-    }
-  }
-
-  async insertAboardPointBunch(
-    aboardPoints: AboardPointExcel[],
-  ): Promise<void> {
-    try {
-      const mappedAboardPoints: CreateAboardPointDTO[] = aboardPoints.map(
-        (aboardPoint) => ({
-          name: aboardPoint.nombre,
-          status: (aboardPoint.status as Status) ?? Status.ACTIVE,
-        }),
-      );
-      await this.aboardPointModel.insertMany(mappedAboardPoints);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong inserting aboard points.',
+        'Something went wrong getting all aboard points',
         error,
       );
     }

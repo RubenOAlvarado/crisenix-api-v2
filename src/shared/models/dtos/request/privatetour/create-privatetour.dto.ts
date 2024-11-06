@@ -87,7 +87,7 @@ export class CreatePrivatetourDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  children?: number;
+  childrens?: number;
 
   @ApiProperty({
     description: 'Description of the private tour',

@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
-@Controller('tourtype')
+@Controller('tour-types')
 export class TourtypeController {}

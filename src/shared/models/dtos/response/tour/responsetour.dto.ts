@@ -6,8 +6,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AboardHourTransformer } from '@/shared/utilities/transformers/aboardhour.transformer';
 import { ResponseAboardHourDTO } from './responseaboardhour.dto';
 import { ResponseCoordinatorDto } from './response-coordinator.dto';
-import { ResponseItineraryDTO } from './reponseitinerary.dto';
-import { ItineraryTransformers } from '@/shared/utilities/transformers/itinerary.transformer';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 import { ResponsePriceDTO } from '../price/responseprice.dto';
 import { PriceTransformers } from '@/shared/utilities/transformers/price.transformer';
@@ -99,15 +97,6 @@ export class ResponseTourDTO {
   @Expose()
   tourType: ResponseTourTypeDTO | string;
 
-  @ApiPropertyOptional({
-    type: ResponseItineraryDTO,
-    isArray: true,
-  })
-  @Expose()
-  @Type(() => ResponseItineraryDTO)
-  @ItineraryTransformers()
-  itineraries?: ResponseItineraryDTO[] | string[];
-
   @ApiProperty({
     type: ResponsePriceDTO,
     isArray: true,
@@ -141,7 +130,6 @@ export class ResponseTourDTO {
     coordinators?: ResponseCoordinatorDto[],
     front?: string,
     recommendations?: string,
-    itineraries?: ResponseItineraryDTO[] | string[],
   ) {
     this._id = _id;
     this.destination = destination;
@@ -160,7 +148,6 @@ export class ResponseTourDTO {
     this.front = front;
     this.recommendations = recommendations;
     this.tourType = tourType;
-    this.itineraries = itineraries;
     this.prices = prices;
     this.status = status;
   }

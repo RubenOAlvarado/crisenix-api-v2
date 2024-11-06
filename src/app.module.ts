@@ -6,7 +6,6 @@ import { AboardpointModule } from './aboardpoint/aboardpoint.module';
 import { CaptionsModule } from './captions/captions.module';
 import { CategoryModule } from './category/category.module';
 import { ClassificationModule } from './classification/classification.module';
-import { IncludedModule } from './included/included.module';
 import { OrigincityModule } from './origincity/origincity.module';
 import { PassengerModule } from './passenger/passenger.module';
 import { RolesModule } from './roles/roles.module';
@@ -26,10 +25,10 @@ import configuration from './configs/configuration';
 import { MulterModule } from '@nestjs/platform-express';
 import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
-import { FileManagerModule } from './file-manager/file-manager.module';
 import { TransfertypeModule } from './transfertype/transfertype.module';
 import { PricesModule } from './prices/prices.module';
 import { ReservationModule } from './reservation/reservation.module';
+import { IncludedServicesModule } from './includedServices/includedServices.module';
 
 @Module({
   imports: [
@@ -50,7 +49,7 @@ import { ReservationModule } from './reservation/reservation.module';
     CaptionsModule,
     CategoryModule,
     ClassificationModule,
-    IncludedModule,
+    IncludedServicesModule,
     OrigincityModule,
     PassengerModule,
     RolesModule,
@@ -64,7 +63,6 @@ import { ReservationModule } from './reservation/reservation.module';
     SalesModule,
     TourModule,
     UserModule,
-    FileManagerModule,
     PricesModule,
     ReservationModule,
   ],

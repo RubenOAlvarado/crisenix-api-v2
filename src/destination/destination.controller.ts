@@ -28,12 +28,11 @@ import { PhotoValidator } from '@/shared/models/dtos/validators/photo.validator'
 import { CreateDestinationDTO } from '@/shared/models/dtos/request/destination/createdestination.dto';
 import { UpdateDestinationDTO } from '@/shared/models/dtos/request/destination/updatedestination.dto';
 import { ResponseDestinationDTO } from '@/shared/models/dtos/response/destination/responsedestination.dto';
-import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destination/searcherDestination.dto';
 import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 
-@Controller('destination')
+@Controller('destinations')
 @ApiTags('Destination')
 @ApiExtraModels(PaginatedResponseDTO)
 export class DestinationController {
@@ -104,22 +103,6 @@ export class DestinationController {
   }
 
   @ApiOkResponse({
-    description: 'Destination cities found.',
-    type: ResponseOriginCityDTO,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding the destination cities.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Destination not found.',
-  })
-  @Public()
-  @Get(':id/cities')
-  async findCities(@Param() IdValidator: IdValidator) {
-    return await this.destinationService.findCities(IdValidator);
-  }
-
-  @ApiOkResponse({
     description: 'The destination has been found.',
     type: ResponseDestinationDTO,
   })
@@ -173,7 +156,7 @@ export class DestinationController {
   @ApiBadRequestResponse({
     description: 'Wrong new status.',
   })
-  @Patch(':id/change_status')
+  @Patch(':id/change-status')
   async delete(
     @Param() IdValidator: IdValidator,
     @Query() status: StatusDTO,

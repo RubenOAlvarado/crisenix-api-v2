@@ -6,10 +6,10 @@ import { HydratedDocument } from 'mongoose';
   timestamps: true,
 })
 export class TourTypes {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   name: string;
 
-  @Prop()
+  @Prop({ type: String, required: false })
   description?: string;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })

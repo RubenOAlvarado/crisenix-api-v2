@@ -7,13 +7,8 @@ import { handleDocumentsId } from '../helpers';
 
 export const categoryTransformer = ({ value }: { value: CategoryLean[] }) => {
   if (value?.length) {
-    return value.map(({ _id, label, status, main }) => {
-      return new ResponseCategoryDTO(
-        label,
-        status,
-        main,
-        handleDocumentsId(_id),
-      );
+    return value.map(({ _id, label, status }) => {
+      return new ResponseCategoryDTO(label, status, handleDocumentsId(_id));
     });
   }
   return undefined;

@@ -1,23 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { AboardPoints } from './aboarpoint.schema';
+import { HydratedDocument } from 'mongoose';
 import { Status } from '@/shared/enums/status.enum';
 
 @Schema({
   timestamps: true,
 })
 export class OriginCities {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   state: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   name: string;
-
-  // ref: 'AboardPoint'
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AboardPoints' }],
-  })
-  aboardPoints?: Array<AboardPoints>;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;

@@ -11,7 +11,7 @@ import { CreatePrivatetourDto } from '@/shared/models/dtos/request/privatetour/c
 
 @ApiBearerAuth()
 @ApiTags('Private Tour')
-@Controller('privatetour')
+@Controller('private-tours')
 export class PrivatetourController {
   constructor(private privateTourService: PrivatetourService) {}
 

@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
-@Controller('transfertype')
+@Controller('transfer-types')
 export class TransfertypeController {}

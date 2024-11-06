@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  // ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -40,7 +39,6 @@ export class RolesController {
     description: 'Something went wrong creating role.',
   })
   @Post()
-  @Public()
   @ApiBody({ type: CreateRoleDTO })
   async createRole(@Body() createRoleDTO: CreateRoleDTO) {
     return await this.rolesService.createRole(createRoleDTO);
@@ -55,7 +53,6 @@ export class RolesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong looking roles.',
   })
-  @Public()
   @Get()
   async getAllRoles(@Query() query: StatusDTO) {
     return await this.rolesService.getRoles(query);
@@ -102,7 +99,7 @@ export class RolesController {
     description: 'Something went wrong updating role.',
   })
   @ApiBadRequestResponse({ description: 'Role already inactive.' })
-  @Patch(':id/changes_status')
+  @Patch(':id/changes-status')
   async changeStatus(@Param() params: IdValidator, @Query() query: StatusDTO) {
     await this.rolesService.changeStatus(params, query);
     return 'Role inactivated successfully.';

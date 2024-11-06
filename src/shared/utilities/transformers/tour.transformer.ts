@@ -1,4 +1,4 @@
-import { TourLean } from '@/shared/types/tour/tour.lean.type';
+/* import { TourLean } from '@/shared/types/tour/tour.lean.type';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { ResponseTourTypeDTO } from '@/shared/models/dtos/response/tourType/responseTourType.dto';
 import { applyDecorators } from '@nestjs/common';
@@ -39,7 +39,6 @@ export const tourTransformer = ({ value }: { value: TourLean[] }) => {
           transport,
           returnDate,
           tourType as ResponseTourTypeDTO,
-          prices as ResponsePriceDTO[],
           status,
           handleDocumentsId(_id),
           availableSeat,
@@ -60,3 +59,4 @@ export const tourTransformer = ({ value }: { value: TourLean[] }) => {
 
 export const TourTransformers = () =>
   applyDecorators(ApiPropertyOptional(), Expose(), Transform(tourTransformer));
+ */

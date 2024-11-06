@@ -50,16 +50,6 @@ export class CreateDestinationDTO {
   categories?: Array<string>;
 
   @ApiPropertyOptional({
-    description: 'Destination origin city/ies',
-    example: ['5f9d7b9b9d3e4b2b1c1b1c1b'],
-  })
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsMongoId({ each: true, message: 'Should have at least one originCity' })
-  originCities?: Array<string>;
-
-  @ApiPropertyOptional({
     description: 'Destination tentative dates',
     example: '2023-01-01/2025-01-15',
   })

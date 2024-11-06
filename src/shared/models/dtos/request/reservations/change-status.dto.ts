@@ -1,6 +1,6 @@
 import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class ChangeStatusDTO {
   @ApiProperty({
@@ -12,16 +12,7 @@ export class ChangeStatusDTO {
   @IsNotEmpty()
   status: ReservationStatus;
 
-  @ApiProperty({
-    description: 'Reservation ID',
-    example: '60f4b3b3b3b3b3b3b3b3b3',
-  })
-  @IsNotEmpty()
-  @IsMongoId()
-  id: string;
-
-  constructor(status: ReservationStatus, id: string) {
+  constructor(status: ReservationStatus) {
     this.status = status;
-    this.id = id;
   }
 }

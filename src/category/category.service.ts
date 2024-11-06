@@ -1,6 +1,5 @@
 import { Status } from '@/shared/enums/status.enum';
 import { CategoryLean } from '@/shared/types/category/category.lean.type';
-import { CategoryExcel } from '@/shared/interfaces/excel/category.excel.interface';
 import { CreateCategoryDTO } from '@/shared/models/dtos/request/category/createcategory.dto';
 import { UpdateCategoryDTO } from '@/shared/models/dtos/request/category/updatecategory.dto';
 import {
@@ -119,62 +118,21 @@ export class CategoryService {
     }
   }
 
-  async mapFromNameToObjectId(labels: string[]): Promise<string[]> {
+  async findMainCategories({
+    status,
+  }: StatusDTO): Promise<Array<CategoryLean>> {
     try {
-      if (!labels?.length) {
-        throw new BadRequestException('No categories provided.');
-      }
-      const categories = [];
-      for (const label of labels) {
-        const sanitizedLabel = label.trim();
-        const category = await this.categoryModel
-          .findOne({ label: sanitizedLabel })
-          .select({ _id: 1 })
-          .lean();
-        if (!category) {
-          throw new NotFoundException(`Category ${label} not found.`);
-        }
-        categories.push(category._id.toString());
-      }
+      const categories = await this.categoryModel
+        .find({ status, parentCategory: null })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!categories) throw new NotFoundException('No main categories found.');
       return categories;
     } catch (error) {
       throw handleErrorsOnServices(
-        'Something went wrong mapping categories',
+        'Something went wrong while finding main categories.',
         error,
       );
     }
-  }
-
-  async insertCategoriesBunch(categorias: CategoryExcel[]): Promise<void> {
-    try {
-      const categoriesDTO: CreateCategoryDTO[] = this.mapDTO(categorias);
-      await this.categoryModel.insertMany(categoriesDTO);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while inserting categories.',
-        error,
-      );
-    }
-  }
-
-  private mapDTO(categories: CategoryExcel[]): CreateCategoryDTO[] {
-    return categories.flatMap(({ nombre, subCategorias }) => {
-      const label = nombre.trim();
-      const subCategories = subCategorias
-        ? this.mapSubCategories(label, subCategorias)
-        : [];
-      return [...subCategories, { label, status: Status.ACTIVE }];
-    });
-  }
-
-  private mapSubCategories(
-    main: string,
-    subCategories: string,
-  ): CreateCategoryDTO[] {
-    return subCategories.split(',').map((subCategory) => ({
-      label: subCategory.trim(),
-      main,
-      status: Status.ACTIVE,
-    }));
   }
 }

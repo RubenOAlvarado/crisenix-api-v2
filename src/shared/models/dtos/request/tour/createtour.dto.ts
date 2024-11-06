@@ -17,9 +17,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AboardHourDTO } from './aboardhour.dto';
 import { CoordinatorDTO } from './coordinator.dto';
-import { ItineraryDTO } from './itinerary.dto';
 import { Type } from 'class-transformer';
-import { CreateTourIncludedDTO } from './createTourIncluded.dto';
 
 export class CreateTourDTO {
   @ApiProperty({
@@ -51,7 +49,7 @@ export class CreateTourDTO {
     message: 'Tour needs a seating number to be created.',
   })
   @IsNumber()
-  seating: number;
+  seats: number;
 
   @ApiPropertyOptional({
     description: 'Available seats',
@@ -59,7 +57,7 @@ export class CreateTourDTO {
   })
   @IsOptional()
   @IsNumber()
-  availableSeat?: number;
+  availableSeats?: number;
 
   @ApiPropertyOptional({
     description: 'Ocuppied seats',
@@ -67,7 +65,7 @@ export class CreateTourDTO {
   })
   @IsOptional()
   @IsNumber()
-  ocuppiedSeat?: number;
+  ocuppiedSeats?: number;
 
   @ApiProperty({
     description: 'Tour initial date',
@@ -80,7 +78,7 @@ export class CreateTourDTO {
   initDate: Date;
 
   @ApiPropertyOptional({
-    description: 'hour and place of aboard',
+    description: 'Hours and aboarding points for the tour',
     type: AboardHourDTO,
     isArray: true,
   })
@@ -89,7 +87,7 @@ export class CreateTourDTO {
   @IsDefined()
   @Type(() => AboardHourDTO)
   @ValidateNested({ each: true })
-  aboardHour?: Array<AboardHourDTO>;
+  aboardHours?: Array<AboardHourDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour days long',
@@ -131,7 +129,7 @@ export class CreateTourDTO {
   returnDate: Date;
 
   @ApiPropertyOptional({
-    description: 'hour and place of return',
+    description: 'Hours and return points for the tour',
     type: AboardHourDTO,
     isArray: true,
   })
@@ -140,7 +138,7 @@ export class CreateTourDTO {
   @IsDefined()
   @Type(() => AboardHourDTO)
   @ValidateNested({ each: true })
-  returnHour?: Array<AboardHourDTO>;
+  returnHours?: Array<AboardHourDTO>;
 
   @ApiPropertyOptional({
     description: 'Coordinator/s assigned to the tour',
@@ -152,7 +150,7 @@ export class CreateTourDTO {
   @IsDefined()
   @Type(() => CoordinatorDTO)
   @ValidateNested({ each: true })
-  coordinator?: Array<CoordinatorDTO>;
+  coordinators?: Array<CoordinatorDTO>;
 
   @ApiPropertyOptional({
     description: 'Tour front image',
@@ -182,28 +180,15 @@ export class CreateTourDTO {
   tourType: string;
 
   @ApiPropertyOptional({
-    description: 'Tour included',
-    type: CreateTourIncludedDTO,
+    description: 'Tour included services',
+    type: String,
     isArray: true,
   })
   @IsOptional()
   @ArrayNotEmpty()
   @IsDefined()
-  @Type(() => CreateTourIncludedDTO)
-  @ValidateNested({ each: true })
-  includeds?: Array<CreateTourIncludedDTO>;
-
-  @ApiPropertyOptional({
-    description: 'Tour itinerary, array of activities',
-    type: ItineraryDTO,
-    isArray: true,
-  })
-  @IsOptional()
-  @ArrayNotEmpty()
-  @IsDefined()
-  @Type(() => ItineraryDTO)
-  @ValidateNested({ each: true })
-  itineraries?: Array<ItineraryDTO>;
+  @IsMongoId({ each: true })
+  includedServices?: Array<string>;
 
   @ApiPropertyOptional({
     description: 'Tour prices',
@@ -218,42 +203,40 @@ export class CreateTourDTO {
   constructor(
     destination: string,
     code: string,
-    seating: number,
+    seats: number,
     initDate: Date,
     transport: string,
     returnDate: Date,
     tourType: string,
-    availableSeat?: number,
-    ocuppiedSeat?: number,
-    aboardHour?: Array<AboardHourDTO>,
+    availableSeats?: number,
+    ocuppiedSeats?: number,
+    aboardHours?: Array<AboardHourDTO>,
     days?: number,
     nights?: number,
-    returnHour?: Array<AboardHourDTO>,
-    coordinator?: Array<CoordinatorDTO>,
+    returnHours?: Array<AboardHourDTO>,
+    coordinators?: Array<CoordinatorDTO>,
     front?: string,
     recommendations?: string,
-    includeds?: Array<CreateTourIncludedDTO>,
-    itineraries?: Array<ItineraryDTO>,
+    includedServices?: Array<string>,
     prices?: Array<string>,
   ) {
     this.destination = destination;
     this.code = code;
-    this.seating = seating;
-    this.availableSeat = availableSeat;
-    this.ocuppiedSeat = ocuppiedSeat;
+    this.seats = seats;
+    this.availableSeats = availableSeats;
+    this.ocuppiedSeats = ocuppiedSeats;
     this.initDate = initDate;
-    this.aboardHour = aboardHour;
+    this.aboardHours = aboardHours;
     this.days = days;
     this.nights = nights;
     this.transport = transport;
     this.returnDate = returnDate;
-    this.returnHour = returnHour;
-    this.coordinator = coordinator;
+    this.returnHours = returnHours;
+    this.coordinators = coordinators;
     this.front = front;
     this.recommendations = recommendations;
     this.tourType = tourType;
-    this.includeds = includeds;
-    this.itineraries = itineraries;
+    this.includedServices = includedServices;
     this.prices = prices;
   }
 }

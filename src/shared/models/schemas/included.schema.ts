@@ -6,13 +6,14 @@ import { Status } from '@/shared/enums/status.enum';
 @Schema({
   timestamps: true,
 })
-export class Includeds {
-  @Prop({ required: true, index: true })
+export class IncludedServices {
+  @Prop({ required: true, index: true, type: String })
   concept: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Entries',
+    required: true,
   })
   entry: Entries;
 
@@ -26,5 +27,6 @@ export class Includeds {
   }
 }
 
-export type IncludedDocument = HydratedDocument<Includeds>;
-export const IncludedSchema = SchemaFactory.createForClass(Includeds);
+export type IncludedServicesDocument = HydratedDocument<IncludedServices>;
+export const IncludedServicesSchema =
+  SchemaFactory.createForClass(IncludedServices);

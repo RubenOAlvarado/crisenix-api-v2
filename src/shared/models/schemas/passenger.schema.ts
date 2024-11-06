@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Reservations } from './reservation.schema';
 import { AboardPoints } from './aboarpoint.schema';
 import { PriceBase } from '@/shared/enums/priceBase.enum';
@@ -8,17 +8,17 @@ import { PriceBase } from '@/shared/enums/priceBase.enum';
   timestamps: true,
 })
 export class Passengers {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   name: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   lastName: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   secondLastName: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'AboardPoints',
     required: true,
   })
@@ -32,13 +32,13 @@ export class Passengers {
   base: PriceBase;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'Reservations',
     required: true,
   })
   reservation: Reservations;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Number })
   cost: number;
 
   constructor(

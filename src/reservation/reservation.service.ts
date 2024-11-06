@@ -98,7 +98,7 @@ export class ReservationService {
     }
   }
 
-  async changeStatus({ id, status }: ChangeStatusDTO) {
+  async changeStatus({ id }: IdValidator, { status }: ChangeStatusDTO) {
     try {
       const command = new ChangeReservationStatus(
         this.reservationModel,

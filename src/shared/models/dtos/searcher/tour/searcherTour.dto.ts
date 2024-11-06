@@ -2,20 +2,18 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   ValidateIf,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
 import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { SearchableTourFields } from '@/shared/enums/searcher/tour/fields.enum';
-import { BooleanString } from '@/shared/enums/boolean-string.type';
 import { SortTourFields } from '@/shared/enums/searcher/tour/sortFields.enum';
+import { TourQueryDTO } from './tourQuery.dto';
 
-export class SearcherTourDTO {
+export class SearcherTourDTO extends TourQueryDTO {
   @ApiPropertyOptional({
     description: 'field to search',
     example: SearchableTourFields.NAME,
@@ -25,7 +23,7 @@ export class SearcherTourDTO {
   @IsEnum(SearchableTourFields)
   @IsNotEmpty()
   @IsString()
-  field: SearchableTourFields;
+  field!: SearchableTourFields;
 
   @ApiProperty({
     description:
@@ -36,18 +34,7 @@ export class SearcherTourDTO {
   @MaxLength(150)
   @ValidateIf((o) => o.field && o.field === SearchableTourFields.INITDATE)
   @IsInitDate()
-  word: string;
-
-  @ApiPropertyOptional({
-    description: 'Indicator if we want to populate catalogs for tour.',
-    default: false,
-  })
-  @IsOptional()
-  @IsEnum(BooleanString, {
-    message: `The populate value must be either 'true' or 'false'`,
-  })
-  @Transform(({ value }) => value === 'true', { toPlainOnly: true })
-  populate: boolean;
+  word!: string;
 
   @ApiPropertyOptional({
     description: 'SortField to sort the results.',
@@ -57,53 +44,15 @@ export class SearcherTourDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsEnum(SortTourFields)
-  sort: SortTourFields;
+  sort!: SortTourFields;
 
   @ApiPropertyOptional({
-    default: 'Activo',
+    default: TourStatus.ACTIVE,
     description: 'Status to look for (optional)',
     enum: TourStatus,
   })
   @IsOptional()
   @IsNotEmpty()
-  @IsString()
+  @IsEnum(TourStatus)
   status?: TourStatus;
-
-  @ApiProperty({
-    default: 1,
-    description: 'Page number',
-    type: Number,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  page: number;
-
-  @ApiProperty({
-    default: 10,
-    description: 'Number of items per page',
-    type: Number,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  limit: number;
-
-  constructor(
-    field: SearchableTourFields,
-    word: string,
-    populate: boolean,
-    sort: SortTourFields,
-    page: number,
-    limit: number,
-    status: TourStatus,
-  ) {
-    this.field = field;
-    this.word = word;
-    this.populate = populate;
-    this.sort = sort;
-    this.page = page;
-    this.limit = limit;
-    this.status = status;
-  }
 }

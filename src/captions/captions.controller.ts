@@ -116,7 +116,7 @@ export class CaptionsController {
   @ApiNotFoundResponse({
     description: 'Caption not found.',
   })
-  @Patch(':id/changes_status')
+  @Patch(':id/changes-status')
   async delete(
     @Param() params: IdValidator,
     @Query() query: StatusDTO,

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Reservations } from './reservation.schema';
 import { SalesStatus } from '@/shared/enums/sales/saleStatus.enum';
 import { Currency } from '@/shared/enums/currency.enum';
@@ -10,7 +10,7 @@ import { FailureReason } from '@/shared/enums/sales/failureReason.enum';
 })
 export class Sales {
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'Reservations',
     required: true,
   })
@@ -22,13 +22,14 @@ export class Sales {
       validator: (value: number) => value >= 0,
       message: 'Total must be positive.',
     },
+    type: Number,
   })
   total: number;
 
   @Prop({ enum: Currency, required: true, default: Currency.MXN })
   currency: Currency;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Date })
   paymentDate: Date;
 
   @Prop({ enum: SalesStatus, default: SalesStatus.PENDING, required: true })

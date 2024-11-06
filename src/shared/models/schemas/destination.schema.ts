@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Categories } from './category.schema';
-import { OriginCities } from './origincity.schema';
 import { TransferTypes } from './transfertype.schema';
 import { Status } from '@/shared/enums/status.enum';
 import { Visa } from '@/shared/enums/visa.enum';
@@ -16,38 +15,37 @@ export class Destinations {
   @Prop({ type: String, required: true, index: true })
   name: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: false })
   description?: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Categories' }] })
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'Categories' }],
+    required: false,
+  })
   categories?: Array<Categories>;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OriginCities' }],
-  })
-  originCities?: Array<OriginCities>;
-
-  @Prop({ type: String })
+  @Prop({ type: String, required: false })
   tentativeDates?: string;
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Boolean, default: false, required: false })
   passport?: boolean;
 
-  @Prop({ type: String, enum: Visa, default: Visa.NO })
+  @Prop({ type: String, enum: Visa, default: Visa.NO, required: true })
   visa: Visa;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TransferTypes' }],
+    type: [{ type: Types.ObjectId, ref: 'TransferTypes' }],
+    required: false,
   })
   transferTypes?: Array<TransferTypes>;
 
-  @Prop({ type: String })
+  @Prop({ type: String, required: false })
   transfer?: string;
 
-  @Prop({ type: Array })
+  @Prop({ type: Array, required: false })
   photos?: Array<string>;
 
   constructor(code: string, name: string, status: Status, visa: Visa) {

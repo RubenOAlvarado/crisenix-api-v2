@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateIncludedDTO {
+export class CreateIncludedServiceDTO {
   @ApiProperty({
     description: 'Service concept',
     example: 'Desayuno completo',

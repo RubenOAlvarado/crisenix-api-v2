@@ -94,7 +94,7 @@ export class SalesController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the sales by reservation id.',
   })
-  @Get('by_reservation/:id')
+  @Get('reservation/:id')
   async getSaleByReservationId(@Param() param: IdValidator) {
     return await this.salesService.findSalesByReservationId(param);
   }

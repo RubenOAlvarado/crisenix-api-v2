@@ -5,34 +5,34 @@ import { HydratedDocument } from 'mongoose';
   timestamps: true,
 })
 export class PrivateTours {
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   phone: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   destination: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   origin: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   initDate: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   returnDate: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Number })
   adults: number;
 
-  @Prop()
-  children?: number;
+  @Prop({ type: Number, required: false })
+  childrens?: number;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   tourDescription: string;
 
   constructor(

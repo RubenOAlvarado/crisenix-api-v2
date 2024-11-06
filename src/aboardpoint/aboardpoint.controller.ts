@@ -26,9 +26,9 @@ import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoin
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
 
-@ApiTags('Aboard Point')
+@ApiTags('Aboard Points')
 @ApiBearerAuth()
-@Controller('aboardpoint')
+@Controller('aboard-points')
 export class AboardPointController {
   constructor(private service: AboardpointService) {}
 
@@ -118,12 +118,28 @@ export class AboardPointController {
   @ApiBadRequestResponse({
     description: 'Wrong status sended.',
   })
-  @Patch(':id/changes_status')
+  @Patch(':id/changes-status')
   async delete(
     @Param() param: IdValidator,
     @Query() status: StatusDTO,
   ): Promise<string> {
     await this.service.changeStatus(param, status);
     return 'The aboard point status has been successfully changed.';
+  }
+
+  @ApiOkResponse({
+    description: 'The aboard points for the origin city has been found.',
+  })
+  @ApiNotFoundResponse({
+    description: 'No aboard points registered for the origin city.',
+  })
+  @ApiInternalServerErrorResponse({
+    description:
+      'Something went wrong finding the aboard points for the origin city.',
+  })
+  @Public()
+  @Get('origin-city/:id')
+  async findByOriginCity(@Param() param: IdValidator) {
+    return await this.service.findByOriginCity(param);
   }
 }

@@ -19,7 +19,7 @@ import { PrivatetourModule } from '@/privatetour/privatetour.module';
 import { PassengerModule } from '@/passenger/passenger.module';
 import { SalesModule } from '@/sales/sales.module';
 import { DestinationModule } from '@/destination/destination.module';
-import { IncludedModule } from '@/included/included.module';
+import { IncludedServicesModule } from '@/includedServices/includedServices.module';
 import { PricesModule } from '@/prices/prices.module';
 import { ReservationModule } from '@/reservation/reservation.module';
 
@@ -46,7 +46,7 @@ export const buildSwaggerModule = async (
       CaptionsModule,
       CategoryModule,
       DestinationModule,
-      IncludedModule,
+      IncludedServicesModule,
       OrigincityModule,
       PrivatetourModule,
       PassengerModule,

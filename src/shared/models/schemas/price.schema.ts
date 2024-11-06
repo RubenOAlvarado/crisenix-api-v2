@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { Destinations } from './destination.schema';
+import { HydratedDocument, Types } from 'mongoose';
 import { OriginCities } from './origincity.schema';
 import { Currency } from '@/shared/enums/currency.enum';
 import { Status } from '@/shared/enums/status.enum';
@@ -10,14 +9,7 @@ import { Status } from '@/shared/enums/status.enum';
 })
 export class Prices {
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Destinations',
-    required: true,
-  })
-  destination: Destinations;
-  // ref: 'OriginCity'
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'OriginCities',
     required: true,
   })
@@ -26,37 +18,31 @@ export class Prices {
   @Prop({ required: true, enum: Currency, default: Currency.MXN })
   currency: Currency;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   general?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   singleBase?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   doubleBase?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   tripleBase?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   quadrupleBase?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   minor?: number;
 
-  @Prop()
+  @Prop({ required: true, type: Number })
   inapam?: number;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  constructor(
-    destination: Destinations,
-    city: OriginCities,
-    currency: Currency,
-    status: Status,
-  ) {
-    this.destination = destination;
+  constructor(city: OriginCities, currency: Currency, status: Status) {
     this.city = city;
     this.currency = currency;
     this.status = status;

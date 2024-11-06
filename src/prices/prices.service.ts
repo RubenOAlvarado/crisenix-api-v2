@@ -1,6 +1,3 @@
-import { DestinationService } from '@/destination/destination.service';
-import { OriginCityService } from '@/origincity/origincity.service';
-import { Currency } from '@/shared/enums/currency.enum';
 import { Status } from '@/shared/enums/status.enum';
 import { PricesExcel } from '@/shared/interfaces/excel/prices.excel.interface';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
@@ -17,8 +14,6 @@ export class PricesService {
   constructor(
     @InjectModel(Prices.name)
     private readonly priceModel: Model<Prices>,
-    private readonly destinationService: DestinationService,
-    private readonly originCityService: OriginCityService,
   ) {}
 
   async createPrice(createPriceDTO: CreatePriceDTO): Promise<Prices> {
@@ -101,84 +96,13 @@ export class PricesService {
 
   async insertPricesBunch(prices: PricesExcel[]): Promise<void> {
     try {
-      const pricesDTO: CreatePriceDTO[] = await this.mapDTO(prices);
-      await this.priceModel.insertMany(pricesDTO);
+      // const pricesDTO: CreatePriceDTO[] = await this.mapDTO(prices);
+      await this.priceModel.insertMany(prices);
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while inserting categories.',
         error,
       );
-    }
-  }
-
-  private async mapDTO(prices: PricesExcel[]): Promise<CreatePriceDTO[]> {
-    try {
-      const mappedDTO: CreatePriceDTO[] = [];
-      for (const {
-        destino,
-        ciudad,
-        moneda,
-        general,
-        sencillo,
-        doble,
-        triple,
-        cuadruple,
-        menor,
-        inapam,
-      } of prices) {
-        const destination = await this.destinationService.validateFromTourExcel(
-          destino,
-        );
-        const city = await this.originCityService.validateFromPriceExcel(
-          ciudad,
-        );
-        const dto: CreatePriceDTO = {
-          destination,
-          city,
-          currency: moneda as Currency,
-          general,
-          singleBase: sencillo,
-          doubleBase: doble,
-          tripleBase: triple,
-          quadrupleBase: cuadruple,
-          minor: menor,
-          inapam,
-        };
-        mappedDTO.push(dto);
-      }
-      return Promise.all(mappedDTO);
-    } catch (error) {
-      throw handleErrorsOnServices('Error mapping prices.', error);
-    }
-  }
-
-  async validateFromTourExcel(price: string): Promise<string[]> {
-    try {
-      const mappedPrices: string[] = [];
-      const prices = price.split(',');
-      for (const price of prices) {
-        const [destination, city] = price.split('-');
-        const destinationId =
-          await this.destinationService.validateFromTourExcel(
-            destination?.trim(),
-          );
-        const cityId = await this.originCityService.validateFromPriceExcel(
-          city?.trim(),
-        );
-        const priceExists = await this.priceModel
-          .findOne({
-            destination: destinationId,
-            city: cityId,
-          })
-          .exec();
-        if (!priceExists) {
-          throw new Error('Price not found.');
-        }
-        mappedPrices.push(priceExists?._id?.toString());
-      }
-      return mappedPrices;
-    } catch (error) {
-      throw handleErrorsOnServices('Error validating price.', error);
     }
   }
 }

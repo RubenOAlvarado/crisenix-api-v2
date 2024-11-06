@@ -1,6 +1,6 @@
 import { Status } from '@/shared/enums/status.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 @Schema({
   timestamps: true,
@@ -9,15 +9,20 @@ export class Categories {
   @Prop({ required: true, index: true })
   label: string;
 
-  @Prop()
-  main?: string;
+  @Prop({ type: Types.ObjectId, ref: 'Category', default: null })
+  parentCategory?: Types.ObjectId | null;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  constructor(label: string, status: Status) {
+  constructor(
+    label: string,
+    status: Status,
+    parentCategory?: Types.ObjectId | null,
+  ) {
     this.label = label;
     this.status = status;
+    this.parentCategory = parentCategory;
   }
 }
 

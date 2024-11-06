@@ -1,12 +1,9 @@
-import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { DestinationService } from '@/destination/destination.service';
-import { PricesService } from '@/prices/prices.service';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
 import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/types/tour/tour.lean.type';
-import { AboardHourDTO } from '@/shared/models/dtos/request/tour/aboardhour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
@@ -20,8 +17,6 @@ import {
 import { pipelinesMaker } from '@/shared/utilities/tour-query-maker.helper';
 import { DestinationValidator } from '@/shared/models/dtos/validators/destination.validator';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
-import { TourtypeService } from '@/tourtype/tourtype.service';
-import { TransportsService } from '@/transports/transports.service';
 import {
   BadRequestException,
   Injectable,
@@ -37,10 +32,6 @@ export class TourService {
   constructor(
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
     private readonly destinationService: DestinationService,
-    private readonly transportService: TransportsService,
-    private readonly tourTypeService: TourtypeService,
-    private readonly priceService: PricesService,
-    private readonly aboardPointService: AboardpointService,
   ) {}
 
   async createTour(tour: CreateTourDTO): Promise<Tours> {
@@ -219,10 +210,10 @@ export class TourService {
     }
   }
 
-  async changeTourStatus({
-    id,
-    newStatus,
-  }: ChangeTourStatusDTO): Promise<TourLean | undefined> {
+  async changeTourStatus(
+    { id }: IdValidator,
+    { newStatus }: ChangeTourStatusDTO,
+  ): Promise<TourLean | undefined> {
     try {
       const tour = await this.tourModel.findById(id);
 
@@ -298,7 +289,10 @@ export class TourService {
     return true;
   }
 
-  async getTourCatalog({ id, catalogName }: GetTourCatalogDTO): Promise<any> {
+  async getTourCatalog(
+    { id }: IdValidator,
+    { catalogName }: GetTourCatalogDTO,
+  ): Promise<any> {
     try {
       const query = CatalogQueryFactory.createQuery(catalogName);
 
@@ -369,114 +363,26 @@ export class TourService {
 
   async insertToursBunch(jsonObject: TourExcel[]) {
     try {
-      const tours = await this.mapToDto(jsonObject);
-      await this.tourModel.insertMany(tours);
+      // const tours = await this.mapToDto(jsonObject);
+      await this.tourModel.insertMany(jsonObject);
     } catch (error) {
       throw handleErrorsOnServices('Error inserting tours bunch.', error);
     }
   }
 
-  private async mapToDto(excelTours: TourExcel[]): Promise<CreateTourDTO[]> {
+  async updateTourCatalog(
+    { id }: IdValidator,
+    { catalogName, data }: UpdateTourCatalogDTO,
+  ): Promise<any> {
     try {
-      const mappedDTO: CreateTourDTO[] = [];
-      for (const tour of excelTours) {
-        const {
-          destino,
-          transporte,
-          tipo,
-          horaDeAbordaje,
-          horaDeRegreso,
-          portada,
-          dias,
-          noches,
-          lugares,
-          lugaresLibres,
-          lugaresOcupados,
-          fechaInicio,
-          fechaRegreso,
-          recomendaciones,
-          codigo,
-          estatus,
-          precio,
-        } = tour;
-        const destination = await this.destinationService.validateFromTourExcel(
-          destino.trim(),
-        );
-        const transport = await this.transportService.validateFromTourExcel(
-          transporte?.trim(),
-        );
-        const tourType = await this.tourTypeService.validateFromTourExcel(
-          tipo.trim(),
-        );
-        const prices = await this.priceService.validateFromTourExcel(
-          precio.trim(),
-        );
-        const tourDto = {
-          destination,
-          transport,
-          tourType,
-          aboardHour: await this.mapAboardHourAndReturnHour(horaDeAbordaje),
-          returnHour: await this.mapAboardHourAndReturnHour(horaDeRegreso),
-          front: portada ?? '',
-          days: dias ?? 1,
-          nights: noches ?? 0,
-          seating: lugares ?? 0,
-          availableSeat: lugaresLibres ?? 0,
-          ocuppiedSeat: lugaresOcupados ?? 0,
-          initDate: new Date(fechaInicio ?? ''),
-          returnDate: new Date(fechaRegreso ?? ''),
-          recommendations: recomendaciones ?? '',
-          code: codigo ?? '',
-          status: estatus ?? TourStatus.INACTIVE,
-          prices,
-        };
-        mappedDTO.push(tourDto);
-      }
-      return mappedDTO;
-    } catch (error) {
-      throw handleErrorsOnServices('Error mapping tours to DTO.', error);
-    }
-  }
-
-  private async mapAboardHourAndReturnHour(
-    aboardTime: string,
-  ): Promise<AboardHourDTO[]> {
-    try {
-      const times = aboardTime.split('|');
-      const mappedDTO = times.map(async (time) => {
-        const [aboardPoint, hour] = time.split(',');
-        const mappedAboardPoint = await this.aboardPointService.findByName(
-          aboardPoint?.trim(),
-        );
-        return new AboardHourDTO(
-          hour ?? '',
-          mappedAboardPoint._id.toString() ?? '',
-        );
-      });
-      return Promise.all(mappedDTO);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Error mapping aboard hour and return hour.',
-        error,
-      );
-    }
-  }
-
-  async updateTourCatalog({
-    tourId,
-    catalogName,
-    data,
-  }: UpdateTourCatalogDTO): Promise<any> {
-    try {
-      const isIdValidator =
-        catalogName === 'includeds' || catalogName === 'prices';
+      const isIdValidator = catalogName === 'prices';
 
       const transformedData = isIdValidator
         ? data.map(({ id }: IdValidator) => id)
         : data;
       const update = { $set: { [catalogName]: transformedData } };
       const tour = await this.tourModel
-        .findByIdAndUpdate(tourId, update, { new: true })
+        .findByIdAndUpdate(id, update, { new: true })
         .populate(catalogName)
         .exec();
 
@@ -497,13 +403,13 @@ export class TourService {
     try {
       const tour = await this.tourModel.findById(tourId);
       if (!tour) throw new NotFoundException('Tour not found.');
-      if (tour && seats > tour?.availableSeat)
+      if (tour && seats > (tour?.availableSeats ?? 0))
         throw new BadRequestException('Not enough seats available.');
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         tour._id,
         {
-          availableSeat: tour?.availableSeat - seats,
-          ocuppiedSeat: tour?.ocuppiedSeat + seats,
+          availableSeat: (tour?.availableSeats ?? 0) - seats,
+          ocuppiedSeat: tour?.ocuppiedSeats + seats,
         },
         { new: true },
       );
@@ -522,13 +428,13 @@ export class TourService {
     try {
       const tour = await this.tourModel.findById(tourId);
       if (!tour) throw new NotFoundException('Tour not found.');
-      if (tour && seats > tour?.ocuppiedSeat)
+      if (tour && seats > tour?.ocuppiedSeats)
         throw new BadRequestException('Not enough seats reserved.');
       const updatedTour = await this.tourModel.findByIdAndUpdate(
         tour._id,
         {
-          availableSeat: tour?.availableSeat + seats,
-          ocuppiedSeat: tour?.ocuppiedSeat - seats,
+          availableSeat: (tour?.availableSeats ?? 0) + seats,
+          ocuppiedSeat: tour?.ocuppiedSeats - seats,
         },
         { new: true },
       );

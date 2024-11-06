@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/*
 import { TransportsService } from '@/transports/transports.service';
 import { Injectable } from '@nestjs/common';
 import { WorkBook, readFile } from 'xlsx';
@@ -178,3 +178,4 @@ export class CatalogManagerService {
     }
   }
 }
+ */

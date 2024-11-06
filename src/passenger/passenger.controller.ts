@@ -22,7 +22,7 @@ import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 
 @ApiBearerAuth()
 @ApiTags('Passenger')
-@Controller('passenger')
+@Controller('passengers')
 export class PassengerController {
   constructor(private passengerService: PassengerService) {}
 

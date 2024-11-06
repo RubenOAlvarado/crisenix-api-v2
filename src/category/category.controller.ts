@@ -29,7 +29,7 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Category')
 @ApiBearerAuth()
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -61,6 +61,23 @@ export class CategoryController {
   @Get()
   async findAll(@Query() { status }: QueryDTO) {
     return await this.categoryService.findAll(status);
+  }
+
+  @ApiOkResponse({
+    description: 'Main categories found successfully.',
+    type: ResponseCategoryDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding main categories.',
+  })
+  @ApiNotFoundResponse({
+    description: 'No main categories found.',
+  })
+  @Public()
+  @Get('main')
+  async findMainCategories(@Query() query: StatusDTO) {
+    return await this.categoryService.findMainCategories(query);
   }
 
   @ApiOkResponse({
@@ -114,7 +131,7 @@ export class CategoryController {
   @ApiBadRequestResponse({
     description: 'Wrong status.',
   })
-  @Patch(':id/changes_status')
+  @Patch(':id/changes-status')
   async delete(
     @Param() param: IdValidator,
     @Query() query: StatusDTO,

@@ -3,20 +3,12 @@ import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Currency } from '@/shared/enums/currency.enum';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
-import { ResponseDestinationDTO } from '../destination/responsedestination.dto';
 
 export class ResponsePriceDTO {
   @ApiPropertyOptional()
   @Expose()
   @ObjectIdToString()
   _id?: string;
-
-  @ApiProperty({
-    type: ResponseDestinationDTO,
-  })
-  @Type(() => ResponseDestinationDTO)
-  @Expose()
-  destination: ResponseDestinationDTO | string;
 
   @ApiProperty({
     type: ResponseOriginCityDTO,
@@ -58,7 +50,6 @@ export class ResponsePriceDTO {
   inapam?: number;
 
   constructor(
-    destination: ResponseDestinationDTO | string,
     city: ResponseOriginCityDTO | string,
     currency: Currency,
     _id?: string,
@@ -70,7 +61,6 @@ export class ResponsePriceDTO {
     minor?: number,
     inapam?: number,
   ) {
-    this.destination = destination;
     this._id = _id;
     this.city = city;
     this.currency = currency;

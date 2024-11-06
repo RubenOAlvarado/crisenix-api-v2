@@ -4,7 +4,7 @@ import { CatalogQuery } from '../interfaces/catalogQuery.interface';
 export class IncludedQuery implements CatalogQuery {
   createQuery() {
     return {
-      path: TourCatalogs.INCLUDED,
+      path: TourCatalogs.INCLUDEDSERVICES,
       populate: {
         path: 'included',
         model: 'Includeds',

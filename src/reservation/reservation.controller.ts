@@ -25,7 +25,7 @@ import { ChangeStatusDTO } from '@/shared/models/dtos/request/reservations/chang
 import { QueryReservationStatusDTO } from '@/shared/models/dtos/request/reservations/query-reservations.dto';
 
 @ApiTags('Reservations')
-@Controller('reservation')
+@Controller('reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 
@@ -93,8 +93,11 @@ export class ReservationController {
   @ApiBadRequestResponse({
     description: 'Invalid status provided.',
   })
-  @Patch('change_status')
-  async changeStatus(@Body() data: ChangeStatusDTO) {
-    return await this.reservationService.changeStatus(data);
+  @Patch(':id/change-status')
+  async changeStatus(
+    @Param() param: IdValidator,
+    @Body() body: ChangeStatusDTO,
+  ) {
+    return await this.reservationService.changeStatus(param, body);
   }
 }

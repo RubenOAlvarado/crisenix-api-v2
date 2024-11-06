@@ -6,7 +6,7 @@ import { HydratedDocument } from 'mongoose';
   timestamps: true,
 })
 export class Roles {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   description: string;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })

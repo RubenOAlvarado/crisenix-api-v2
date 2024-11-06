@@ -11,13 +11,12 @@ export const originCityTransformer = ({
   value: OriginCityLean[];
 }) => {
   if (value?.length) {
-    return value.map(({ state, name, status, _id, aboardPoints }) => {
+    return value.map(({ state, name, status, _id }) => {
       return new ResponseOriginCityDTO(
         state,
         name,
         status,
         handleDocumentsId(_id),
-        aboardPoints,
       );
     });
   }

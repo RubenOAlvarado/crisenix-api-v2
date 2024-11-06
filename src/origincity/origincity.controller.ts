@@ -28,13 +28,12 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
-import { AddAboardPointsDTO } from '@/shared/models/dtos/request/originCity/add-aboard-points.dto';
 import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiBearerAuth()
-@Controller('origincity')
+@Controller('origin-cities')
 @ApiTags('Origin City')
 @ApiExtraModels(PaginatedResponseDTO)
 export class OriginCityController {
@@ -136,36 +135,12 @@ export class OriginCityController {
   @ApiBadRequestResponse({
     description: 'The status is invalid.',
   })
-  @Patch(':id')
+  @Patch(':id/change-status')
   async changeStatus(
     @Param() param: IdValidator,
     @Query() query: StatusDTO,
   ): Promise<string> {
     await this.originCityService.changeStatus(param, query);
     return 'The origin city status has been successfully changed.';
-  }
-
-  @ApiOkResponse({
-    description:
-      'The aboard point/s has been successfully added to the origin city.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Origin city not found.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong adding the aboard point/s.',
-  })
-  @Patch(':id/addPoints')
-  @ApiBody({
-    description: 'Array of aboard points ids',
-    type: AddAboardPointsDTO,
-    isArray: true,
-  })
-  async addPoints(
-    @Param() IdValidator: IdValidator,
-    @Body() aboardPointsDTO: AddAboardPointsDTO,
-  ): Promise<string> {
-    await this.originCityService.addAboardPoints(IdValidator, aboardPointsDTO);
-    return 'The aboard point/s has been successfully added to the origin city.';
   }
 }

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Tours } from './tour.schema';
 import { User } from './user.schema';
 import { Passengers } from './passenger.schema';
@@ -16,14 +16,14 @@ export class Reservations {
   status: ReservationStatus;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'Tours',
     required: true,
   })
   tour: Tours | Types.ObjectId;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'User',
     required: true,
   })
@@ -36,6 +36,7 @@ export class Reservations {
       },
       message: 'Client name is required when user is not provided',
     },
+    type: String,
   })
   clientName?: string;
 
@@ -46,6 +47,7 @@ export class Reservations {
       },
       message: 'Client last name is required when user is not provided',
     },
+    type: String,
   })
   clientLastName?: string;
 
@@ -56,6 +58,7 @@ export class Reservations {
       },
       message: 'Client mother last name is required when user is not provided',
     },
+    type: String,
   })
   clientMotherLastName?: string;
 
@@ -66,16 +69,17 @@ export class Reservations {
       },
       message: 'Client email is required when user is not provided',
     },
+    type: String,
   })
   clientEmail?: string;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   totalSeats: number;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passengers' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Passengers' }] })
   passengers?: Array<Passengers>;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Date })
   paymentDeadline: Date;
 
   constructor(

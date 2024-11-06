@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Roles } from './roles.schema';
 import { Status } from '@/shared/enums/status.enum';
 
@@ -7,28 +7,32 @@ import { Status } from '@/shared/enums/status.enum';
   timestamps: true,
 })
 export class User {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   firebaseUid: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   lastName: string;
 
-  @Prop()
+  @Prop({ type: String, required: false })
   secondLast?: string;
 
-  @Prop()
+  @Prop({ type: String, required: false })
   phone?: string;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  @Prop()
+  @Prop({
+    type: Date,
+    default: null,
+    required: false,
+  })
   deletedAt?: Date;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Roles' })
+  @Prop({ type: Types.ObjectId, ref: 'Roles', required: true })
   role: Roles;
 
   constructor(

@@ -29,7 +29,7 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Classification')
 @ApiBearerAuth()
-@Controller('classification')
+@Controller('classifications')
 export class ClassificationController {
   constructor(private readonly classificationService: ClassificationService) {}
 
@@ -120,7 +120,7 @@ export class ClassificationController {
   @ApiBadRequestResponse({
     description: 'classification already deleted.',
   })
-  @Patch(':id/changes_status')
+  @Patch(':id/changes-status')
   async delete(
     @Param() param: IdValidator,
     @Query() query: StatusDTO,

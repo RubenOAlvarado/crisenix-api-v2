@@ -1,4 +1,4 @@
 export interface CategoryExcel {
   nombre: string;
-  subCategorias?: string;
+  categoriaPadre?: string;
 }

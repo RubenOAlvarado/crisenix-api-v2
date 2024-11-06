@@ -31,7 +31,7 @@ export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
 export function pipelinesMaker({
   field,
   word,
-  populate,
+  shouldPopulate,
   sort,
   page,
   limit,
@@ -44,10 +44,18 @@ export function pipelinesMaker({
     field as SearchableTourFields,
   );
   builder.addStage(
-    searchStrategy.search({ field, word, populate, sort, status, page, limit }),
+    searchStrategy.search({
+      field,
+      word,
+      shouldPopulate,
+      sort,
+      status,
+      page,
+      limit,
+    }),
   );
 
-  builder.addStage(populateSubcatalogsQuery(populate));
+  builder.addStage(populateSubcatalogsQuery(shouldPopulate));
   builder.addStage(sortQueryBuilder(sort));
   builder.addStage(paginationQuery({ page, limit }));
 

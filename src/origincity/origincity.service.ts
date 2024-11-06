@@ -18,7 +18,6 @@ import {
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
-import { AboardpointService } from '@/aboardpoint/aboardpoint.service';
 import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
@@ -27,7 +26,6 @@ export class OriginCityService {
   constructor(
     @InjectModel(OriginCities.name)
     private readonly originCityModel: Model<OriginCities>,
-    private readonly aboardPointService: AboardpointService,
   ) {}
 
   async create(
@@ -72,7 +70,6 @@ export class OriginCityService {
         .find(Query)
         .limit(limit * 1)
         .skip((page - 1) * limit)
-        .populate('aboardPoints')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!docs.length)
@@ -161,7 +158,6 @@ export class OriginCityService {
             { country: { $regex: word, $options: 'i' } },
           ],
         })
-        .populate('aboardPoints')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!searchResult.length)
@@ -170,24 +166,6 @@ export class OriginCityService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong searching origin city.',
-        error,
-      );
-    }
-  }
-
-  async addAboardPoints(
-    { id }: IdValidator,
-    { aboardPoints }: UpdateOriginCityDTO,
-  ): Promise<void> {
-    try {
-      await this.originCityModel.findByIdAndUpdate(
-        id,
-        { $push: { aboardPoints } },
-        { new: true },
-      );
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong adding aboard points to origin city.',
         error,
       );
     }
@@ -222,16 +200,10 @@ export class OriginCityService {
   ): Promise<CreateOriginCityDTO[]> {
     try {
       const mappedDTO: CreateOriginCityDTO[] = [];
-      for (const { nombre, estado, puntosDeAscenso } of jsonObject) {
-        const aboardPoints = puntosDeAscenso
-          ? await this.aboardPointService.mapFromNameToObjectId(
-              puntosDeAscenso.split(','),
-            )
-          : undefined;
+      for (const { nombre, estado } of jsonObject) {
         const dto: CreateOriginCityDTO = {
           name: nombre,
           state: estado ?? '',
-          aboardPoints,
         };
         mappedDTO.push(dto);
       }

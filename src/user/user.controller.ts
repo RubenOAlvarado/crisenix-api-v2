@@ -28,9 +28,9 @@ import { WebUserDTO } from '@/shared/models/dtos/request/user/createwebuser.dto'
 import { UpdateWebUserDTO } from '@/shared/models/dtos/request/user/updatewebuser.dto';
 import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto';
 
-@ApiTags('User')
+@ApiTags('Users')
 @ApiBearerAuth()
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 

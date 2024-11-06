@@ -11,7 +11,6 @@ export const priceTransformer = ({ value }: { value: PricesLean[] }) => {
     return value.map(
       ({
         _id,
-        destination,
         city,
         currency,
         general,
@@ -22,7 +21,6 @@ export const priceTransformer = ({ value }: { value: PricesLean[] }) => {
         inapam,
       }) => {
         return new ResponsePriceDTO(
-          destination,
           city,
           currency as Currency,
           handleDocumentsId(_id),

@@ -36,8 +36,8 @@ import { SearcherTourDTO } from '@/shared/models/dtos/searcher/tour/searcherTour
 import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeStatus.dto';
 
 @ApiBearerAuth()
-@ApiTags('Tour')
-@Controller('tour')
+@ApiTags('Tours')
+@Controller('tours')
 export class TourController {
   constructor(private tourService: TourService) {}
 
@@ -52,6 +52,32 @@ export class TourController {
   @Post()
   async createTour(@Body() tour: CreateTourDTO) {
     return await this.tourService.createTour(tour);
+  }
+
+  @ApiPaginatedResponse(ResponseTourDTO)
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong finding tours.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tours not found.',
+  })
+  @Public()
+  @Get()
+  async getTours(@Query() query: PaginatedTourDTO) {
+    return await this.tourService.findAll(query);
+  }
+
+  @ApiPaginatedResponse(ResponseTourDTO)
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong searching tours.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tours not found.',
+  })
+  @Public()
+  @Get('search')
+  async searchTours(@Query() query: SearcherTourDTO) {
+    return await this.tourService.searchTours(query);
   }
 
   @ApiOkResponse({
@@ -88,19 +114,6 @@ export class TourController {
     return await this.tourService.getLastRegisteredTour(param);
   }
 
-  @ApiPaginatedResponse(ResponseTourDTO)
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong finding tours.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Tours not found.',
-  })
-  @Public()
-  @Get()
-  async getTours(@Query() query: PaginatedTourDTO) {
-    return await this.tourService.findAll(query);
-  }
-
   @ApiOkResponse({
     description: 'Catalog found.',
   })
@@ -114,9 +127,12 @@ export class TourController {
     description: 'Tour does not exist.',
   })
   @Public()
-  @Get('get_catalog')
-  async getTourCatalog(@Query() query: GetTourCatalogDTO) {
-    return await this.tourService.getTourCatalog(query);
+  @Get(':id/get-catalog')
+  async getTourCatalog(
+    @Param() param: IdValidator,
+    @Query() query: GetTourCatalogDTO,
+  ) {
+    return await this.tourService.getTourCatalog(param, query);
   }
 
   @ApiOkResponse({
@@ -156,19 +172,6 @@ export class TourController {
     return 'Tour deleted successfully.';
   }
 
-  @ApiPaginatedResponse(ResponseTourDTO)
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong searching tours.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Tours not found.',
-  })
-  @Public()
-  @Get('search')
-  async searchTours(@Query() query: SearcherTourDTO) {
-    return await this.tourService.searchTours(query);
-  }
-
   @ApiOkResponse({
     description: 'Tour status changed.',
     type: ResponseTourDTO,
@@ -183,9 +186,12 @@ export class TourController {
     description: `Tour status can't be changed because it's invalid or it's already in the required status.`,
   })
   @Public()
-  @Patch('change_status')
-  async changeTourStatus(@Body() param: ChangeTourStatusDTO) {
-    return await this.tourService.changeTourStatus(param);
+  @Patch(':id/change-status')
+  async changeTourStatus(
+    @Param() param: IdValidator,
+    @Body() body: ChangeTourStatusDTO,
+  ) {
+    return await this.tourService.changeTourStatus(param, body);
   }
 
   @ApiOkResponse({
@@ -200,14 +206,17 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'You sent an invalid catalog name or incorrect values.',
   })
-  @Patch('update_catalog')
+  @Patch(':id/update-catalog')
   @ApiBody({
     description: 'The catalog name and the new values to be updated.',
     type: UpdateTourCatalogDTO,
   })
   @UseInterceptors(CatalogValidationInterceptor)
   @Public()
-  async updateTourCatalog(@Body() body: UpdateTourCatalogDTO) {
-    return await this.tourService.updateTourCatalog(body);
+  async updateTourCatalog(
+    @Param() param: IdValidator,
+    @Body() body: UpdateTourCatalogDTO,
+  ) {
+    return await this.tourService.updateTourCatalog(param, body);
   }
 }
