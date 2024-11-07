@@ -1,4 +1,4 @@
-/* import {
+import {
   Controller,
   Post,
   UploadedFile,
@@ -9,6 +9,7 @@ import { ApiExcludeController, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { excelFileFilter } from '@/shared/utilities/fileManagement.utils';
 import { Public } from '@/auth/public.decorator';
+import { CatalogManagerService } from './catalog-manager.service';
 
 @ApiExcludeController()
 @Controller('file-manager')
@@ -45,4 +46,4 @@ export class FileManagerController {
     // deepcode ignore PT: <please specify a reason of ignoring this>
     await this.catalogFileManager.loadCatalogs(file.path);
   }
-} */
+}

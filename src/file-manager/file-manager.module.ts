@@ -1,5 +1,4 @@
-/* import { Module } from '@nestjs/common';
-import { FileManagerService } from './file-manager.service';
+import { Module } from '@nestjs/common';
 import { DestinationModule } from '@/destination/destination.module';
 import { TourModule } from '@/tour/tour.module';
 import { TransportsModule } from '@/transports/transports.module';
@@ -9,6 +8,8 @@ import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 import { CategoryModule } from '@/category/category.module';
 import { TransfertypeModule } from '@/transfertype/transfertype.module';
 import { PricesModule } from '@/prices/prices.module';
+import { FileManagerController } from './file-manager.controller';
+import { CatalogManagerService } from './catalog-manager.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { PricesModule } from '@/prices/prices.module';
     PricesModule,
   ],
   controllers: [FileManagerController],
-  providers: [FileManagerService],
+  providers: [CatalogManagerService],
 })
-export class FileManagerModule {} */
+export class FileManagerModule {}
