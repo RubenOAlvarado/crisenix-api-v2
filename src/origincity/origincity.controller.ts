@@ -7,6 +7,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { OriginCityService } from './origincity.service';
@@ -34,11 +35,12 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiBearerAuth()
 @Controller('origin-cities')
-@ApiTags('Origin City')
+@ApiTags('Origin Cities')
 @ApiExtraModels(PaginatedResponseDTO)
 export class OriginCityController {
   constructor(private readonly originCityService: OriginCityService) {}
 
+  @ApiOperation({ summary: 'Create a new origin city' })
   @ApiCreatedResponse({
     description: 'The origin city has been successfully created.',
     type: ResponseOriginCityDTO,
@@ -55,6 +57,7 @@ export class OriginCityController {
     return await this.originCityService.create(createOriginCityDTO);
   }
 
+  @ApiOperation({ summary: 'Get all origin cities' })
   @ApiPaginatedResponse(ResponseOriginCityDTO)
   @ApiNotFoundResponse({ description: 'No origin cities registered.' })
   @ApiInternalServerErrorResponse({
@@ -66,6 +69,7 @@ export class OriginCityController {
     return await this.originCityService.findAll(queryDTO);
   }
 
+  @ApiOperation({ summary: 'Search origin cities by word' })
   @ApiOkResponse({
     description: 'The origin city/es has been successfully found.',
     type: ResponseOriginCityDTO,
@@ -85,6 +89,7 @@ export class OriginCityController {
     return await this.originCityService.searcher(searcherDTO);
   }
 
+  @ApiOperation({ summary: 'Get an origin city by id' })
   @ApiOkResponse({
     description: 'The origin city has been found.',
     type: ResponseOriginCityDTO,
@@ -101,6 +106,7 @@ export class OriginCityController {
     return await this.originCityService.findOne(IdValidator);
   }
 
+  @ApiOperation({ summary: 'Update an origin city' })
   @ApiOkResponse({
     description: 'The origin city has been successfully updated.',
     type: ResponseOriginCityDTO,
@@ -123,6 +129,7 @@ export class OriginCityController {
     return await this.originCityService.update(param, updateOriginCityDTO);
   }
 
+  @ApiOperation({ summary: 'Change the status of an origin city' })
   @ApiOkResponse({
     description: 'The origin city status has been successfully changed.',
   })

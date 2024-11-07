@@ -17,7 +17,6 @@ import {
 } from '@/shared/utilities/helpers';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
-import { OriginCityExcel } from '@/shared/interfaces/excel/originCity.excel.interface';
 import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
@@ -168,68 +167,6 @@ export class OriginCityService {
         'Something went wrong searching origin city.',
         error,
       );
-    }
-  }
-
-  async validateFromPriceExcel(name?: string): Promise<string> {
-    try {
-      if (!name) throw new BadRequestException('No origin city provided.');
-      const sanitizedCity = name.trim();
-      const originCity = await this.originCityModel
-        .findOne({ name: sanitizedCity })
-        .select({ _id: 1 })
-        .lean();
-      if (!originCity) throw new NotFoundException('Origin city not found.');
-      return originCity._id.toString();
-    } catch (error) {
-      throw handleErrorsOnServices('Error validating origin city.', error);
-    }
-  }
-
-  async insertOriginCityBunch(jsonObject: OriginCityExcel[]): Promise<void> {
-    try {
-      const originCityDTO = await this.mapToDto(jsonObject);
-      await this.originCityModel.insertMany(originCityDTO);
-    } catch (error) {
-      throw handleErrorsOnServices('Error inserting origin cities.', error);
-    }
-  }
-
-  private async mapToDto(
-    jsonObject: OriginCityExcel[],
-  ): Promise<CreateOriginCityDTO[]> {
-    try {
-      const mappedDTO: CreateOriginCityDTO[] = [];
-      for (const { nombre, estado } of jsonObject) {
-        const dto: CreateOriginCityDTO = {
-          name: nombre,
-          state: estado ?? '',
-        };
-        mappedDTO.push(dto);
-      }
-      return mappedDTO;
-    } catch (error) {
-      throw handleErrorsOnServices('Error mapping origin cities.', error);
-    }
-  }
-
-  async mapFromDestinationExcel(names: string[]): Promise<string[]> {
-    try {
-      if (!names?.length) {
-        throw new BadRequestException('No origin cities provided.');
-      }
-      const cities = [];
-      for (const name of names) {
-        const sanitizedCity = name.trim();
-        const originCity = await this.originCityModel
-          .findOne({ name: sanitizedCity })
-          .lean();
-        if (!originCity) throw new NotFoundException('Origin city not found.');
-        cities.push(originCity._id.toString());
-      }
-      return cities;
-    } catch (error) {
-      throw handleErrorsOnServices('Error validating origin city.', error);
     }
   }
 }

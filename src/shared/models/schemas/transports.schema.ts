@@ -15,7 +15,7 @@ export class Transports {
     ref: 'TransferTypes',
     required: true,
   })
-  transferType: TransferTypes;
+  transferType: TransferTypes | Types.ObjectId;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;

@@ -16,6 +16,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
@@ -33,6 +34,7 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @ApiOperation({ summary: 'Create a new category.' })
   @ApiCreatedResponse({
     description: 'Category created successfully.',
     type: ResponseCategoryDTO,
@@ -46,6 +48,7 @@ export class CategoryController {
     return await this.categoryService.create(createCategoryDTO);
   }
 
+  @ApiOperation({ summary: 'Find all categories.' })
   @ApiOkResponse({
     description: 'Categories found successfully.',
     type: ResponseCategoryDTO,
@@ -63,6 +66,7 @@ export class CategoryController {
     return await this.categoryService.findAll(status);
   }
 
+  @ApiOperation({ summary: 'Find all main categories.' })
   @ApiOkResponse({
     description: 'Main categories found successfully.',
     type: ResponseCategoryDTO,
@@ -80,6 +84,7 @@ export class CategoryController {
     return await this.categoryService.findMainCategories(query);
   }
 
+  @ApiOperation({ summary: 'Find a category by id.' })
   @ApiOkResponse({
     description: 'Category found successfully.',
     type: ResponseCategoryDTO,
@@ -95,6 +100,7 @@ export class CategoryController {
     return await this.categoryService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Update a category by id.' })
   @ApiOkResponse({
     description: 'Category updated successfully.',
     type: ResponseCategoryDTO,
@@ -118,6 +124,7 @@ export class CategoryController {
     return updatedCategory;
   }
 
+  @ApiOperation({ summary: 'Change category status by id.' })
   @ApiOkResponse({
     description: 'The category status was changed successfully.',
     type: String,

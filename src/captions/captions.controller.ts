@@ -15,6 +15,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { CaptionsService } from './captions.service';
@@ -31,6 +32,7 @@ import { UpdateCaptionDTO } from '@/shared/models/dtos/request/captions/updateca
 export class CaptionsController {
   constructor(private readonly captionService: CaptionsService) {}
 
+  @ApiOperation({ summary: 'Create a new caption.' })
   @ApiCreatedResponse({
     description: 'The caption has been successfully created.',
     type: ResponseCaptionsDTO,
@@ -47,6 +49,7 @@ export class CaptionsController {
     return await this.captionService.create(createCaptionDTO);
   }
 
+  @ApiOperation({ summary: 'Find all captions.' })
   @ApiOkResponse({
     description: 'All captions found.',
     type: ResponseCaptionsDTO,
@@ -64,6 +67,7 @@ export class CaptionsController {
     return await this.captionService.findAll(query);
   }
 
+  @ApiOperation({ summary: 'Find a caption by id.' })
   @ApiOkResponse({
     description: 'Caption found.',
     type: ResponseCaptionsDTO,
@@ -80,6 +84,7 @@ export class CaptionsController {
     return await this.captionService.findOne(params);
   }
 
+  @ApiOperation({ summary: 'Update a caption by id.' })
   @ApiOkResponse({
     description: 'Caption updated.',
     type: ResponseCaptionsDTO,
@@ -106,12 +111,13 @@ export class CaptionsController {
     return updatedCaption;
   }
 
+  @ApiOperation({ summary: 'Change a caption status by id.' })
   @ApiOkResponse({
-    description: 'The caption has been successfully deleted.',
+    description: 'The caption status has been successfully changed.',
     type: String,
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting the caption.',
+    description: 'Something went wrong changing status of the caption.',
   })
   @ApiNotFoundResponse({
     description: 'Caption not found.',
@@ -122,6 +128,6 @@ export class CaptionsController {
     @Query() query: StatusDTO,
   ): Promise<string> {
     await this.captionService.changeStatus(params, query);
-    return 'The caption has been successfully deleted.';
+    return 'The caption status has been successfully changed.';
   }
 }

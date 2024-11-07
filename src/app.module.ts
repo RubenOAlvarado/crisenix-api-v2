@@ -29,6 +29,7 @@ import { TransfertypeModule } from './transfertype/transfertype.module';
 import { PricesModule } from './prices/prices.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { IncludedServicesModule } from './includedServices/includedServices.module';
+import { ItineraryActivitiesModule } from './itineraryActivities/itineraryActivities.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { IncludedServicesModule } from './includedServices/includedServices.modu
     UserModule,
     PricesModule,
     ReservationModule,
+    ItineraryActivitiesModule,
   ],
   controllers: [AppController],
   providers: [

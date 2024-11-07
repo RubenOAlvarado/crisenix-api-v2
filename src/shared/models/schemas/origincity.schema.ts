@@ -6,7 +6,7 @@ import { Status } from '@/shared/enums/status.enum';
   timestamps: true,
 })
 export class OriginCities {
-  @Prop({ required: true, index: true, type: String })
+  @Prop({ required: true, type: String })
   state: string;
 
   @Prop({ required: true, index: true, type: String })

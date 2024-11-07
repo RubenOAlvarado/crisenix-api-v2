@@ -29,7 +29,7 @@ export class UpdateWebUserDTO {
   @IsOptional()
   @IsString()
   @MaxLength(150)
-  secondLast?: string;
+  motherLastName?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

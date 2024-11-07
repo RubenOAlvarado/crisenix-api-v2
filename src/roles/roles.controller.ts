@@ -15,6 +15,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
@@ -31,6 +32,7 @@ import { Public } from '@/auth/public.decorator';
 export class RolesController {
   constructor(private rolesService: RolesService) {}
 
+  @ApiOperation({ summary: 'Create a new role' })
   @ApiCreatedResponse({
     type: ResponseRoleDTO,
     description: 'Role created successfully.',
@@ -44,6 +46,7 @@ export class RolesController {
     return await this.rolesService.createRole(createRoleDTO);
   }
 
+  @ApiOperation({ summary: 'Get all roles' })
   @ApiOkResponse({
     type: ResponseRoleDTO,
     isArray: true,
@@ -58,6 +61,7 @@ export class RolesController {
     return await this.rolesService.getRoles(query);
   }
 
+  @ApiOperation({ summary: 'Get a role by id' })
   @ApiOkResponse({
     type: ResponseRoleDTO,
     description: 'Role found successfully.',
@@ -72,6 +76,7 @@ export class RolesController {
     return await this.rolesService.getRoleById(params);
   }
 
+  @ApiOperation({ summary: 'Update a role' })
   @ApiOkResponse({
     type: String,
     description: 'Role updated successfully.',
@@ -90,6 +95,7 @@ export class RolesController {
     return 'Role updated successfully.';
   }
 
+  @ApiOperation({ summary: 'Change the status of a role' })
   @ApiOkResponse({
     type: String,
     description: 'Role updated successfully.',
@@ -105,6 +111,7 @@ export class RolesController {
     return 'Role inactivated successfully.';
   }
 
+  @ApiOperation({ summary: 'Get a role by description' })
   @ApiOkResponse({
     type: ResponseRoleDTO,
     description: 'Role found successfully.',

@@ -10,6 +10,7 @@ import {
 } from '@/shared/models/schemas/destination.schema';
 import { pipelinesMaker } from '@/shared/utilities/destination-query-maker.helper';
 import {
+  applyPopulateOptions,
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
@@ -22,12 +23,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Query } from 'mongoose';
+import { Model, PopulateOptions } from 'mongoose';
 import { filterOutPhotos } from './destinations.helper';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destination/searcherDestination.dto';
-import { PopulateConfig } from '@/shared/types/populateConfig.types';
 import { CustomQueryOptions } from '@/shared/interfaces/queryOptions.interface';
 
 @Injectable()
@@ -41,20 +41,9 @@ export class DestinationService {
 
   private readonly defaultExcludedFields = { __v: 0, createdAt: 0 };
 
-  private readonly defaultPopulateOptions: PopulateConfig[] = [
-    {
-      path: 'originCities',
-      populate: {
-        path: 'aboardPoints',
-      },
-      select: this.defaultExcludedFields,
-    },
+  private readonly defaultPopulateOptions: PopulateOptions[] = [
     {
       path: 'categories',
-      select: this.defaultExcludedFields,
-    },
-    {
-      path: 'transferTypes',
       select: this.defaultExcludedFields,
     },
   ];
@@ -64,31 +53,25 @@ export class DestinationService {
     limit,
     shouldPopulate = false,
     filter = {},
-  }: CustomQueryOptions & { filter: Record<string, any> }): Promise<
-    DestinationLean[]
-  > {
+    sort = { createdAt: -1 },
+  }: CustomQueryOptions): Promise<DestinationLean[]> {
     let query = this.destinationModel
       .find(filter)
-      .select(this.defaultExcludedFields);
+      .select(this.defaultExcludedFields)
+      .sort(sort);
 
     if (page && limit) {
       query = query.limit(limit).skip((page - 1) * limit);
     }
 
     if (shouldPopulate) {
-      query = this.applyPopulateOptions(query);
+      query = applyPopulateOptions<DestinationDocument>(
+        query,
+        this.defaultPopulateOptions,
+      );
     }
 
     return await query.lean();
-  }
-
-  private applyPopulateOptions(
-    query: Query<DestinationDocument[], DestinationDocument>,
-  ): Query<DestinationDocument[], DestinationDocument> {
-    return this.defaultPopulateOptions.reduce(
-      (acc, populateOption) => acc.populate(populateOption),
-      query,
-    );
   }
 
   async getValidatedDestination(id: string, status: Status = Status.ACTIVE) {

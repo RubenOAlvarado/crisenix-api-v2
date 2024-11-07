@@ -47,7 +47,7 @@ export class ResponseWebUserDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  secondLast?: string;
+  motherLastName?: string;
 
   @ApiPropertyOptional()
   @Expose()
@@ -67,7 +67,7 @@ export class ResponseWebUserDTO {
     phoneNumber?: string,
     photoUrl?: string,
     disabled?: boolean,
-    secondLast?: string,
+    motherLastName?: string,
     phone?: string,
     displayName?: string,
     email?: string,
@@ -81,7 +81,7 @@ export class ResponseWebUserDTO {
     this.phoneNumber = phoneNumber;
     this.photoUrl = photoUrl;
     this.disabled = disabled;
-    this.secondLast = secondLast;
+    this.motherLastName = motherLastName;
     this.phone = phone;
     this.email = email;
   }

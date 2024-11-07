@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { PipelineStage, Types } from 'mongoose';
+import { PipelineStage, PopulateOptions, Query, Types } from 'mongoose';
 import { PaginationDTO } from '../models/dtos/searcher/pagination.dto';
 
 const logger = new Logger();
@@ -86,4 +86,14 @@ export function paginationQuery({
       },
     },
   ];
+}
+
+export function applyPopulateOptions<T>(
+  query: Query<T[], T>,
+  defaultPopulateOptions: PopulateOptions[],
+): Query<T[], T> {
+  return defaultPopulateOptions.reduce(
+    (acc, populateOption) => acc.populate(populateOption),
+    query,
+  );
 }

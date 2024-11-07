@@ -14,7 +14,7 @@ export class Sales {
     ref: 'Reservations',
     required: true,
   })
-  reservation: Reservations;
+  reservation: Reservations | Types.ObjectId;
 
   @Prop({
     required: true,

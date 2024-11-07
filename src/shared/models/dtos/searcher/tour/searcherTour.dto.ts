@@ -8,7 +8,6 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { IsInitDate } from '@/shared/decorators/isValidInitDate.decorator';
-import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { SearchableTourFields } from '@/shared/enums/searcher/tour/fields.enum';
 import { SortTourFields } from '@/shared/enums/searcher/tour/sortFields.enum';
 import { TourQueryDTO } from './tourQuery.dto';
@@ -45,14 +44,4 @@ export class SearcherTourDTO extends TourQueryDTO {
   @IsNotEmpty()
   @IsEnum(SortTourFields)
   sort!: SortTourFields;
-
-  @ApiPropertyOptional({
-    default: TourStatus.ACTIVE,
-    description: 'Status to look for (optional)',
-    enum: TourStatus,
-  })
-  @IsOptional()
-  @IsNotEmpty()
-  @IsEnum(TourStatus)
-  status?: TourStatus;
 }

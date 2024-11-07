@@ -18,6 +18,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { TourService } from './tour.service';
@@ -27,13 +28,14 @@ import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { DestinationValidator } from '@/shared/models/dtos/validators/destination.validator';
 import { ResponseTourDTO } from '@/shared/models/dtos/response/tour/responsetour.dto';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
-import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
 import { CatalogValidationInterceptor } from '@/shared/interceptors/catalogValidationInterceptor';
 import { SearcherTourDTO } from '@/shared/models/dtos/searcher/tour/searcherTour.dto';
 import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeStatus.dto';
+import { TourQueryDTO } from '@/shared/models/dtos/searcher/tour/tourQuery.dto';
+import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 
 @ApiBearerAuth()
 @ApiTags('Tours')
@@ -41,6 +43,7 @@ import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeSt
 export class TourController {
   constructor(private tourService: TourService) {}
 
+  @ApiOperation({ summary: 'Create a new tour.' })
   @ApiCreatedResponse({
     description: 'Tour successfully created.',
     type: ResponseTourDTO,
@@ -48,12 +51,13 @@ export class TourController {
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong creating tour.',
   })
-  @ApiBody({ type: CreateTourDTO })
+  @ApiBody({ type: CreateTourDTO, description: 'Tour data to be created.' })
   @Post()
   async createTour(@Body() tour: CreateTourDTO) {
     return await this.tourService.createTour(tour);
   }
 
+  @ApiOperation({ summary: 'Get all tours.' })
   @ApiPaginatedResponse(ResponseTourDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding tours.',
@@ -63,10 +67,11 @@ export class TourController {
   })
   @Public()
   @Get()
-  async getTours(@Query() query: PaginatedTourDTO) {
+  async getTours(@Query() query: TourQueryDTO) {
     return await this.tourService.findAll(query);
   }
 
+  @ApiOperation({ summary: 'Search tours.' })
   @ApiPaginatedResponse(ResponseTourDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong searching tours.',
@@ -80,6 +85,7 @@ export class TourController {
     return await this.tourService.searchTours(query);
   }
 
+  @ApiOperation({ summary: 'Get a tour by ID.' })
   @ApiOkResponse({
     description: 'Tour found.',
     type: ResponseTourDTO,
@@ -92,10 +98,14 @@ export class TourController {
   })
   @Public()
   @Get(':id')
-  async getTourById(@Param() param: IdValidator) {
-    return await this.tourService.findOne(param);
+  async getTourById(
+    @Param() param: IdValidator,
+    @Query() query: FetchOptionsDto,
+  ) {
+    return await this.tourService.findOne(param, query);
   }
 
+  @ApiOperation({ summary: 'Get last tour registered by destination.' })
   @ApiOkResponse({
     description: 'Last tour registered found.',
     type: ResponseTourDTO,
@@ -114,6 +124,7 @@ export class TourController {
     return await this.tourService.getLastRegisteredTour(param);
   }
 
+  @ApiOperation({ summary: 'Get the catalog of a tour.' })
   @ApiOkResponse({
     description: 'Catalog found.',
   })
@@ -135,6 +146,7 @@ export class TourController {
     return await this.tourService.getTourCatalog(param, query);
   }
 
+  @ApiOperation({ summary: 'Update a tour.' })
   @ApiOkResponse({
     description: 'Tour updated successfully.',
     type: ResponseTourDTO,
@@ -148,12 +160,13 @@ export class TourController {
   @ApiBadRequestResponse({
     description: 'Tour does not exist.',
   })
-  @ApiBody({ type: UpdateTourDTO })
+  @ApiBody({ type: UpdateTourDTO, description: 'Tour data to be updated.' })
   @Put(':id')
   async updateTour(@Param() param: IdValidator, @Body() tour: UpdateTourDTO) {
     return await this.tourService.updateTour(param, tour);
   }
 
+  @ApiOperation({ summary: 'Delete a tour (logical delete).' })
   @ApiOkResponse({
     description: 'Tour deleted successfully.',
   })
@@ -172,6 +185,7 @@ export class TourController {
     return 'Tour deleted successfully.';
   }
 
+  @ApiOperation({ summary: 'Change the status of a tour.' })
   @ApiOkResponse({
     description: 'Tour status changed.',
     type: ResponseTourDTO,
@@ -185,7 +199,6 @@ export class TourController {
   @ApiBadRequestResponse({
     description: `Tour status can't be changed because it's invalid or it's already in the required status.`,
   })
-  @Public()
   @Patch(':id/change-status')
   async changeTourStatus(
     @Param() param: IdValidator,
@@ -194,6 +207,7 @@ export class TourController {
     return await this.tourService.changeTourStatus(param, body);
   }
 
+  @ApiOperation({ summary: 'Update the catalog of a tour.' })
   @ApiOkResponse({
     description: 'Tour updated successfully.',
   })
@@ -212,7 +226,6 @@ export class TourController {
     type: UpdateTourCatalogDTO,
   })
   @UseInterceptors(CatalogValidationInterceptor)
-  @Public()
   async updateTourCatalog(
     @Param() param: IdValidator,
     @Body() body: UpdateTourCatalogDTO,

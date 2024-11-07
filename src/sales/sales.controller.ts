@@ -7,6 +7,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
@@ -20,6 +21,7 @@ import { DeclineSaleDto } from '@/shared/models/dtos/request/sales/declineSale.d
 export class SalesController {
   constructor(private salesService: SalesService) {}
 
+  @ApiOperation({ summary: 'Create a new sale' })
   @ApiCreatedResponse({
     description: 'Sale created successfully.',
   })
@@ -35,6 +37,7 @@ export class SalesController {
     return await this.salesService.create(createSaleDTO);
   }
 
+  @ApiOperation({ summary: 'Mark sale as paid' })
   @ApiOkResponse({
     description: 'Sale marked as paid successfully.',
   })
@@ -56,6 +59,7 @@ export class SalesController {
     return await this.salesService.markSaleAsPaid(param);
   }
 
+  @ApiOperation({ summary: 'Mark sale as declined' })
   @ApiOkResponse({
     description: 'Sale marked as declined successfully.',
   })
@@ -77,6 +81,7 @@ export class SalesController {
     return await this.salesService.markSaleAsDeclined(declineSaleDto);
   }
 
+  @ApiOperation({ summary: 'Get all sales' })
   @ApiOkResponse({
     description: 'Sale found successfully.',
   })
@@ -88,6 +93,7 @@ export class SalesController {
     return await this.salesService.findOne(param);
   }
 
+  @ApiOperation({ summary: 'Get all sales by reservation id' })
   @ApiOkResponse({
     description: 'Sales found successfully.',
   })

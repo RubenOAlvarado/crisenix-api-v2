@@ -49,7 +49,7 @@ export class CreateUserDTO {
   @IsOptional()
   @IsString()
   @MaxLength(150)
-  secondLast?: string;
+  motherLastName?: string;
 
   @ApiPropertyOptional({
     description: 'User phone number',

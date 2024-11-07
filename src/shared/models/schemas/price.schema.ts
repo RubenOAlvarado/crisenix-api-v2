@@ -13,37 +13,37 @@ export class Prices {
     ref: 'OriginCities',
     required: true,
   })
-  city: OriginCities;
+  originCity: OriginCities | Types.ObjectId;
 
   @Prop({ required: true, enum: Currency, default: Currency.MXN })
   currency: Currency;
 
-  @Prop({ required: true, type: Number })
-  general?: number;
+  @Prop({ required: false, type: Number })
+  generalPrice?: number;
 
-  @Prop({ required: true, type: Number })
-  singleBase?: number;
+  @Prop({ required: false, type: Number })
+  singleBasePrice?: number;
 
-  @Prop({ required: true, type: Number })
-  doubleBase?: number;
+  @Prop({ required: false, type: Number })
+  doubleBasePrice?: number;
 
-  @Prop({ required: true, type: Number })
-  tripleBase?: number;
+  @Prop({ required: false, type: Number })
+  tripleBasePrice?: number;
 
-  @Prop({ required: true, type: Number })
-  quadrupleBase?: number;
+  @Prop({ required: false, type: Number })
+  quadrupleBasePrice?: number;
 
-  @Prop({ required: true, type: Number })
-  minor?: number;
+  @Prop({ required: false, type: Number })
+  minorPrice?: number;
 
-  @Prop({ required: true, type: Number })
-  inapam?: number;
+  @Prop({ required: false, type: Number })
+  inapamPrice?: number;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  constructor(city: OriginCities, currency: Currency, status: Status) {
-    this.city = city;
+  constructor(originCity: OriginCities, currency: Currency, status: Status) {
+    this.originCity = originCity;
     this.currency = currency;
     this.status = status;
   }

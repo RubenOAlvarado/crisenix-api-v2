@@ -4,6 +4,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { PrivatetourService } from './privatetour.service';
@@ -15,6 +16,7 @@ import { CreatePrivatetourDto } from '@/shared/models/dtos/request/privatetour/c
 export class PrivatetourController {
   constructor(private privateTourService: PrivatetourService) {}
 
+  @ApiOperation({ summary: 'Create a new private tour' })
   @ApiCreatedResponse({
     description: 'Private Tour created successfully.',
     type: CreatePrivatetourDto,

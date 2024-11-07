@@ -1,13 +1,7 @@
-import { Status } from '@/shared/enums/status.enum';
-import { TransferTypeExcel } from '@/shared/interfaces/excel/transferType.excel.interface';
 import { TransferTypes } from '@/shared/models/schemas/transfertype.schema';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 
@@ -44,39 +38,6 @@ export class TransfertypeService {
       return transferType._id.toString();
     } catch (error) {
       throw handleErrorsOnServices('Error getting transfer type.', error);
-    }
-  }
-
-  async mapTransferTypeNames(names: string[]): Promise<string[]> {
-    try {
-      if (!names.length) {
-        throw new BadRequestException('No transfer types provided.');
-      }
-      const transferTypes = [];
-      for (const name of names) {
-        const transferType = await this.getTransferTypeByName(name.trim());
-        if (!transferType) {
-          throw new NotFoundException(`Transfer type ${name} not found.`);
-        }
-        transferTypes.push(transferType);
-      }
-      return transferTypes;
-    } catch (error) {
-      throw handleErrorsOnServices('Error mapping transfer types.', error);
-    }
-  }
-
-  async insertTransferTypesBunch(
-    transferTypes: TransferTypeExcel[],
-  ): Promise<void> {
-    try {
-      const mappedTransferTypes = transferTypes.map(({ nombre }) => ({
-        name: nombre,
-        status: Status.ACTIVE,
-      }));
-      await this.transferModel.insertMany(mappedTransferTypes);
-    } catch (error) {
-      throw handleErrorsOnServices('Error inserting transfer types.', error);
     }
   }
 }

@@ -12,8 +12,6 @@ export class PrivatetourService {
     private readonly privateTourModel: Model<PrivateTours>,
   ) {}
 
-  // private readonly logger = new Logger(PrivatetourService.name);
-
   async create(
     createPrivateTourDto: CreatePrivatetourDto,
   ): Promise<CreatePrivatetourDto> {

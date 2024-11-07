@@ -22,7 +22,7 @@ export class ResponsePassengerDTO {
 
   @ApiPropertyOptional()
   @Expose()
-  secondLastName?: string;
+  motherLastName?: string;
 
   @ApiProperty()
   @Type(() => ResponseOriginCityDTO)

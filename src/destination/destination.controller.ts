@@ -18,6 +18,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { DestinationService } from './destination.service';
@@ -33,11 +34,12 @@ import { SearcherDestinationDto } from '@/shared/models/dtos/searcher/destinatio
 import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 
 @Controller('destinations')
-@ApiTags('Destination')
+@ApiTags('Destinations')
 @ApiExtraModels(PaginatedResponseDTO)
 export class DestinationController {
   constructor(private readonly destinationService: DestinationService) {}
 
+  @ApiOperation({ summary: 'Create a new destination.' })
   @ApiCreatedResponse({
     description: 'The destination has been created.',
     type: ResponseDestinationDTO,
@@ -51,6 +53,8 @@ export class DestinationController {
     return await this.destinationService.create(createDestinationDTO);
   }
 
+  @ApiOperation({ summary: 'Find all destinations.' })
+  @ApiPaginatedResponse(ResponseDestinationDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the destinations.',
   })
@@ -63,6 +67,7 @@ export class DestinationController {
     return await this.destinationService.findAll(queryDTO);
   }
 
+  @ApiOperation({ summary: 'Search destinations.' })
   @ApiPaginatedResponse(ResponseDestinationDTO)
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong searching the destinations.',
@@ -76,6 +81,7 @@ export class DestinationController {
     return await this.destinationService.search(queryDTO);
   }
 
+  @ApiOperation({ summary: 'Delete destination photos.' })
   @ApiOkResponse({
     description: 'Destination photos successfully deleted.',
     type: String,
@@ -102,6 +108,7 @@ export class DestinationController {
     return 'Destination photos successfully deleted.';
   }
 
+  @ApiOperation({ summary: 'Find a destination by id.' })
   @ApiOkResponse({
     description: 'The destination has been found.',
     type: ResponseDestinationDTO,
@@ -121,6 +128,7 @@ export class DestinationController {
     return await this.destinationService.findOne(IdValidator, query);
   }
 
+  @ApiOperation({ summary: 'Update a destination by id.' })
   @ApiOkResponse({
     description: 'Destination successfully updated.',
     type: ResponseDestinationDTO,
@@ -144,6 +152,7 @@ export class DestinationController {
     return updatedDestination;
   }
 
+  @ApiOperation({ summary: 'Change a destination status by id.' })
   @ApiOkResponse({
     description: 'Destination status successfully changed.',
   })

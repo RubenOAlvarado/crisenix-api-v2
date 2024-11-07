@@ -17,7 +17,7 @@ export class User {
   lastName: string;
 
   @Prop({ type: String, required: false })
-  secondLast?: string;
+  motherLastName?: string;
 
   @Prop({ type: String, required: false })
   phone?: string;

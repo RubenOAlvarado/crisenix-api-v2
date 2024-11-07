@@ -17,6 +17,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -34,6 +35,7 @@ import { UpdateUserDTO } from '@/shared/models/dtos/request/user/updateuser.dto'
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiOperation({ summary: 'Create a new user' })
   @ApiCreatedResponse({
     description: 'The user has been successfully created.',
     type: ResponseWebUserDTO,
@@ -53,6 +55,7 @@ export class UserController {
     return await this.userService.createWebUser(webUserDTO);
   }
 
+  @ApiOperation({ summary: 'Get all users' })
   @ApiPaginatedResponse(ResponseWebUserDTO)
   @ApiNotFoundResponse({
     description: 'No users found!',
@@ -65,6 +68,7 @@ export class UserController {
     return await this.userService.getDbUsers(query);
   }
 
+  @ApiOperation({ summary: 'Update a user profile' })
   @ApiOkResponse({
     description: 'The user has been updated succesfully.',
   })
@@ -86,6 +90,7 @@ export class UserController {
     return await this.userService.updateWebUser(params, updateWebUserDTO);
   }
 
+  @ApiOperation({ summary: 'Delete a user' })
   @ApiOkResponse({
     description: 'The user has been successfully deleted.',
     type: String,
@@ -102,6 +107,7 @@ export class UserController {
     return 'The user has been successfully deleted.';
   }
 
+  @ApiOperation({ summary: 'Get a user profile by his id' })
   @ApiOkResponse({
     description: 'The user profile have been succesfully found.',
     type: ResponseWebUserDTO,
@@ -118,6 +124,7 @@ export class UserController {
   }
 
   // app endpoints
+  @ApiOperation({ summary: 'Get a user profile by his id' })
   @ApiOkResponse({
     description: 'The user profile has been found.',
     type: ResponseWebUserDTO,
@@ -133,6 +140,7 @@ export class UserController {
     return await this.userService.getDbUserById(params);
   }
 
+  @ApiOperation({ summary: 'Get a user profile by his firebase id' })
   @ApiOkResponse({
     description: 'The user profile has been found by his firebase id.',
     type: ResponseWebUserDTO,
@@ -149,6 +157,7 @@ export class UserController {
     return await this.userService.getDbUserByFbUid(id);
   }
 
+  @ApiOperation({ summary: 'Update a user profile' })
   @ApiOkResponse({
     description: 'The user profiles have been succesfully updated.',
   })
@@ -167,6 +176,7 @@ export class UserController {
     return await this.userService.updateDbUser(params, updateUserDTO);
   }
 
+  @ApiOperation({ summary: 'Delete a user profile' })
   @ApiOkResponse({
     description: 'The user profile has been successfully deleted.',
   })

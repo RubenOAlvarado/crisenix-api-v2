@@ -8,7 +8,7 @@ export class DestinationValidator {
     example: '5f9d7a3b9d3e9e1b7c9b4b1c',
   })
   @IsString()
-  @IsMongoId()
+  @IsMongoId({ message: 'The destination id is invalid.' })
   destination: string;
 
   constructor(destination: string) {

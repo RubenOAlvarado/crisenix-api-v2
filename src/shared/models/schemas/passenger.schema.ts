@@ -14,15 +14,15 @@ export class Passengers {
   @Prop({ required: true, index: true, type: String })
   lastName: string;
 
-  @Prop({ required: true, index: true, type: String })
-  secondLastName: string;
+  @Prop({ required: false, type: String })
+  motherLastName: string;
 
   @Prop({
     type: Types.ObjectId,
     ref: 'AboardPoints',
     required: true,
   })
-  aboardPoint: AboardPoints;
+  aboardPoint: AboardPoints | Types.ObjectId;
 
   @Prop({
     enum: PriceBase,
@@ -36,27 +36,22 @@ export class Passengers {
     ref: 'Reservations',
     required: true,
   })
-  reservation: Reservations;
-
-  @Prop({ required: true, type: Number })
-  cost: number;
+  reservation: Reservations | Types.ObjectId;
 
   constructor(
     name: string,
     lastName: string,
-    secondLastName: string,
+    motherLastName: string,
     base: PriceBase,
     reservation: Reservations,
     aboardPoint: AboardPoints,
-    cost: number,
   ) {
     this.name = name;
     this.lastName = lastName;
-    this.secondLastName = secondLastName;
+    this.motherLastName = motherLastName;
     this.base = base;
     this.reservation = reservation;
     this.aboardPoint = aboardPoint;
-    this.cost = cost;
   }
 }
 

@@ -1,7 +1,6 @@
 import {
   ArrayNotEmpty,
   IsArray,
-  IsBoolean,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
@@ -9,7 +8,6 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Visa } from '@/shared/enums/visa.enum';
 
 export class CreateDestinationDTO {
   @ApiProperty({
@@ -57,36 +55,6 @@ export class CreateDestinationDTO {
   @IsString({ message: 'If sended, tentatives dates must not be null' })
   tentativeDates?: string;
 
-  @ApiProperty({
-    description: 'Destination passport if required',
-    example: true,
-  })
-  @IsNotEmpty()
-  @IsBoolean()
-  passport: boolean;
-
-  @ApiProperty({
-    enum: Visa,
-    description: 'Destination visa indicator (who should tramit it)',
-    example: Visa.CLIENTE,
-  })
-  @IsNotEmpty()
-  @IsString()
-  visa: Visa;
-
-  @ApiPropertyOptional({
-    description: 'Destination transfer type/s',
-    example: ['5f9d7b9b9d3e4b2b1c1b1c1b'],
-  })
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsMongoId({
-    each: true,
-    message: 'Should have at least one transferTypes',
-  })
-  transferTypes?: Array<string>;
-
   @ApiPropertyOptional({
     description: 'Destination translation route',
     example: 'Mex-NY-Mex',
@@ -107,10 +75,8 @@ export class CreateDestinationDTO {
   @MaxLength(300, { each: true, message: 'url too long' })
   photos?: Array<string>;
 
-  constructor(code: string, name: string, passport: boolean, visa: Visa) {
+  constructor(code: string, name: string) {
     this.code = code;
     this.name = name;
-    this.passport = passport;
-    this.visa = visa;
   }
 }

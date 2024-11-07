@@ -1,20 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Tours } from './tour.schema';
 import { Classifications } from './classification.schema';
+import { ItineraryActivityStatus } from '@/shared/enums/itineraries/itinerary.status.enum';
 
 @Schema({
   timestamps: true,
 })
-export class Itineraries {
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Tours' }] })
-  tour: Tours;
-
+export class ItineraryActivities {
   @Prop({ type: String, required: true })
   activityName: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Classifications' }] })
-  classification: Classifications;
+  classification: Classifications | Types.ObjectId;
 
   @Prop({ type: Boolean, default: false })
   hasAdditionalCost: boolean;
@@ -23,7 +20,10 @@ export class Itineraries {
     type: Number,
     required: false,
     validate: {
-      validator: function (this: Itineraries, value: boolean | undefined) {
+      validator: function (
+        this: ItineraryActivities,
+        value: boolean | undefined,
+      ) {
         return this.hasAdditionalCost ? value !== null : true;
       },
       message: 'Additional cost is required when hasAdditionalCost is true',
@@ -43,8 +43,14 @@ export class Itineraries {
   @Prop({ type: String, required: true })
   endTime: string;
 
+  @Prop({
+    type: String,
+    default: ItineraryActivityStatus.ACTIVE,
+    enum: ItineraryActivityStatus,
+  })
+  status: ItineraryActivityStatus;
+
   constructor(
-    tour: Tours,
     activityName: string,
     classification: Classifications,
     hasAdditionalCost: boolean,
@@ -53,8 +59,8 @@ export class Itineraries {
     startTime: string,
     endDate: Date,
     endTime: string,
+    status: ItineraryActivityStatus,
   ) {
-    this.tour = tour;
     this.activityName = activityName;
     this.classification = classification;
     this.hasAdditionalCost = hasAdditionalCost;
@@ -63,8 +69,10 @@ export class Itineraries {
     this.startTime = startTime;
     this.endDate = endDate;
     this.endTime = endTime;
+    this.status = status;
   }
 }
 
-export type ItineraryDocument = HydratedDocument<Itineraries>;
-export const ItinerarySchema = SchemaFactory.createForClass(Itineraries);
+export type ItineraryActivitiesDocument = HydratedDocument<ItineraryActivities>;
+export const ItineraryActivitiesSchema =
+  SchemaFactory.createForClass(ItineraryActivities);

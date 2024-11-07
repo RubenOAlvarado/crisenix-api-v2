@@ -18,6 +18,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { IdValidator } from '../shared/models/dtos/validators/id.validator';
@@ -32,6 +33,7 @@ import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/u
 export class AboardPointController {
   constructor(private service: AboardpointService) {}
 
+  @ApiOperation({ summary: 'Create a new aboard point.' })
   @ApiCreatedResponse({
     description: 'The aboard point has been successfully created.',
     type: ResponseAboardPointDTO,
@@ -48,6 +50,7 @@ export class AboardPointController {
     return await this.service.create(createAboardPointDTO);
   }
 
+  @ApiOperation({ summary: 'Find all aboard points.' })
   @ApiOkResponse({
     description: 'The aboard points has been successfully found.',
     type: ResponseAboardPointDTO,
@@ -63,6 +66,7 @@ export class AboardPointController {
     return await this.service.findAll(query);
   }
 
+  @ApiOperation({ summary: 'Find a aboard point by id.' })
   @ApiOkResponse({
     description: 'The aboard point has been found.',
     type: ResponseAboardPointDTO,
@@ -79,6 +83,7 @@ export class AboardPointController {
     return await this.service.findOne(param);
   }
 
+  @ApiOperation({ summary: 'Update a aboard point by id.' })
   @ApiOkResponse({
     description: 'The aboard point has been successfully updated.',
     type: ResponseAboardPointDTO,
@@ -105,6 +110,7 @@ export class AboardPointController {
     return updatedAboardpoint;
   }
 
+  @ApiOperation({ summary: 'Change a aboard point status by id.' })
   @ApiOkResponse({
     description: 'The aboard point status has been successfully changed.',
     type: String,
@@ -127,6 +133,7 @@ export class AboardPointController {
     return 'The aboard point status has been successfully changed.';
   }
 
+  @ApiOperation({ summary: 'Find all aboard points for the origin city.' })
   @ApiOkResponse({
     description: 'The aboard points for the origin city has been found.',
   })

@@ -1,16 +1,15 @@
 import { DestinationService } from '@/destination/destination.service';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { CatalogQueryFactory } from '@/shared/factories/catalogQuery.factory';
-import { TourExcel } from '@/shared/interfaces/excel/tour.excel.interface';
 import { PaginateResult } from '@/shared/interfaces/paginate.interface';
 import { TourLean } from '@/shared/types/tour/tour.lean.type';
 import { CreateTourDTO } from '@/shared/models/dtos/request/tour/createtour.dto';
 import { GetTourCatalogDTO } from '@/shared/models/dtos/request/tour/getTourCatalog.dto';
 import { UpdateTourDTO } from '@/shared/models/dtos/request/tour/updatetour.dto';
 import { UpdateTourCatalogDTO } from '@/shared/models/dtos/request/tour/updateTourCatalog.dto';
-import { PaginatedTourDTO } from '@/shared/models/dtos/response/tour/paginatedTour.dto';
 import { Tours, TourDocument } from '@/shared/models/schemas/tour.schema';
 import {
+  applyPopulateOptions,
   createPaginatedObject,
   handleErrorsOnServices,
 } from '@/shared/utilities/helpers';
@@ -26,6 +25,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, PopulateOptions } from 'mongoose';
 import { SearcherTourDTO } from '@/shared/models/dtos/searcher/tour/searcherTour.dto';
 import { ChangeTourStatusDTO } from '@/shared/models/dtos/searcher/tour/changeStatus.dto';
+import { CustomQueryOptions } from '@/shared/interfaces/queryOptions.interface';
+import { TourQueryDTO } from '@/shared/models/dtos/searcher/tour/tourQuery.dto';
+import { FetchOptionsDto } from '@/shared/models/dtos/searcher/fetchOptions.dto';
 
 @Injectable()
 export class TourService {
@@ -33,6 +35,86 @@ export class TourService {
     @InjectModel(Tours.name) private readonly tourModel: Model<Tours>,
     private readonly destinationService: DestinationService,
   ) {}
+
+  private readonly defaultExcludedFields = { __v: 0, createdAt: 0 };
+
+  private readonly defaultPopulateOptions: PopulateOptions[] = [
+    {
+      path: 'destination',
+      model: 'Destinations',
+      populate: [
+        {
+          path: 'categories',
+          model: 'Categories',
+          select: this.defaultExcludedFields,
+        },
+      ],
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'aboardHours.aboardPoint',
+      model: 'AboardPoints',
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'returnHours.aboardPoint',
+      model: 'AboardPoints',
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'transport',
+      model: 'Transports',
+      populate: [
+        {
+          path: 'transferType',
+          model: 'TransferTypes',
+          select: this.defaultExcludedFields,
+        },
+      ],
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'tourType',
+      model: 'TourTypes',
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'includedServices',
+      model: 'IncludedServices',
+      select: this.defaultExcludedFields,
+    },
+    {
+      path: 'itinerary',
+      model: 'ItineraryActivities',
+      select: this.defaultExcludedFields,
+    },
+  ];
+
+  private async queryBuilder({
+    page,
+    limit,
+    shouldPopulate = false,
+    filter = {},
+    sort = { createdAt: 1 },
+  }: CustomQueryOptions): Promise<TourLean[]> {
+    let query = this.tourModel
+      .find(filter)
+      .select(this.defaultExcludedFields)
+      .sort(sort);
+
+    if (page && limit) {
+      query = query.limit(limit).skip((page - 1) * limit);
+    }
+
+    if (shouldPopulate) {
+      query = applyPopulateOptions<TourDocument>(
+        query,
+        this.defaultPopulateOptions,
+      );
+    }
+
+    return await query.lean();
+  }
 
   async createTour(tour: CreateTourDTO): Promise<Tours> {
     try {
@@ -51,32 +133,19 @@ export class TourService {
     page,
     limit,
     status,
-  }: PaginatedTourDTO): Promise<PaginateResult<Tours>> {
+    shouldPopulate = false,
+  }: TourQueryDTO): Promise<PaginateResult<Tours>> {
     try {
-      const query = status ? { status } : {};
-      const docs = await this.tourModel
-        .find(query)
-        .limit(limit)
-        .skip(limit * (page - 1))
-        .populate('destination', { __v: 0, createdAt: 0 })
-        .populate('transport', { __v: 0, createdAt: 0 })
-        .populate('tourType', { __v: 0, createdAt: 0 })
-        .populate({
-          path: 'aboardHour.aboardPoint',
-          model: 'AboardPoints',
-          select: { __v: 0, createdAt: 0 },
-        })
-        .populate({
-          path: 'returnHour.aboardPoint',
-          model: 'AboardPoints',
-          select: { __v: 0, createdAt: 0 },
-        })
-        .select({ __v: 0, createdAt: 0 })
-        .lean()
-        .exec();
+      const filter = status ? { status } : {};
+      const docs = await this.queryBuilder({
+        page,
+        limit,
+        shouldPopulate,
+        filter,
+      });
       if (docs.length === 0)
         throw new NotFoundException('No tours registered.');
-      const totalDocs = await this.tourModel.countDocuments(query).exec();
+      const totalDocs = await this.tourModel.countDocuments(filter).exec();
 
       return createPaginatedObject<Tours>(docs, totalDocs, page, limit);
     } catch (error) {
@@ -87,57 +156,18 @@ export class TourService {
     }
   }
 
-  async findOne({ id }: IdValidator): Promise<TourLean> {
+  async findOne(
+    { id }: IdValidator,
+    { shouldPopulate }: FetchOptionsDto,
+  ): Promise<TourLean> {
     try {
-      const tour = await this.tourModel
-        .findById(id)
-        .populate('transport', { __v: 0, createdAt: 0 })
-        .populate('tourType', { __v: 0, createdAt: 0 })
-        .populate('includeds', { __v: 0, createdAt: 0 })
-        .populate('itineraries', { __v: 0, createdAt: 0 })
-        .populate({
-          path: 'destination',
-          model: 'Destinations',
-          populate: [
-            {
-              path: 'originCities',
-              model: 'OriginCities',
-              populate: {
-                path: 'aboardPoints',
-                model: 'AboardPoints',
-                select: { __v: 0, createdAt: 0 },
-              },
-              select: { __v: 0, createdAt: 0 },
-            },
-            {
-              path: 'categories',
-              model: 'Categories',
-              select: { __v: 0, createdAt: 0 },
-            },
-            {
-              path: 'transferTypes',
-              model: 'TransferTypes',
-              select: { __v: 0, createdAt: 0 },
-            },
-          ],
-          select: { __v: 0, createdAt: 0 },
-        })
-        .populate({
-          path: 'aboardHour.aboardPoint',
-          model: 'AboardPoints',
-          select: { __v: 0, createdAt: 0 },
-        })
-        .populate({
-          path: 'returnHour.aboardPoint',
-          model: 'AboardPoints',
-          select: { __v: 0, createdAt: 0 },
-        })
-        .select({ __v: 0, createdAt: 0 })
-        .lean()
-        .exec();
+      const tours = await this.queryBuilder({
+        filter: { _id: id },
+        shouldPopulate,
+      });
 
-      if (!tour) throw new NotFoundException('Tour not found.');
-      return tour;
+      if (!tours[0]) throw new NotFoundException('Tour not found.');
+      return tours[0];
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong getting tour by id.',
@@ -153,34 +183,12 @@ export class TourService {
       const validDestination =
         await this.destinationService.getValidatedDestination(destination);
       if (validDestination) {
-        const tour = await this.tourModel
-          .findOne({ destination })
-          .sort({ createdAt: -1 })
-          .populate('transport', { __v: 0, createdAt: 0 })
-          .populate('tourType', { __v: 0, createdAt: 0 })
-          .populate('includeds', { __v: 0, createdAt: 0 })
-          .populate('itineraries', { __v: 0, createdAt: 0 })
-          .populate({
-            path: 'destination',
-            model: 'Destinations',
-            select: { __v: 0, createdAt: 0 },
-          })
-          .populate({
-            path: 'aboardHour.aboardPoint',
-            model: 'AboardPoints',
-            select: { __v: 0, createdAt: 0 },
-          })
-          .populate({
-            path: 'returnHour.aboardPoint',
-            model: 'AboardPoints',
-            select: { __v: 0, createdAt: 0 },
-          })
-          .select({ __v: 0, createdAt: 0 })
-          .limit(1)
-          .lean();
+        const filter = { destination };
+        const sort = { createdAt: -1 };
+        const tour = await this.queryBuilder({ filter, sort });
 
-        if (!tour) throw new NotFoundException('No tour registered.');
-        return tour;
+        if (!tour[0]) throw new NotFoundException('No tour registered.');
+        return tour[0];
       }
       return {} as TourLean;
     } catch (error) {
@@ -361,28 +369,20 @@ export class TourService {
     }
   }
 
-  async insertToursBunch(jsonObject: TourExcel[]) {
-    try {
-      // const tours = await this.mapToDto(jsonObject);
-      await this.tourModel.insertMany(jsonObject);
-    } catch (error) {
-      throw handleErrorsOnServices('Error inserting tours bunch.', error);
-    }
-  }
-
   async updateTourCatalog(
     { id }: IdValidator,
     { catalogName, data }: UpdateTourCatalogDTO,
   ): Promise<any> {
     try {
-      const isIdValidator = catalogName === 'prices';
+      const isIdValidator =
+        catalogName === 'prices' || catalogName === 'itinerary';
 
       const transformedData = isIdValidator
         ? data.map(({ id }: IdValidator) => id)
         : data;
-      const update = { $set: { [catalogName]: transformedData } };
+      const updateQuery = { $set: { [catalogName]: transformedData } };
       const tour = await this.tourModel
-        .findByIdAndUpdate(id, update, { new: true })
+        .findByIdAndUpdate(id, updateQuery, { new: true })
         .populate(catalogName)
         .exec();
 

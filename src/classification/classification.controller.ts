@@ -16,6 +16,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { ClassificationService } from './classification.service';
@@ -33,6 +34,7 @@ import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 export class ClassificationController {
   constructor(private readonly classificationService: ClassificationService) {}
 
+  @ApiOperation({ summary: 'Create a new classification.' })
   @ApiCreatedResponse({
     description: 'Classification created successfully.',
     type: ResponseClassificationDTO,
@@ -49,6 +51,7 @@ export class ClassificationController {
     return await this.classificationService.create(createClassificationDTO);
   }
 
+  @ApiOperation({ summary: 'Find all classifications.' })
   @ApiOkResponse({
     description: 'Categories found successfully.',
     type: ResponseClassificationDTO,
@@ -66,6 +69,7 @@ export class ClassificationController {
     return await this.classificationService.findAll(status);
   }
 
+  @ApiOperation({ summary: 'Find a classification by id.' })
   @ApiOkResponse({
     description: 'classification found successfully.',
     type: ResponseClassificationDTO,
@@ -81,6 +85,7 @@ export class ClassificationController {
     return await this.classificationService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Update a classification by id.' })
   @ApiOkResponse({
     description: 'classification updated successfully.',
     type: ResponseClassificationDTO,
@@ -107,6 +112,7 @@ export class ClassificationController {
     return updatedclassification;
   }
 
+  @ApiOperation({ summary: 'Change a classification status by id.' })
   @ApiOkResponse({
     description: 'The classification was deleted successfully.',
     type: String,

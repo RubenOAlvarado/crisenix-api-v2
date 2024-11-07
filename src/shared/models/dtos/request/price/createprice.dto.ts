@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -11,79 +12,84 @@ import { Currency } from 'src/shared/enums/currency.enum';
 
 export class CreatePriceDTO {
   @ApiProperty({
-    description: 'Destination id that this price belongs to.',
+    description: 'Origin City id that this price belongs to.',
     example: '60f1b2b3e6b2f1b2b3e6b2f1',
+    required: true,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Origin City id is required' })
   @IsString()
-  @IsMongoId()
-  destination: string;
-
-  @ApiProperty({
-    description: 'City id that this price belongs to.',
-    example: '60f1b2b3e6b2f1b2b3e6b2f1',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @IsMongoId()
-  city: string;
+  @IsMongoId({ message: 'Origin City id must be a valid ObjectId' })
+  originCity: string;
 
   @ApiProperty({
     enum: Currency,
     description: 'Currency of the price.',
     example: Currency.MXN,
+    default: Currency.MXN,
+    required: true,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Currency is required' })
   @IsEnum(Currency)
   currency: Currency;
 
   @ApiPropertyOptional({
     description: 'General price.',
     example: 100,
+    required: true,
   })
-  @IsOptional()
+  @IsNotEmpty({ message: 'General price is required' })
   @IsNumber()
-  general?: number;
+  @IsPositive({ message: 'General price must be a positive number' })
+  generalPrice: number;
 
   @ApiPropertyOptional({
     description: 'Single base price.',
     example: 100,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
-  singleBase?: number;
+  @IsPositive({ message: 'Single base price must be a positive number' })
+  singleBasePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Double base price.',
     example: 100,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
-  doubleBase?: number;
+  @IsPositive({ message: 'Double base price must be a positive number' })
+  doubleBasePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Triple base price.',
     example: 100,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
-  tripleBase?: number;
+  tripleBasePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Quadruple base price.',
     example: 100,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
-  quadrupleBase?: number;
+  @IsPositive({ message: 'Quadruple base price must be a positive number' })
+  quadrupleBasePrice?: number;
 
   @ApiPropertyOptional({
     description: 'Minor base price (just for childrens).',
     example: 100,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
-  minor?: number;
+  @IsPositive({ message: 'Minor base price must be a positive number' })
+  minorPrice?: number;
 
   @ApiPropertyOptional({
     description: 'Inapam base price (just for old people).',
@@ -91,11 +97,12 @@ export class CreatePriceDTO {
   })
   @IsOptional()
   @IsNumber()
-  inapam?: number;
+  @IsPositive({ message: 'Inapam base price must be a positive number' })
+  inapamPrice?: number;
 
-  constructor(destination: string, city: string, currency: Currency) {
-    this.destination = destination;
-    this.city = city;
+  constructor(originCity: string, currency: Currency, generalPrice: number) {
+    this.originCity = originCity;
     this.currency = currency;
+    this.generalPrice = generalPrice;
   }
 }

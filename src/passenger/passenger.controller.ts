@@ -13,6 +13,7 @@ import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { PassengerService } from './passenger.service';
@@ -26,6 +27,7 @@ import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 export class PassengerController {
   constructor(private passengerService: PassengerService) {}
 
+  @ApiOperation({ summary: 'Create a new passenger' })
   @ApiCreatedResponse({
     description: 'Passenger created successfully.',
     type: ResponsePassengerDTO,
@@ -42,6 +44,7 @@ export class PassengerController {
     return await this.passengerService.create(createPassengerDTO);
   }
 
+  @ApiOperation({ summary: 'Get all passengers' })
   @ApiCreatedResponse({
     description: 'Passengers fetched successfully.',
     type: ResponsePassengerDTO,
@@ -58,6 +61,7 @@ export class PassengerController {
     return await this.passengerService.getAll();
   }
 
+  @ApiOperation({ summary: 'Get a passenger by id' })
   @ApiCreatedResponse({
     description: 'Passenger fetched successfully.',
     type: ResponsePassengerDTO,
@@ -73,6 +77,7 @@ export class PassengerController {
     return await this.passengerService.getById(id);
   }
 
+  @ApiOperation({ summary: 'Delete a passenger' })
   @ApiCreatedResponse({
     description: 'Passenger deleted successfully.',
   })
@@ -88,6 +93,7 @@ export class PassengerController {
     return 'Passenger deleted successfully.';
   }
 
+  @ApiOperation({ summary: 'Update a passenger' })
   @ApiCreatedResponse({
     description: 'Passenger updated successfully.',
   })
@@ -103,5 +109,55 @@ export class PassengerController {
     @Body() updatePassengerDTO: CreatePassengerDTO,
   ) {
     return await this.passengerService.update(id, updatePassengerDTO);
+  }
+
+  @ApiOperation({ summary: 'Get passenger list by reservation id' })
+  @ApiCreatedResponse({
+    description: 'Passenger list fetched successfully.',
+    type: ResponsePassengerDTO,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passengers list.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Not passengers registered for this reservation.',
+  })
+  @Get('reservation/:id')
+  async getByReservationId(@Param() param: IdValidator) {
+    return await this.passengerService.getByReservationId(param);
+  }
+
+  @ApiOperation({ summary: 'Get passenger list by aboard point id' })
+  @ApiCreatedResponse({
+    description: 'Passenger list fetched successfully.',
+    type: ResponsePassengerDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passengers list.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Not passengers registered for this aboard point.',
+  })
+  @Get('aboardpoint/:id')
+  async getByAboardPointId(@Param() param: IdValidator) {
+    return await this.passengerService.getByAboardPointId(param);
+  }
+
+  @ApiOperation({ summary: 'Get passenger list by tour id' })
+  @ApiCreatedResponse({
+    description: 'Passenger list fetched successfully.',
+    type: ResponsePassengerDTO,
+    isArray: true,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Something went wrong fetching the passengers list.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Not passengers registered for this tour.',
+  })
+  @Get('tour/:id')
+  async getByTourId(@Param() param: IdValidator) {
+    return await this.passengerService.getByTourId(param);
   }
 }

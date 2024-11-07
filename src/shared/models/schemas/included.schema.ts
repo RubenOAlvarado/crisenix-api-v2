@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Entries } from './entry.schema';
 import { Status } from '@/shared/enums/status.enum';
 
@@ -11,11 +11,11 @@ export class IncludedServices {
   concept: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: 'Entries',
     required: true,
   })
-  entry: Entries;
+  entry: Entries | Types.ObjectId;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;

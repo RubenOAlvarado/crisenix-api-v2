@@ -1,22 +1,14 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { PricesService } from './prices.service';
 import { ResponsePriceDTO } from '@/shared/models/dtos/response/price/responseprice.dto';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
@@ -29,6 +21,7 @@ import { Public } from '@/auth/public.decorator';
 export class PricesController {
   constructor(private pricesService: PricesService) {}
 
+  @ApiOperation({ summary: 'Create a new Price' })
   @ApiCreatedResponse({
     type: ResponsePriceDTO,
     description: 'Price created successfully.',
@@ -42,6 +35,7 @@ export class PricesController {
     return await this.pricesService.createPrice(createPriceDTO);
   }
 
+  @ApiOperation({ summary: 'Get all Prices' })
   @ApiOkResponse({
     type: ResponsePriceDTO,
     isArray: true,
@@ -57,6 +51,7 @@ export class PricesController {
     return await this.pricesService.getPrices();
   }
 
+  @ApiOperation({ summary: 'Get Price by id' })
   @ApiOkResponse({
     type: ResponsePriceDTO,
     description: 'Price found successfully.',
@@ -70,6 +65,7 @@ export class PricesController {
     return await this.pricesService.getPriceById(params);
   }
 
+  @ApiOperation({ summary: 'Update Price' })
   @ApiOkResponse({
     type: ResponsePriceDTO,
     description: 'Price updated successfully.',
@@ -85,20 +81,5 @@ export class PricesController {
     @Param() params: IdValidator,
   ) {
     return await this.pricesService.updatePrice(params, updatePriceDTO);
-  }
-
-  @ApiOkResponse({
-    type: String,
-    description: 'Price updated successfully.',
-  })
-  @ApiNotFoundResponse({ description: 'Price not found.' })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong updating Price.',
-  })
-  @ApiBadRequestResponse({ description: 'Price already inactive.' })
-  @Delete(':id')
-  async inactivePrice(@Param() params: IdValidator) {
-    await this.pricesService.inactivatePrice(params);
-    return 'Price inactivated successfully.';
   }
 }

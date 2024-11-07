@@ -23,6 +23,39 @@ export function populateSubcatalogsQuery(populate?: boolean): PipelineStage[] {
       {
         $unwind: { path: '$tourType', preserveNullAndEmptyArrays: true },
       },
+      {
+        $lookup: {
+          from: 'transports',
+          localField: 'transport',
+          foreignField: '_id',
+          as: 'transport',
+        },
+      },
+      {
+        $unwind: { path: '$transport', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: 'prices',
+          localField: 'price',
+          foreignField: '_id',
+          as: 'price',
+        },
+      },
+      {
+        $unwind: { path: '$price', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: 'itineraryactivities',
+          localField: 'itinerary',
+          foreignField: '_id',
+          as: 'itinerary',
+        },
+      },
+      {
+        $unwind: { path: '$itinerary', preserveNullAndEmptyArrays: true },
+      },
     ];
   }
   return [];

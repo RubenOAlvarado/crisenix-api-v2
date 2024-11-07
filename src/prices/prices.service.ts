@@ -1,5 +1,3 @@
-import { Status } from '@/shared/enums/status.enum';
-import { PricesExcel } from '@/shared/interfaces/excel/prices.excel.interface';
 import { CreatePriceDTO } from '@/shared/models/dtos/request/price/createprice.dto';
 import { UpdatePriceDTO } from '@/shared/models/dtos/request/price/updateprice.dto';
 import { Prices } from '@/shared/models/schemas/price.schema';
@@ -76,31 +74,6 @@ export class PricesService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while looking for price.',
-        error,
-      );
-    }
-  }
-
-  async inactivatePrice({ id }: IdValidator): Promise<void> {
-    try {
-      await this.priceModel
-        .findByIdAndUpdate(id, { status: Status.INACTIVE }, { new: true })
-        .exec();
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while inactivating price.',
-        error,
-      );
-    }
-  }
-
-  async insertPricesBunch(prices: PricesExcel[]): Promise<void> {
-    try {
-      // const pricesDTO: CreatePriceDTO[] = await this.mapDTO(prices);
-      await this.priceModel.insertMany(prices);
-    } catch (error) {
-      throw handleErrorsOnServices(
-        'Something went wrong while inserting categories.',
         error,
       );
     }

@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Tours } from './tour.schema';
 import { User } from './user.schema';
-import { Passengers } from './passenger.schema';
 import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
 
 @Schema({
@@ -75,9 +74,6 @@ export class Reservations {
 
   @Prop({ type: Number, required: true })
   totalSeats: number;
-
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Passengers' }] })
-  passengers?: Array<Passengers>;
 
   @Prop({ required: true, type: Date })
   paymentDeadline: Date;

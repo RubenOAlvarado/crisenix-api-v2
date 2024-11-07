@@ -7,6 +7,7 @@ import { Transports } from './transports.schema';
 import { Prices } from './price.schema';
 import { TourStatus } from '@/shared/enums/tour/status.enum';
 import { IncludedServices } from './included.schema';
+import { ItineraryActivities } from './itineraryActivities.schema';
 
 @Schema({
   timestamps: true,
@@ -17,7 +18,7 @@ export class Tours {
     ref: 'Destinations',
     required: true,
   })
-  destination: Destinations;
+  destination: Destinations | Types.ObjectId;
 
   @Prop({ type: String, required: true, index: true, unique: true })
   code: string;
@@ -45,7 +46,7 @@ export class Tours {
   @Prop({ type: Array, required: false })
   aboardHours?: Array<{
     hour: string;
-    aboardPoint: AboardPoints;
+    aboardPoint: AboardPoints | Types.ObjectId;
   }>;
 
   @Prop({ type: Number, default: 1, required: true })
@@ -59,13 +60,16 @@ export class Tours {
     ref: 'Transports',
     required: true,
   })
-  transport: Transports;
+  transport: Transports | Types.ObjectId;
 
   @Prop({ type: Date, required: true })
   returnDate: Date;
 
   @Prop({ type: Array, required: false })
-  returnHours?: Array<{ hour: string; aboardPoint: AboardPoints }>;
+  returnHours?: Array<{
+    hour: string;
+    aboardPoint: AboardPoints | Types.ObjectId;
+  }>;
 
   @Prop({ type: Array, required: false })
   coordinators?: Array<{
@@ -85,7 +89,7 @@ export class Tours {
     ref: 'TourTypes',
     required: true,
   })
-  tourType: TourTypes;
+  tourType: TourTypes | Types.ObjectId;
 
   @Prop({
     type: [{ type: Types.ObjectId, ref: 'IncludedServices' }],
@@ -96,26 +100,26 @@ export class Tours {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Prices' }], required: true })
   prices: Array<Prices>;
 
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'ItineraryActivities' }],
+    required: false,
+  })
+  itinerary?: Array<ItineraryActivities>;
+
   constructor(
-    destination: Destinations,
+    destination: Destinations | Types.ObjectId,
     code: string,
     status: TourStatus,
     seats: number,
     initDate: Date,
-    transport: Transports,
+    transport: Transports | Types.ObjectId,
     returnDate: Date,
-    tourType: TourTypes,
+    tourType: TourTypes | Types.ObjectId,
     prices: Array<Prices>,
     availableSeats: number,
     ocuppiedSeats: number,
     days: number,
     nights: number,
-    aboardHours?: Array<{ hour: string; aboardPoint: AboardPoints }>,
-    returnHours?: Array<{ hour: string; aboardPoint: AboardPoints }>,
-    coordinators?: Array<{ transport: string; name: string; phone: string }>,
-    front?: string,
-    recommendations?: string,
-    includedServices?: Array<IncludedServices>,
   ) {
     this.destination = destination;
     this.code = code;
@@ -128,14 +132,8 @@ export class Tours {
     this.prices = prices;
     this.availableSeats = availableSeats;
     this.ocuppiedSeats = ocuppiedSeats;
-    this.aboardHours = aboardHours;
     this.days = days;
     this.nights = nights;
-    this.returnHours = returnHours;
-    this.coordinators = coordinators;
-    this.front = front;
-    this.recommendations = recommendations;
-    this.includedServices = includedServices;
   }
 }
 

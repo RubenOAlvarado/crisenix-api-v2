@@ -1,8 +1,8 @@
 import { IntersectionType } from '@nestjs/swagger';
-import { PaginationDTO } from '../pagination.dto';
 import { FetchOptionsDto } from '../fetchOptions.dto';
+import { PaginatedTourDTO } from '../../response/tour/paginatedTour.dto';
 
 export class TourQueryDTO extends IntersectionType(
-  PaginationDTO,
+  PaginatedTourDTO,
   FetchOptionsDto,
 ) {}

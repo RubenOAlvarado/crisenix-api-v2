@@ -8,6 +8,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdatePassengerDTO } from '../shared/models/dtos/request/passenger/updatepassenger.dto';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 
 @Injectable()
 export class PassengerService {
@@ -84,6 +85,45 @@ export class PassengerService {
   async getAll(): Promise<PassengerDocument[]> {
     try {
       return await this.passengerModel.find();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong fetching passengers.',
+        error,
+      );
+    }
+  }
+
+  async getByReservationId({ id }: IdValidator): Promise<PassengerDocument[]> {
+    try {
+      return await this.passengerModel.find({ reservation: id }).exec();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong fetching passengers.',
+        error,
+      );
+    }
+  }
+
+  async getByAboardPointId({ id }: IdValidator): Promise<PassengerDocument[]> {
+    try {
+      return await this.passengerModel.find({ aboardPoint: id }).exec();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong fetching passengers.',
+        error,
+      );
+    }
+  }
+
+  async getByTourId({ id }: IdValidator): Promise<PassengerDocument[]> {
+    try {
+      return await this.passengerModel
+        .find()
+        .populate({
+          path: 'reservation',
+          match: { tour: id },
+        })
+        .exec();
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong fetching passengers.',

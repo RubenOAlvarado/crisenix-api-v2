@@ -9,34 +9,6 @@ export class PopulateSubcatalogsStrategy
       ? [
           {
             $lookup: {
-              from: 'origincities',
-              localField: 'originCities',
-              foreignField: '_id',
-              as: 'originCities',
-            },
-          },
-          {
-            $unwind: {
-              path: '$originCities',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
-              from: 'transferTypes',
-              localField: 'transferTypes',
-              foreignField: '_id',
-              as: 'transferTypes',
-            },
-          },
-          {
-            $unwind: {
-              path: '$transferTypes',
-              preserveNullAndEmptyArrays: true,
-            },
-          },
-          {
-            $lookup: {
               from: 'categories',
               localField: 'categories',
               foreignField: '_id',

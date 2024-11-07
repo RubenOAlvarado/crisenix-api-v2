@@ -2,20 +2,22 @@ import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedRes
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@/auth/public.decorator';
@@ -26,6 +28,7 @@ import { ResponseIncludedDTO } from '@/shared/models/dtos/response/included/resp
 import { CreateIncludedServiceDTO } from '@/shared/models/dtos/request/included/createincluded.dto';
 import { UpdateIncludedServiceDTO } from '@/shared/models/dtos/request/included/updateincluded.dto';
 import { IncludedServicesService } from './includedServices.service';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @Controller('included-services')
 @ApiTags('Included Services')
@@ -35,6 +38,7 @@ export class IncludedServicesController {
     private readonly includedServicesService: IncludedServicesService,
   ) {}
 
+  @ApiOperation({ summary: 'Create a new included service.' })
   @ApiCreatedResponse({
     description: 'The included service has been found.',
     type: ResponseIncludedDTO,
@@ -48,6 +52,7 @@ export class IncludedServicesController {
     return await this.includedServicesService.create(createIncludedDTO);
   }
 
+  @ApiOperation({ summary: 'Find all included services.' })
   @ApiPaginatedResponse(ResponseIncludedDTO)
   @ApiNotFoundResponse({ description: 'No included services registered.' })
   @ApiInternalServerErrorResponse({
@@ -59,6 +64,7 @@ export class IncludedServicesController {
     return await this.includedServicesService.findAll(queryDTO);
   }
 
+  @ApiOperation({ summary: 'Find a included service by id.' })
   @ApiOkResponse({
     description: 'The included service has been found.',
     type: ResponseIncludedDTO,
@@ -75,6 +81,7 @@ export class IncludedServicesController {
     return await this.includedServicesService.findOne(param);
   }
 
+  @ApiOperation({ summary: 'Update a included service.' })
   @ApiOkResponse({
     description: 'The included service has been updated.',
     type: ResponseIncludedDTO,
@@ -97,19 +104,26 @@ export class IncludedServicesController {
     );
   }
 
+  @ApiOperation({ summary: 'Change a included service status by id.' })
   @ApiOkResponse({
-    description: 'The included service has been deleted.',
+    description: 'The included service status has been sucessfully changed.',
     type: String,
   })
   @ApiNotFoundResponse({
     description: 'Included service not found.',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Something went wrong deleting the included service.',
+    description: 'Something went wrong changing the included service status.',
   })
-  @Delete(':id')
-  async delete(@Param() IdValidator: IdValidator): Promise<string> {
-    await this.includedServicesService.delete(IdValidator);
-    return 'Included service deleted successfully.';
+  @ApiBadRequestResponse({
+    description: 'The status is invalid.',
+  })
+  @Patch(':id/change-status')
+  async delete(
+    @Param() IdValidator: IdValidator,
+    @Body() body: StatusDTO,
+  ): Promise<string> {
+    await this.includedServicesService.changeStatus(IdValidator, body);
+    return 'The included service status has been sucessfully changed.';
   }
 }

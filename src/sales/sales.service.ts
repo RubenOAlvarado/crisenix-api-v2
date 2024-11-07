@@ -7,11 +7,14 @@ import { CreateSaleDTO } from '@/shared/models/dtos/request/sales/createsales.dt
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { SalesStatus } from '@/shared/enums/sales/saleStatus.enum';
 import { DeclineSaleDto } from '@/shared/models/dtos/request/sales/declineSale.dto';
+import { ReservationService } from '@/reservation/reservation.service';
+import { ReservationStatus } from '@/shared/enums/reservation-status.enum';
 
 @Injectable()
 export class SalesService {
   constructor(
     @InjectModel(Sales.name) private readonly salesModel: Model<Sales>,
+    private readonly reservationService: ReservationService,
   ) {}
 
   async create(sale: CreateSaleDTO): Promise<SalesDocument> {
@@ -68,14 +71,20 @@ export class SalesService {
 
   async markSaleAsPaid({ id }: IdValidator): Promise<Sales> {
     try {
-      const sale = await this.validateSale(id);
+      const validSale = await this.validateSale(id);
       const updatedSale = await this.salesModel
         .findByIdAndUpdate(
-          sale._id,
+          validSale._id,
           { status: SalesStatus.PAID, paymentDate: new Date() },
           { new: true },
         )
         .exec();
+      await this.reservationService.changeStatus(
+        { id: validSale.reservation.toString() },
+        {
+          status: ReservationStatus.PAID,
+        },
+      );
       if (!updatedSale) {
         throw new NotFoundException(`Sale not found.`);
       }
@@ -93,18 +102,23 @@ export class SalesService {
     failureReason,
   }: DeclineSaleDto): Promise<Sales> {
     try {
-      const sale = await this.validateSale(id);
+      const validSale = await this.validateSale(id);
       const updatedSale = await this.salesModel
         .findByIdAndUpdate(
-          sale._id,
+          validSale._id,
           { status: SalesStatus.DECLINED, failureReason },
           { new: true },
         )
         .exec();
+      await this.reservationService.changeStatus(
+        { id: validSale.reservation.toString() },
+        {
+          status: ReservationStatus.CANCELLED,
+        },
+      );
       if (!updatedSale) {
         throw new NotFoundException(`Sale not found.`);
       }
-      // TODO: cancel reservation and release seats
       return updatedSale;
     } catch (error) {
       throw handleErrorsOnServices(
