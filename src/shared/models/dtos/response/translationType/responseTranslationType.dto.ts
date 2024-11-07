@@ -2,7 +2,7 @@ import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transf
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-export class ResponseTransferTypeDTO {
+export class ResponseTransportTypeDTO {
   @ApiPropertyOptional()
   @Expose()
   @ObjectIdToString()

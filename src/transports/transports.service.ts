@@ -30,9 +30,7 @@ export class TransportsService {
 
   async insertBunch(transports: CreateTransportsDTO[]): Promise<void> {
     try {
-      await this.transportModel.insertMany(transports).catch((error) => {
-        throw new Error(error);
-      });
+      await this.transportModel.insertMany(transports);
     } catch (error) {
       throw handleErrorsOnServices('Error inserting transports.', error);
     }

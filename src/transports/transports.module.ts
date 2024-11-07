@@ -6,7 +6,7 @@ import {
   Transports,
   TransportsSchema,
 } from '@/shared/models/schemas/transports.schema';
-import { TransfertypeModule } from '@/transfertype/transfertype.module';
+import { TransportTypeModule } from '@/transporttype/transporttype.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { TransfertypeModule } from '@/transfertype/transfertype.module';
         schema: TransportsSchema,
       },
     ]),
-    TransfertypeModule,
+    TransportTypeModule,
   ],
   controllers: [TransportsController],
   providers: [TransportsService],

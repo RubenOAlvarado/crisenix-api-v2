@@ -20,14 +20,14 @@ export abstract class BaseSheetLoader<T> implements SheetLoader {
       if (!sheet) {
         throw new Error(`Sheet ${targetSheet} is null or undefined.`);
       }
-      const sheetData = this.transformSheet(sheet);
+      const sheetData: T[] = (await this.transformSheet(sheet)) as T[];
       await this.service.insertBunch(sheetData);
     } catch (error) {
       throw handleErrorsOnServices(`Error loading ${this.sheetName}.`, error);
     }
   }
 
-  protected transformSheet(sheet: WorkSheet): T[] {
+  protected async transformSheet(sheet: WorkSheet): Promise<any[]> {
     if (!sheet) {
       throw new Error('Sheet is null or undefined.');
     }

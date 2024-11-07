@@ -7,8 +7,6 @@ import {
   Destinations,
 } from '@/shared/models/schemas/destination.schema';
 import { CategoryModule } from '@/category/category.module';
-import { TransfertypeModule } from '@/transfertype/transfertype.module';
-import { OrigincityModule } from '@/origincity/origincity.module';
 
 @Module({
   imports: [
@@ -16,8 +14,6 @@ import { OrigincityModule } from '@/origincity/origincity.module';
       { name: Destinations.name, schema: DestinationSchema },
     ]),
     CategoryModule,
-    TransfertypeModule,
-    OrigincityModule,
   ],
   controllers: [DestinationController],
   providers: [DestinationService],

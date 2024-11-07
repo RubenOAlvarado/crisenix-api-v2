@@ -11,7 +11,7 @@ import { Public } from '@/auth/public.decorator';
 import { CatalogManagerService } from './catalog-manager.service';
 
 @ApiExcludeController()
-@Controller('file-manager')
+@Controller('loader')
 export class FileManagerController {
   constructor(private readonly catalogFileManager: CatalogManagerService) {}
 

@@ -1,0 +1,15 @@
+meta {
+  name: Loader
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/v2/loader
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(C:\Users\Usuario\Downloads\Test transports.xlsx)
+}

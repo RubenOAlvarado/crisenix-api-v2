@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { TransferTypes } from './transfertype.schema';
 import { Status } from '@/shared/enums/status.enum';
+import { TransportTypes } from './transporttype.schema';
 
 @Schema({
   timestamps: true,
@@ -12,17 +12,17 @@ export class Transports {
 
   @Prop({
     type: Types.ObjectId,
-    ref: 'TransferTypes',
+    ref: 'TransportTypes',
     required: true,
   })
-  transferType: TransferTypes | Types.ObjectId;
+  transportType: TransportTypes | Types.ObjectId;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  constructor(name: string, transferType: TransferTypes, status: Status) {
+  constructor(name: string, transportType: TransportTypes, status: Status) {
     this.name = name;
-    this.transferType = transferType;
+    this.transportType = transportType;
     this.status = status;
   }
 }

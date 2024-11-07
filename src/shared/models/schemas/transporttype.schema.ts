@@ -5,7 +5,7 @@ import { HydratedDocument } from 'mongoose';
 @Schema({
   timestamps: true,
 })
-export class TransferTypes {
+export class TransportTypes {
   @Prop({ type: String, required: true, index: true })
   name: string;
 
@@ -18,5 +18,6 @@ export class TransferTypes {
   }
 }
 
-export type TransferTypesDocument = HydratedDocument<TransferTypes>;
-export const TransferTypesSchema = SchemaFactory.createForClass(TransferTypes);
+export type TransportTypesDocument = HydratedDocument<TransportTypes>;
+export const TransportTypesSchema =
+  SchemaFactory.createForClass(TransportTypes);

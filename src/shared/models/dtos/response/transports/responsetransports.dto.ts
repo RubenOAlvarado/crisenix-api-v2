@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
-import { ResponseTransferTypeDTO } from '../translationType/responseTranslationType.dto';
+import { ResponseTransportTypeDTO } from '../translationType/responseTranslationType.dto';
 import { Expose, Type } from 'class-transformer';
 import { ObjectIdToString } from '@/shared/decorators/objectIdTransformer.transformer';
 
@@ -14,12 +14,12 @@ export class ResponseTransportsDTO {
   name: string;
 
   @ApiProperty()
-  @Type(() => ResponseTransferTypeDTO)
+  @Type(() => ResponseTransportTypeDTO)
   @Expose()
-  transferType?: ResponseTransferTypeDTO | string;
+  TransportType?: ResponseTransportTypeDTO | string;
 
-  constructor(name: string, transferType: ResponseTransferTypeDTO | string) {
+  constructor(name: string, TransportType: ResponseTransportTypeDTO | string) {
     this.name = name;
-    this.transferType = transferType;
+    this.TransportType = TransportType;
   }
 }

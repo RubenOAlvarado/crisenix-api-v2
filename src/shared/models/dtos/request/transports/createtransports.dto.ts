@@ -1,41 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
-import { Status } from 'src/shared/enums/status.enum';
+import { IsMongoId, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateTransportsDTO {
   @ApiProperty({
     description: 'Name of the transport.',
     example: 'Bus',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Name is required.' })
   @IsString()
   @MaxLength(150)
   name: string;
 
   @ApiProperty({
-    description: 'Transfer type for the transport.',
+    description: 'Transport type for the transport.',
   })
-  @IsNotEmpty()
-  @IsMongoId()
-  transferType: string;
+  @IsNotEmpty({ message: 'Transport type is required.' })
+  @IsMongoId({ message: 'Transport type must be a mongo Id.' })
+  transportType: string;
 
-  @ApiProperty({
-    enum: Status,
-    description: 'Status of the transport.',
-    example: Status.ACTIVE,
-  })
-  @IsOptional()
-  @IsString()
-  status?: Status;
-
-  constructor(name: string, transferType: string) {
+  constructor(name: string, transportType: string) {
     this.name = name;
-    this.transferType = transferType;
+    this.transportType = transportType;
   }
 }

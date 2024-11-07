@@ -1,3 +1,3 @@
-export interface TransferTypeExcel {
+export interface TransportTypeExcel {
   nombre: string;
 }

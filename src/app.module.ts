@@ -25,11 +25,12 @@ import configuration from './configs/configuration';
 import { MulterModule } from '@nestjs/platform-express';
 import { FirebaseAuthStrategy } from './auth/firebase-auth.strategy';
 import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
-import { TransfertypeModule } from './transfertype/transfertype.module';
 import { PricesModule } from './prices/prices.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { IncludedServicesModule } from './includedServices/includedServices.module';
 import { ItineraryActivitiesModule } from './itineraryActivities/itineraryActivities.module';
+import { TransportTypeModule } from './transporttype/transporttype.module';
+import { FileManagerModule } from './file-manager/file-manager.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { ItineraryActivitiesModule } from './itineraryActivities/itineraryActivi
     RolesModule,
     TemplatesModule,
     TourtypeModule,
-    TransfertypeModule,
+    TransportTypeModule,
     TransportsModule,
     DestinationModule,
     MailerModule,
@@ -67,6 +68,7 @@ import { ItineraryActivitiesModule } from './itineraryActivities/itineraryActivi
     PricesModule,
     ReservationModule,
     ItineraryActivitiesModule,
+    FileManagerModule,
   ],
   controllers: [AppController],
   providers: [

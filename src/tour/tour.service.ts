@@ -66,8 +66,8 @@ export class TourService {
       model: 'Transports',
       populate: [
         {
-          path: 'transferType',
-          model: 'TransferTypes',
+          path: 'TransportType',
+          model: 'TransportTypes',
           select: this.defaultExcludedFields,
         },
       ],
