@@ -6,6 +6,8 @@ import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CatalogSheetNames } from '@/shared/enums/file-manager/catalogsSheetNames.enum';
 import { TourTypeSheetLoader } from './loaders/tourTypeSheet.loader';
 import { AboardPointsSheetLoader } from './loaders/aboardPointsSheet.loader';
+import { CategorySheetLoader } from './loaders/CategorySheet.loader';
+import { DestinationSheetLoader } from './loaders/destinationSheet.loader';
 
 @Injectable()
 export class CatalogManagerService {
@@ -16,13 +18,16 @@ export class CatalogManagerService {
     transportLoader: TransportSheetLoader,
     tourTypeLoader: TourTypeSheetLoader,
     aboardPointsLoader: AboardPointsSheetLoader,
+    categoriesLoader: CategorySheetLoader,
+    destinationsLoader: DestinationSheetLoader,
   ) {
     this.independentLoaders = [
       transportLoader,
       tourTypeLoader,
       aboardPointsLoader,
+      categoriesLoader,
     ];
-    this.dependentLoaders = [];
+    this.dependentLoaders = [destinationsLoader];
   }
 
   async loadCatalogs(filePath: string): Promise<void> {

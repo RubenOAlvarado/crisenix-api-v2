@@ -3,4 +3,5 @@ export enum CatalogSheetNames {
   TOUR_TYPE = 'TipoDeTour',
   ABOARD_POINTS = 'PuntosDeAscenso',
   CATEGORIES = 'Categorias',
+  DESTINATIONS = 'Destinos',
 }

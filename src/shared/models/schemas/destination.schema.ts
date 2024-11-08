@@ -29,7 +29,7 @@ export class Destinations {
   tentativeDates?: string;
 
   @Prop({ type: String, required: false })
-  transfer?: string;
+  transportation?: string;
 
   @Prop({ type: Array, required: false })
   photos?: Array<string>;

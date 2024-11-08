@@ -123,7 +123,7 @@ export class CategoryService {
   }: StatusDTO): Promise<Array<CategoryLean>> {
     try {
       const categories = await this.categoryModel
-        .find({ status, parentCategory: null })
+        .find({ status, isRootCategory: true })
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!categories) throw new NotFoundException('No main categories found.');
@@ -131,6 +131,45 @@ export class CategoryService {
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while finding main categories.',
+        error,
+      );
+    }
+  }
+
+  async findByName(name?: string): Promise<CategoryLean | undefined | null> {
+    try {
+      if (!name) throw new BadRequestException('Category name is required.');
+      const category = await this.categoryModel.findOne({ label: name }).lean();
+      return category;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while finding category by name.',
+        error,
+      );
+    }
+  }
+
+  async findParentCategoryByName(name?: string): Promise<string | undefined> {
+    try {
+      if (!name) throw new BadRequestException('Category name is required.');
+      const category = await this.categoryModel
+        .findOne({ label: name, isRootCategory: true })
+        .lean();
+      return !category ? undefined : category._id.toString();
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while finding parent category by name.',
+        error,
+      );
+    }
+  }
+
+  async insertBunch(categories: CreateCategoryDTO[]): Promise<void> {
+    try {
+      await this.categoryModel.insertMany(categories);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inserting categories.',
         error,
       );
     }

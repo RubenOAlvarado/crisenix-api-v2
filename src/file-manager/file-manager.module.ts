@@ -9,6 +9,10 @@ import { AboardPointsSheetLoader } from './loaders/aboardPointsSheet.loader';
 import { TourtypeModule } from '@/tourtype/tourtype.module';
 import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 import { OrigincityModule } from '@/origincity/origincity.module';
+import { CategoryModule } from '@/category/category.module';
+import { CategorySheetLoader } from './loaders/CategorySheet.loader';
+import { DestinationModule } from '@/destination/destination.module';
+import { DestinationSheetLoader } from './loaders/destinationSheet.loader';
 
 @Module({
   imports: [
@@ -17,6 +21,8 @@ import { OrigincityModule } from '@/origincity/origincity.module';
     TourtypeModule,
     AboardpointModule,
     OrigincityModule,
+    CategoryModule,
+    DestinationModule,
   ],
   controllers: [FileManagerController],
   providers: [
@@ -24,6 +30,8 @@ import { OrigincityModule } from '@/origincity/origincity.module';
     TransportSheetLoader,
     TourTypeSheetLoader,
     AboardPointsSheetLoader,
+    CategorySheetLoader,
+    DestinationSheetLoader,
   ],
 })
 export class FileManagerModule {}

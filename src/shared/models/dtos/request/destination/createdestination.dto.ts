@@ -61,7 +61,7 @@ export class CreateDestinationDTO {
   })
   @IsOptional()
   @IsNotEmpty()
-  transfer?: string;
+  transportation?: string;
 
   @ApiPropertyOptional({
     description: 'Destination photos',

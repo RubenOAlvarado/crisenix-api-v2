@@ -6,7 +6,9 @@ import { OriginCityService } from '@/origincity/origincity.service';
 import { CatalogSheetNames } from '@/shared/enums/file-manager/catalogsSheetNames.enum';
 import { AboardPointExcel } from '@/shared/interfaces/excel/aboardPoint.excel.interface';
 import { WorkSheet } from 'xlsx';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AboardPointsSheetLoader extends BaseSheetLoader<CreateAboardPointDTO> {
   constructor(
     aboardPointsService: AboardpointService,

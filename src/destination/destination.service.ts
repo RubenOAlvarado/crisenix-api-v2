@@ -228,4 +228,15 @@ export class DestinationService {
       throw handleErrorsOnServices('Error deleting destination photos.', error);
     }
   }
+
+  async insertBunch(destinations: CreateDestinationDTO[]): Promise<void> {
+    try {
+      await this.destinationModel.insertMany(destinations);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inserting destinations.',
+        error,
+      );
+    }
+  }
 }
