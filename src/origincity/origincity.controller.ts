@@ -3,7 +3,6 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -21,22 +20,16 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
-import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
-import { ApiPaginatedResponse } from '@/shared/decorators/api-paginated.response.dto';
-import { PaginatedResponseDTO } from '@/shared/models/dtos/response/paginatedResponse.dto';
 import { Public } from '@/auth/public.decorator';
 import { ResponseOriginCityDTO } from '@/shared/models/dtos/response/origincity/responseorigincity.dto';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
-import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiBearerAuth()
 @Controller('origin-cities')
 @ApiTags('Origin Cities')
-@ApiExtraModels(PaginatedResponseDTO)
 export class OriginCityController {
   constructor(private readonly originCityService: OriginCityService) {}
 
@@ -58,35 +51,18 @@ export class OriginCityController {
   }
 
   @ApiOperation({ summary: 'Get all origin cities' })
-  @ApiPaginatedResponse(ResponseOriginCityDTO)
+  @ApiOkResponse({
+    description: 'All origin cities have been found.',
+    type: ResponseOriginCityDTO,
+  })
   @ApiNotFoundResponse({ description: 'No origin cities registered.' })
   @ApiInternalServerErrorResponse({
     description: 'Something went wrong finding the origin cities.',
   })
   @Public()
   @Get()
-  async findAll(@Query() queryDTO: QueryDTO) {
+  async findAll(@Query() queryDTO: StatusDTO) {
     return await this.originCityService.findAll(queryDTO);
-  }
-
-  @ApiOperation({ summary: 'Search origin cities by word' })
-  @ApiOkResponse({
-    description: 'The origin city/es has been successfully found.',
-    type: ResponseOriginCityDTO,
-    isArray: true,
-  })
-  @ApiNotFoundResponse({
-    description: 'Any origin city match your search.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Something went wrong searching for the origin city.',
-  })
-  @Public()
-  @Get('search/:word')
-  async search(
-    @Param() searcherDTO: OriginCitySearcherDto,
-  ): Promise<Array<OriginCities>> {
-    return await this.originCityService.searcher(searcherDTO);
   }
 
   @ApiOperation({ summary: 'Get an origin city by id' })

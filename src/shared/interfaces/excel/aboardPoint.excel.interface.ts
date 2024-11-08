@@ -1,4 +1,4 @@
 export interface AboardPointExcel {
   nombre: string;
-  status: string;
+  ciudadDeOrigen: string;
 }

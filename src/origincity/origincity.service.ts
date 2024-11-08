@@ -6,18 +6,15 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { Status } from 'src/shared/enums/status.enum';
-import { PaginateResult } from 'src/shared/interfaces/paginate.interface';
-import { OriginCities } from 'src/shared/models/schemas/origincity.schema';
-import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import {
-  createPaginatedObject,
-  handleErrorsOnServices,
-} from '@/shared/utilities/helpers';
+  OriginCities,
+  OriginCityDocument,
+} from 'src/shared/models/schemas/origincity.schema';
+import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
-import { OriginCitySearcherDto } from '@/shared/models/dtos/searcher/originCity/searcherOriginCity.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @Injectable()
@@ -46,7 +43,6 @@ export class OriginCityService {
       const city = await this.originCityModel
         .findById(id)
         .select({ __v: 0, createdAt: 0 })
-        .populate('aboardPoints')
         .lean();
       if (!city) throw new NotFoundException('Origin city not found.');
       return city;
@@ -58,28 +54,15 @@ export class OriginCityService {
     }
   }
 
-  async findAll({
-    page,
-    limit,
-    status,
-  }: QueryDTO): Promise<PaginateResult<OriginCityLean>> {
+  async findAll({ status }: StatusDTO): Promise<OriginCityDocument[]> {
     try {
-      const Query = status ? { status } : {};
-      const docs = await this.originCityModel
-        .find(Query)
-        .limit(limit * 1)
-        .skip((page - 1) * limit)
+      const query = status ? { status } : {};
+      const originCities = await this.originCityModel
+        .find(query)
         .select({ __v: 0, createdAt: 0 })
-        .lean();
-      if (!docs.length)
-        throw new NotFoundException('No origin cities registered.');
-      const totalDocs = await this.originCityModel.countDocuments(Query).exec();
-      return createPaginatedObject<OriginCityLean>(
-        docs,
-        totalDocs,
-        page,
-        limit,
-      );
+        .exec();
+      if (!originCities) throw new NotFoundException('Origin cities not found');
+      return originCities;
     } catch (error) {
       throw handleErrorsOnServices(
         'Something went wrong while finding origin cities.',
@@ -146,25 +129,14 @@ export class OriginCityService {
     }
   }
 
-  async searcher({
-    word,
-  }: OriginCitySearcherDto): Promise<Array<OriginCityLean>> {
+  async findByName(name?: string): Promise<OriginCityLean | undefined | null> {
     try {
-      const searchResult = await this.originCityModel
-        .find({
-          $or: [
-            { name: { $regex: word, $options: 'i' } },
-            { country: { $regex: word, $options: 'i' } },
-          ],
-        })
-        .select({ __v: 0, createdAt: 0 })
-        .lean();
-      if (!searchResult.length)
-        throw new NotFoundException('Any origin city match your search.');
-      return searchResult;
+      if (!name) throw new BadRequestException('Name is required');
+      const city = await this.originCityModel.findOne({ name }).lean();
+      return city;
     } catch (error) {
       throw handleErrorsOnServices(
-        'Something went wrong searching origin city.',
+        'Something went wrong while finding origin city.',
         error,
       );
     }

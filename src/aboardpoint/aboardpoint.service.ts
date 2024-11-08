@@ -41,6 +41,7 @@ export class AboardpointService {
     try {
       const aboardPoint = await this.aboardPointModel
         .findById(id)
+        .populate('originCity')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!aboardPoint) throw new NotFoundException('Aboard point not found.');
@@ -58,6 +59,7 @@ export class AboardpointService {
       const query = status ? { status } : {};
       const aboardPoints = await this.aboardPointModel
         .find(query)
+        .populate('originCity')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (aboardPoints.length === 0)
@@ -138,6 +140,7 @@ export class AboardpointService {
     try {
       const aboardPoints = await this.aboardPointModel
         .find({ originCity: id })
+        .populate('originCity')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (aboardPoints.length === 0)
@@ -148,6 +151,14 @@ export class AboardpointService {
         'Something went wrong getting all aboard points',
         error,
       );
+    }
+  }
+
+  async insertBunch(aboardPoints: CreateAboardPointDTO[]): Promise<void> {
+    try {
+      await this.aboardPointModel.insertMany(aboardPoints);
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting aboard points.', error);
     }
   }
 }

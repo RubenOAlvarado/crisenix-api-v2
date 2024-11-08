@@ -1,8 +1,6 @@
 export enum CatalogSheetNames {
   TRANSPORTS = 'Transportes',
-  /* TOUR_TYPE = 'tipodetour',
-  ORIGIN_CITIES = 'ciudadesdeorigen',
-  ABOARD_POINTS = 'puntosdeascenso',
-  CATEGORIES = 'categorias',
-  TRANSFER_TYPE = 'tipodetraslado', */
+  TOUR_TYPE = 'TipoDeTour',
+  ABOARD_POINTS = 'PuntosDeAscenso',
+  CATEGORIES = 'Categorias',
 }

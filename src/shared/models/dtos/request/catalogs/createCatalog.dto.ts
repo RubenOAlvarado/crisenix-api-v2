@@ -6,32 +6,31 @@ export class CreateCatalogDTO {
   @ApiProperty({
     description: 'Name of the catalog item',
     example: 'Catalog item name',
+    required: true,
   })
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  name: string;
+  name!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Description of the catalog item',
     example: 'Catalog item description',
+    required: false,
   })
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   @MaxLength(150)
-  description: string;
+  description?: string;
 
   @ApiPropertyOptional({
     enum: Status,
     description: 'Status of the catalog item',
     example: Status.ACTIVE,
+    required: false,
   })
   @IsOptional()
   @IsString()
   status?: Status;
-
-  constructor(name: string, description: string) {
-    this.name = name;
-    this.description = description;
-  }
 }

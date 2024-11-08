@@ -46,11 +46,11 @@ export class TransportSheetLoader extends BaseSheetLoader<CreateTransportsDTO> {
       await this.transportTypeService.getTransportTypeByName(cleanedName);
 
     if (!transportType) {
-      const insertedTransportType =
+      const newTransportType =
         await this.transportTypeService.insertTransportType({
           name: cleanedName,
         });
-      return insertedTransportType._id.toString();
+      return newTransportType._id.toString();
     }
 
     return transportType._id.toString();

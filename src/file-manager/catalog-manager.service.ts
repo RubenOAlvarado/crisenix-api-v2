@@ -4,14 +4,24 @@ import { TransportSheetLoader } from './loaders/transportSheet.loader';
 import { readFile, WorkBook } from 'xlsx';
 import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CatalogSheetNames } from '@/shared/enums/file-manager/catalogsSheetNames.enum';
+import { TourTypeSheetLoader } from './loaders/tourTypeSheet.loader';
+import { AboardPointsSheetLoader } from './loaders/aboardPointsSheet.loader';
 
 @Injectable()
 export class CatalogManagerService {
   private readonly independentLoaders: SheetLoader[];
   private readonly dependentLoaders: SheetLoader[];
 
-  constructor(transportLoader: TransportSheetLoader) {
-    this.independentLoaders = [transportLoader];
+  constructor(
+    transportLoader: TransportSheetLoader,
+    tourTypeLoader: TourTypeSheetLoader,
+    aboardPointsLoader: AboardPointsSheetLoader,
+  ) {
+    this.independentLoaders = [
+      transportLoader,
+      tourTypeLoader,
+      aboardPointsLoader,
+    ];
     this.dependentLoaders = [];
   }
 

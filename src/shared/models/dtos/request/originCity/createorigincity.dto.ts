@@ -1,41 +1,23 @@
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Status } from 'src/shared/enums/status.enum';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOriginCityDTO {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  state: string;
+  @ApiProperty({
+    description: 'Name of the state where the city is located',
+    example: 'Jalisco',
+    required: true,
+  })
+  @IsNotEmpty({ message: 'State is required' })
+  @IsString({ message: 'State must be a string' })
+  state!: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({
+    description: 'Name of the city',
+    example: 'Guadalajara',
+    required: true,
+  })
+  @IsNotEmpty({ message: 'Name is required' })
+  @IsString({ message: 'Name must be a string' })
   @MaxLength(150)
-  name: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @ArrayNotEmpty()
-  @IsArray()
-  @IsMongoId({ each: true })
-  aboardPoints?: Array<string>;
-
-  @ApiProperty({ enum: Status })
-  @IsOptional()
-  @IsString()
-  status?: Status;
-
-  constructor(state: string, name: string) {
-    this.state = state;
-    this.name = name;
-  }
+  name!: string;
 }
