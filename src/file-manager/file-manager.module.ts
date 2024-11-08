@@ -10,9 +10,9 @@ import { TourtypeModule } from '@/tourtype/tourtype.module';
 import { AboardpointModule } from '@/aboardpoint/aboardpoint.module';
 import { OrigincityModule } from '@/origincity/origincity.module';
 import { CategoryModule } from '@/category/category.module';
-import { CategorySheetLoader } from './loaders/CategorySheet.loader';
 import { DestinationModule } from '@/destination/destination.module';
 import { DestinationSheetLoader } from './loaders/destinationSheet.loader';
+import { CategorySheetLoader } from './loaders/categorySheet.loader';
 
 @Module({
   imports: [
