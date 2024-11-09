@@ -10,19 +10,10 @@ export class CreateRoleDTO {
     enum: UserRoles,
     example: UserRoles.ADMIN,
   })
-  @IsNotEmpty()
-  @IsEnum(UserRoles)
+  @IsNotEmpty({ message: 'Description is required' })
+  @IsEnum(UserRoles, { message: 'Invalid role description' })
   @IsString()
   description: UserRoles;
-
-  @ApiProperty({
-    enum: ['Activo', 'Inactivo'],
-    description: 'Status of the role',
-    example: 'Activo',
-  })
-  @IsNotEmpty()
-  @IsString()
-  status: string;
 
   @ApiProperty({
     description: 'Permissions of the role.',
@@ -30,20 +21,15 @@ export class CreateRoleDTO {
     enum: Permissions,
     isArray: true,
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Permissions are required' })
   @IsEnum(Permissions, { each: true })
   @IsRolePermissions({
     message: 'Some permissions are not valid for this role',
   })
   permissions: Permissions[];
 
-  constructor(
-    description: UserRoles,
-    status: string,
-    permissions: Permissions[],
-  ) {
+  constructor(description: UserRoles, permissions: Permissions[]) {
     this.description = description;
-    this.status = status;
     this.permissions = permissions;
   }
 }

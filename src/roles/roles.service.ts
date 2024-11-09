@@ -121,4 +121,12 @@ export class RolesService {
       throw handleErrorsOnServices('Error looking up role description.', error);
     }
   }
+
+  async insertBunch(roles: CreateRoleDTO[]): Promise<void> {
+    try {
+      await this.roleModel.insertMany(roles);
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting roles.', error);
+    }
+  }
 }

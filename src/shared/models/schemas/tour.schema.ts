@@ -41,7 +41,7 @@ export class Tours {
   ocuppiedSeats: number;
 
   @Prop({ type: Date, required: true, index: true })
-  initDate: Date;
+  startDate: Date;
 
   @Prop({ type: Array, required: false })
   aboardHours?: Array<{
@@ -63,7 +63,7 @@ export class Tours {
   transport: Transports | Types.ObjectId;
 
   @Prop({ type: Date, required: true })
-  returnDate: Date;
+  endDate: Date;
 
   @Prop({ type: Array, required: false })
   returnHours?: Array<{
@@ -98,7 +98,7 @@ export class Tours {
   includedServices?: Array<IncludedServices>;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Prices' }], required: true })
-  prices: Array<Prices>;
+  prices?: Array<Prices>;
 
   @Prop({
     type: [{ type: Types.ObjectId, ref: 'ItineraryActivities' }],
@@ -111,11 +111,10 @@ export class Tours {
     code: string,
     status: TourStatus,
     seats: number,
-    initDate: Date,
+    startDate: Date,
     transport: Transports | Types.ObjectId,
-    returnDate: Date,
+    endDate: Date,
     tourType: TourTypes | Types.ObjectId,
-    prices: Array<Prices>,
     availableSeats: number,
     ocuppiedSeats: number,
     days: number,
@@ -125,11 +124,10 @@ export class Tours {
     this.code = code;
     this.status = status;
     this.seats = seats;
-    this.initDate = initDate;
+    this.startDate = startDate;
     this.transport = transport;
-    this.returnDate = returnDate;
+    this.endDate = endDate;
     this.tourType = tourType;
-    this.prices = prices;
     this.availableSeats = availableSeats;
     this.ocuppiedSeats = ocuppiedSeats;
     this.days = days;

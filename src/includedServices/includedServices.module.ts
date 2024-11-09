@@ -15,5 +15,6 @@ import { IncludedServicesService } from './includedServices.service';
   ],
   controllers: [IncludedServicesController],
   providers: [IncludedServicesService],
+  exports: [IncludedServicesService],
 })
 export class IncludedServicesModule {}

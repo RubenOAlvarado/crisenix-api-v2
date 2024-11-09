@@ -239,4 +239,22 @@ export class DestinationService {
       );
     }
   }
+
+  async getDestinationByCode(code?: string): Promise<DestinationLean> {
+    try {
+      if (!code) throw new BadRequestException('Destination code is required.');
+      const destination = await this.destinationModel
+        .findOne({ code })
+        .select(this.defaultExcludedFields)
+        .lean();
+      if (!destination)
+        throw new NotFoundException(`Destination with code ${code} not found.`);
+      return destination;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Error looking up destination by code.',
+        error,
+      );
+    }
+  }
 }

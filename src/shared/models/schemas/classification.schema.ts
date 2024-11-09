@@ -6,10 +6,10 @@ import { HydratedDocument } from 'mongoose';
   timestamps: true,
 })
 export class Classifications {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true, index: true, type: String })
   name: string;
 
-  @Prop()
+  @Prop({ required: false, type: String })
   description?: string;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })

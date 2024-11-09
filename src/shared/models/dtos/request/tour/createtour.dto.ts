@@ -74,15 +74,15 @@ export class CreateTourDTO {
   ocuppiedSeats?: number;
 
   @ApiProperty({
-    description: 'Tour initial date',
+    description: 'Tour starting date',
     example: '2020-10-30T05:00:00.000Z',
     required: true,
   })
   @IsNotEmpty({
-    message: 'Tour needs an initial date to be created.',
+    message: 'Tour needs an start date to be created.',
   })
   @IsDateString()
-  initDate: Date;
+  startDate: Date;
 
   @ApiProperty({
     description: 'Tour days long',
@@ -115,15 +115,15 @@ export class CreateTourDTO {
   transport: string;
 
   @ApiProperty({
-    description: 'Tour return date',
+    description: 'Tour ending date',
     example: '2020-10-30T05:00:00.000Z',
     required: true,
   })
   @IsNotEmpty({
-    message: 'Tour needs a return date to be created.',
+    message: 'Tour needs an ending date to be created.',
   })
   @IsDateString()
-  returnDate: Date;
+  endDate: Date;
 
   @ApiProperty({
     description: 'Tour type',
@@ -136,15 +136,16 @@ export class CreateTourDTO {
   @IsMongoId({ message: 'Tour type must be a mongoId' })
   tourType: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Tour prices',
     type: String,
     isArray: true,
     required: true,
   })
+  @IsOptional()
   @ArrayNotEmpty()
   @IsMongoId({ each: true })
-  prices: Array<string>;
+  prices?: Array<string>;
 
   @ApiPropertyOptional({
     description: 'Hours and aboarding points for the tour',
@@ -228,9 +229,9 @@ export class CreateTourDTO {
     destination: string,
     code: string,
     seats: number,
-    initDate: Date,
+    startDate: Date,
     transport: string,
-    returnDate: Date,
+    endDate: Date,
     tourType: string,
     days: number,
     nights: number,
@@ -239,11 +240,11 @@ export class CreateTourDTO {
     this.destination = destination;
     this.code = code;
     this.seats = seats;
-    this.initDate = initDate;
+    this.startDate = startDate;
     this.days = days;
     this.nights = nights;
     this.transport = transport;
-    this.returnDate = returnDate;
+    this.endDate = endDate;
     this.tourType = tourType;
     this.prices = prices;
   }

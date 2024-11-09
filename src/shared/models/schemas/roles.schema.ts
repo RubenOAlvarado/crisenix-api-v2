@@ -1,3 +1,5 @@
+import { Permissions } from '@/shared/enums/permissions.enum';
+import { UserRoles } from '@/shared/enums/roles';
 import { Status } from '@/shared/enums/status.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
@@ -6,16 +8,20 @@ import { HydratedDocument } from 'mongoose';
   timestamps: true,
 })
 export class Roles {
-  @Prop({ required: true, index: true, type: String })
-  description: string;
+  @Prop({ required: true, index: true, type: String, enum: UserRoles })
+  description: UserRoles;
 
   @Prop({ enum: Status, default: Status.ACTIVE, required: true })
   status: Status;
 
-  @Prop({ type: [String], required: true })
-  permissions: string[];
+  @Prop({ type: [String], required: true, enum: Object.values(Permissions) })
+  permissions: Permissions[];
 
-  constructor(description: string, status: Status, permissions: string[]) {
+  constructor(
+    description: UserRoles,
+    status: Status,
+    permissions: Permissions[],
+  ) {
     this.description = description;
     this.status = status;
     this.permissions = permissions;

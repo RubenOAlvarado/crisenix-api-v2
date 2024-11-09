@@ -31,6 +31,7 @@ import { IncludedServicesModule } from './includedServices/includedServices.modu
 import { ItineraryActivitiesModule } from './itineraryActivities/itineraryActivities.module';
 import { TransportTypeModule } from './transporttype/transporttype.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
+import { EntriesModule } from './entries/entries.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { FileManagerModule } from './file-manager/file-manager.module';
     ReservationModule,
     ItineraryActivitiesModule,
     FileManagerModule,
+    EntriesModule,
   ],
   controllers: [AppController],
   providers: [

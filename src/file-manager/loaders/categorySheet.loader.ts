@@ -35,7 +35,7 @@ export class CategorySheetLoader extends BaseSheetLoader<CreateCategoryDTO> {
       transformedCategories.push({
         label: nombre,
         parentCategory,
-        isRootCategory: !!categoriaPadre,
+        isRootCategory: !parentCategory ? true : false,
       });
     }
 
@@ -58,7 +58,7 @@ export class CategorySheetLoader extends BaseSheetLoader<CreateCategoryDTO> {
       const newCategory = await this.categoryService.create({
         label: name,
         parentCategory,
-        isRootCategory: !parentCategory,
+        isRootCategory: !parentCategory ? true : false,
       });
 
       return newCategory._id.toString();

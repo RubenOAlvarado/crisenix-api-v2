@@ -5,8 +5,9 @@ import { CatalogSheetNames } from '@/shared/enums/file-manager/catalogsSheetName
 import { WorkSheet } from 'xlsx';
 import { DestinationsExcel } from '@/shared/interfaces/excel/destinations.excel.interface';
 import { CategoryService } from '@/category/category.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class DestinationSheetLoader extends BaseSheetLoader<CreateDestinationDTO> {
   constructor(
     destinationService: DestinationService,
@@ -51,7 +52,10 @@ export class DestinationSheetLoader extends BaseSheetLoader<CreateDestinationDTO
 
   private async getOrCreateCategory(categories: string): Promise<string[]> {
     const transformedCategories: string[] = [];
-    for (const categoryLabel of categories.split(',')) {
+    const categoriesLabels = categories
+      .split(',')
+      .map((category) => category.trim());
+    for (const categoryLabel of categoriesLabels) {
       const category = await this.categoryService.findByName(categoryLabel);
       if (!category)
         throw new BadRequestException(`Category ${categoryLabel} not found.`);

@@ -78,4 +78,15 @@ export class PricesService {
       );
     }
   }
+
+  async insertBunch(createPriceDTO: CreatePriceDTO[]): Promise<void> {
+    try {
+      await this.priceModel.insertMany(createPriceDTO);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inserting prices.',
+        error,
+      );
+    }
+  }
 }

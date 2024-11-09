@@ -66,7 +66,7 @@ export class TourService {
       model: 'Transports',
       populate: [
         {
-          path: 'TransportType',
+          path: 'transportType',
           model: 'TransportTypes',
           select: this.defaultExcludedFields,
         },
@@ -446,6 +446,14 @@ export class TourService {
         'Something went wrong releasing tour seats.',
         error,
       );
+    }
+  }
+
+  async insertBunch(tours: CreateTourDTO[]): Promise<void> {
+    try {
+      await this.tourModel.insertMany(tours);
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting tours.', error);
     }
   }
 }

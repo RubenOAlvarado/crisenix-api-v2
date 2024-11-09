@@ -161,4 +161,22 @@ export class AboardpointService {
       throw handleErrorsOnServices('Error inserting aboard points.', error);
     }
   }
+
+  async getAboardPointByName(name?: string): Promise<AboardPointLean> {
+    try {
+      if (!name) throw new BadRequestException('Name is required.');
+      const foundAboardPoint = await this.aboardPointModel
+        .findOne({ name })
+        .lean()
+        .exec();
+      if (!foundAboardPoint)
+        throw new NotFoundException(`Aboard point ${name} not found.`);
+      return foundAboardPoint;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Error getting aboard point by name.',
+        error,
+      );
+    }
+  }
 }

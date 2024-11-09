@@ -127,4 +127,17 @@ export class ClassificationService {
       );
     }
   }
+
+  async insertBunch(
+    classifications: Array<CreateClassificationDTO>,
+  ): Promise<void> {
+    try {
+      await this.classificationModel.insertMany(classifications);
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong while inserting classifications.',
+        error,
+      );
+    }
+  }
 }

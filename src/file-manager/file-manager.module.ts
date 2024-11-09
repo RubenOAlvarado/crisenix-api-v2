@@ -13,6 +13,17 @@ import { CategoryModule } from '@/category/category.module';
 import { DestinationModule } from '@/destination/destination.module';
 import { DestinationSheetLoader } from './loaders/destinationSheet.loader';
 import { CategorySheetLoader } from './loaders/categorySheet.loader';
+import { IncludedServicesModule } from '@/includedServices/includedServices.module';
+import { EntriesModule } from '@/entries/entries.module';
+import { IncludedServicesSheetLoader } from './loaders/includedServices.loader';
+import { PricesModule } from '@/prices/prices.module';
+import { PricesSheetLoader } from './loaders/pricesSheet.loader';
+import { ClassificationModule } from '@/classification/classification.module';
+import { ClassificationsSheetLoader } from './loaders/classificationsSheet.loader';
+import { RolesModule } from '@/roles/roles.module';
+import { RolesSheetLoader } from './loaders/rolesSheet.loader';
+import { TourModule } from '@/tour/tour.module';
+import { ToursSheetLoader } from './loaders/toursSheet.loader';
 
 @Module({
   imports: [
@@ -23,6 +34,12 @@ import { CategorySheetLoader } from './loaders/categorySheet.loader';
     OrigincityModule,
     CategoryModule,
     DestinationModule,
+    IncludedServicesModule,
+    EntriesModule,
+    PricesModule,
+    ClassificationModule,
+    RolesModule,
+    TourModule,
   ],
   controllers: [FileManagerController],
   providers: [
@@ -32,6 +49,11 @@ import { CategorySheetLoader } from './loaders/categorySheet.loader';
     AboardPointsSheetLoader,
     CategorySheetLoader,
     DestinationSheetLoader,
+    IncludedServicesSheetLoader,
+    PricesSheetLoader,
+    ClassificationsSheetLoader,
+    RolesSheetLoader,
+    ToursSheetLoader,
   ],
 })
 export class FileManagerModule {}

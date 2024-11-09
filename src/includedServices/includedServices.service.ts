@@ -40,7 +40,6 @@ export class IncludedServicesService {
     try {
       const included = await this.includedServicesModel
         .findById(id)
-        .populate('lodging')
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!included) throw new NotFoundException('Included service not found.');
@@ -62,7 +61,6 @@ export class IncludedServicesService {
       const query = status ? { status } : {};
       const docs = await this.includedServicesModel
         .find(query)
-        .populate('lodging')
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .select({ __v: 0, createdAt: 0 })
@@ -133,5 +131,32 @@ export class IncludedServicesService {
     if (status === Status.ACTIVE && includedService.status !== Status.INACTIVE)
       throw new NotFoundException('Included service must be inactive.');
     return includedService;
+  }
+
+  async insertBunch(
+    includedServices: CreateIncludedServiceDTO[],
+  ): Promise<void> {
+    try {
+      await this.includedServicesModel.insertMany(includedServices);
+    } catch (error) {
+      throw handleErrorsOnServices('Error inserting included services.', error);
+    }
+  }
+
+  async findIncludedServiceByConcept(concept?: string): Promise<IncludedLean> {
+    try {
+      const includedService = await this.includedServicesModel
+        .findOne({ concept })
+        .select({ __v: 0, createdAt: 0 })
+        .lean();
+      if (!includedService)
+        throw new NotFoundException(`Included service ${concept} not found.`);
+      return includedService;
+    } catch (error) {
+      throw handleErrorsOnServices(
+        'Something went wrong finding included service',
+        error,
+      );
+    }
   }
 }

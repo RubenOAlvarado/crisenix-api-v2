@@ -4,4 +4,9 @@ export enum CatalogSheetNames {
   ABOARD_POINTS = 'PuntosDeAscenso',
   CATEGORIES = 'Categorias',
   DESTINATIONS = 'Destinos',
+  INCLUDED_SERVICES = 'ServiciosIncluidos',
+  PRICES = 'Precios',
+  CLASSIFICATIONS = 'Clasificaciones',
+  ROLES = 'RolesDeUsuario',
+  TOURS = 'Tours',
 }
