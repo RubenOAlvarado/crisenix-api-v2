@@ -16,6 +16,7 @@ import { handleErrorsOnServices } from '@/shared/utilities/helpers';
 import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/createorigincity.dto';
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 
 @Injectable()
 export class OriginCityService {
@@ -54,11 +55,13 @@ export class OriginCityService {
     }
   }
 
-  async findAll({ status }: StatusDTO): Promise<OriginCityDocument[]> {
+  async findAll({ status, page, limit }: QueryDTO): Promise<OriginCityDocument[]> {
     try {
       const query = status ? { status } : {};
       const originCities = await this.originCityModel
         .find(query)
+        .limit(limit)
+        .skip((page - 1) * limit)
         .select({ __v: 0, createdAt: 0 })
         .exec();
       if (!originCities) throw new NotFoundException('Origin cities not found');

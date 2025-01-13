@@ -11,7 +11,6 @@ import {
 import { AboardpointService } from './aboardpoint.service';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -29,7 +28,6 @@ import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Aboard Points')
-@ApiBearerAuth()
 @Controller('aboard-points')
 export class AboardPointController {
   constructor(private service: AboardpointService) {}

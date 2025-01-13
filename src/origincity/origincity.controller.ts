@@ -1,6 +1,5 @@
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -26,8 +25,8 @@ import { CreateOriginCityDTO } from '@/shared/models/dtos/request/originCity/cre
 import { UpdateOriginCityDTO } from '@/shared/models/dtos/request/originCity/updateorigincity.dto';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
 import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 
-@ApiBearerAuth()
 @Controller('origin-cities')
 @ApiTags('Origin Cities')
 export class OriginCityController {
@@ -61,7 +60,7 @@ export class OriginCityController {
   })
   @Public()
   @Get()
-  async findAll(@Query() queryDTO: StatusDTO) {
+  async findAll(@Query() queryDTO: QueryDTO) {
     return await this.originCityService.findAll(queryDTO);
   }
 
