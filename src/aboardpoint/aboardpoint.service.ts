@@ -16,8 +16,9 @@ import {
   AboardPointDocument,
 } from 'src/shared/models/schemas/aboarpoint.schema';
 import { IdValidator } from '@/shared/models/dtos/validators/id.validator';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
 @Injectable()
-export class AboardpointService {
+export class  AboardpointService {
   constructor(
     @InjectModel(AboardPoints.name)
     private readonly aboardPointModel: Model<AboardPoints>,
@@ -41,7 +42,10 @@ export class AboardpointService {
     try {
       const aboardPoint = await this.aboardPointModel
         .findById(id)
-        .populate('originCity')
+        .populate([{
+          path: 'originCity',
+          select: { __v: 0, createdAt: 0 },
+        }])
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (!aboardPoint) throw new NotFoundException('Aboard point not found.');
@@ -54,12 +58,17 @@ export class AboardpointService {
     }
   }
 
-  async findAll({ status }: StatusDTO): Promise<Array<AboardPointLean>> {
+  async findAll({ status, page, limit }: QueryDTO): Promise<Array<AboardPointLean>> {
     try {
       const query = status ? { status } : {};
       const aboardPoints = await this.aboardPointModel
         .find(query)
-        .populate('originCity')
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .populate([{
+          path: 'originCity',
+          select: { __v: 0, createdAt: 0 },
+        }])
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (aboardPoints.length === 0)
@@ -140,7 +149,10 @@ export class AboardpointService {
     try {
       const aboardPoints = await this.aboardPointModel
         .find({ originCity: id })
-        .populate('originCity')
+        .populate([{
+          path: 'originCity',
+          select: { __v: 0, createdAt: 0 },
+        }])
         .select({ __v: 0, createdAt: 0 })
         .lean();
       if (aboardPoints.length === 0)

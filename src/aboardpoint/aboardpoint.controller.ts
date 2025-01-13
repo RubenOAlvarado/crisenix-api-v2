@@ -9,7 +9,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { AboardpointService } from './aboardpoint.service';
-import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -26,6 +25,8 @@ import { Public } from '@/auth/public.decorator';
 import { ResponseAboardPointDTO } from '@/shared/models/dtos/response/aboardpoint/responseaboardpoint.dto';
 import { CreateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/createaboardpoint.dto';
 import { UpdateAboardPointDTO } from '@/shared/models/dtos/request/aboardpoint/updateaboardpoint.dto';
+import { QueryDTO } from '@/shared/models/dtos/searcher/query.dto';
+import { StatusDTO } from '@/shared/models/dtos/searcher/statusparam.dto';
 
 @ApiTags('Aboard Points')
 @ApiBearerAuth()
@@ -61,8 +62,9 @@ export class AboardPointController {
   @ApiNotFoundResponse({
     description: 'No aboard points registered.',
   })
+  @Public()
   @Get()
-  async findAll(@Query() query: StatusDTO) {
+  async findAll(@Query() query: QueryDTO) {
     return await this.service.findAll(query);
   }
 
